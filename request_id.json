@@ -1,0 +1,553 @@
+{
+  "BEA": {
+    "qoq_gdp_growth_q": {
+      "name": "GDP Growth QoQ%",
+      "code": "T10101",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "price_index_gdp_q": {
+      "name": "Price Index GDP",
+      "code": "T10104",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "nominal_gdp_number_q": {
+      "name": "Nominal GDP",
+      "code": "T10105",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "real_gdp_number_q": {
+      "name": "Real GDP",
+      "code": "T10106",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "income_and_spending_q": {
+      "name": "Income and Spending",
+      "code": "T20100",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "expenditure_structure_m": {
+      "name": "Expenditure Structure",
+      "code": "U20305",
+      "freq": "M",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "vehicle_data_m": {
+      "name": "Vehicle Data",
+      "code": "U70205S",
+      "freq": "M",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "corp_profit_q": {
+      "name": "Corporation Profit",
+      "code": "T61600B",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "savings_and_invest_q": {
+      "name": "Savings and Investment",
+      "code": "T50100",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "gov_surp_def_q": {
+      "name": "Government Surplus and Deficit",
+      "code": "T30100",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "gov_spending_as_GDP_q": {
+      "name": "Government Spending as GDP",
+      "code": "T30905",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "foreign_trade_q": {
+      "name": "Foreign Trade",
+      "code": "T40100",
+      "freq": "Q",
+      "category": "NIPA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "stock_consumer_durable_goods_a": {
+      "name": "Stock_consumer_durable_goods",
+      "code": "FAAt801",
+      "freq": "A",
+      "category": "FixedAssets",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "sector_priv_fix_invest_a": {
+      "name": "Sector Private Fix Investment",
+      "code": "FAAt307ESI",
+      "freq": "A",
+      "category": "FixedAssets",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "private_fixed_equip_investment_m": {
+      "name": "Private Fixed Equipment Investment",
+      "code": "U50505",
+      "freq": "M",
+      "category": "NIUnderlyingDetail",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "PCE_inflation_Index_m": {
+      "name": "PCE Inflation Index",
+      "code": "U20304",
+      "freq": "M",
+      "category": "NIUnderlyingDetail",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "real_PCE_consumption_trend_m": {
+      "name": "Real PCE consumption trend",
+      "code": "U20406",
+      "freq": "M",
+      "category": "NIUnderlyingDetail",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "inventories_m": {
+      "name": "Inventories",
+      "code": "U001BC",
+      "freq": "M",
+      "category": "NIUnderlyingDetail",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "inventories_sales_ratio_m": {
+      "name": "Inventories Sales Ratio",
+      "code": "U003BU",
+      "freq": "M",
+      "category": "NIUnderlyingDetail",
+      "needs_pct": false,
+      "needs_cleaning": false
+    }
+  },
+
+  "YF": {
+    "sp500_d": {
+      "name": "SPX 500",
+      "code": "^GSPC",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "nasdaq_d": {
+      "name": "Nasdaq Index",
+      "code": "^IXIC",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "vix_d": {
+      "name": "Volatility Index",
+      "code": "^VIX",
+      "needs_pct": false,
+      "needs_cleaning": false
+    }
+  },
+
+  "FRED": {
+    "unemployment_rate_m": {
+      "name": "Unemployment Rate",
+      "code": "UNRATE",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "jolts_job_openings_m": {
+      "name": "JOLTS job openings",
+      "code": "JTSJOL",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "initial_jobless_claims_w": {
+      "name": "Initial Job Claims",
+      "code": "ICSA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "continue_jobless_claims_w": {
+      "name": "Continue Job Claims",
+      "code": "CCSA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "mic_consumer_sentiment_m": {
+      "name": "Michigan Consumer Sentiment",
+      "code": "UMCSENT",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "mic_infla_expectation_m": {
+      "name": "Michigan Inflation Expectation",
+      "code": "MICH",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "personal_saving_rate_m": {
+      "name": "Personal Saving Rate",
+      "code": "PSAVERT",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "chicago_fed_fin_condition_index_w": {
+      "name": "Chicago Financial Condition",
+      "code": "NFCI",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "st_louis_fin_stress_index": {
+      "name": "St. Louis Financial Stress",
+      "code": "CHXRSA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "federal_balance_sheet_w": {
+      "name": "Federal Balance Sheet",
+      "code": "WALCL",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "bond_yield_spread_d": {
+      "name": "10Y-2Y Bond Yield Spread",
+      "code": "T10Y2Y",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "us_ten_year_treasury_rate_d": {
+      "name": "US10Y Treasury Rate",
+      "code": "DGS10",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "bofa_high_yield_index_rate_d": {
+      "name": "BOFA High Yield Bond Rate Index",
+      "code": "BAMLH0A0HYM2EY",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "atlanta_gdp_now_q": {
+      "name": "Atlanta GDPNOW",
+      "code": "GDPNOW",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "weekly_eco_index_LMS_w": {
+      "name": "LMS Weekly Economic Index",
+      "code": "WEI",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "five_year_forward_infla_expectation_d": {
+      "name": "Five Year Inflation Expectation",
+      "code": "T5YIFR",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "self_employment_population_m": {
+      "name": "Self Employment Population",
+      "code": "LNS12027714",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "total_us_debt_q": {
+      "name": "Total US Debt",
+      "code": "GFDEBTN",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "foreign_hold_us_debt_q": {
+      "name": "Foreign Hold US Debt",
+      "code": "FDHBFIN",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "total_us_debt_over_gdp_pct_q": {
+      "name": "Total US Debt Over GDP - QoQ%",
+      "code": "GFDEGDQ188S",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "foreign_us_debt_over_gdp_pct_q": {
+      "name": "Foreign US Debt Over GDP - QoQ%",
+      "code": "HBFIGDQ188S",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "housing_permits_m": {
+      "name": "Housing Permits",
+      "code": "PERMIT",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "housing_started_m": {
+      "name": "Housing Started Number",
+      "code": "HOUST",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "housing_complete_m": {
+      "name": "Housing Complete Number",
+      "code": "COMPUTSA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "housing_sold_m": {
+      "name": "Housing Sold Number",
+      "code": "HSN1F",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "sp_chi_home_price_index_m": {
+      "name": "SP-Chicago Home Price Index",
+      "code": "CHXRSA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "federal_overnight_repurchase_d": {
+      "name": "Federal Overnight Repurchase",
+      "code": "RRPONTSYD",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "fin_commercial_paper_IR_90_AA_d": {
+      "name": "AA-90days Financial Paper Rate",
+      "code": "RIFSPPFAAD90NB",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "non_fin_commercial_paper_IR_90_AA_d": {
+      "name": "AA-90days Non Financial Paper Rate",
+      "code": "DCPN3M",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "import_price_index_m": {
+      "name": "Import Price Index",
+      "code": "IR",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "export_price_index_m": {
+      "name": "Export Price Index",
+      "code": "IQ",
+      "needs_pct": true,
+      "needs_cleaning": false
+    }
+  },
+
+  "BLS": {
+    "eci": {
+      "name": "ECI - Employment Cost index",
+      "code": "CIU1010000000000A",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "eci_manufacture": {
+      "name": "ECI - Manufacture",
+      "code": "CIU2010000000000A",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "long_term_unemployment": {
+      "name": "Long Term Unemployment",
+      "code": "LNS13025703",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "youth_unemployment": {
+      "name": "Youth Unemployment",
+      "code": "LNS14000060",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "part_time_job_population": {
+      "name": "Part Time Job Population",
+      "code": "LNS12032194",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "manufacture_overtime": {
+      "name": "Manufacture Overtime",
+      "code": "CES3000000008",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "average_wage": {
+      "name": "Average Wage",
+      "code": "CES0500000003",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "cpi_no_adj_m": {
+      "name": "CPI (Not Seasonally Adjusted)",
+      "code": "CUUR0000SA0",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "cpi_adj_m": {
+      "name": "CPI (Seasonally Adjusted)",
+      "code": "CUUR0000SA0",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "core_cpi_no_adj_m": {
+      "name": "Core CPI (Not Seasonally Adjusted)",
+      "code": "CUUR0000SA0L1E",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "core_cpi_adj_m": {
+      "name": "Core CPI (Seasonally Adjusted)",
+      "code": "CUSR0000SA0L1E",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "ppi_adj_m": {
+      "name": "PPI (Seasonally Adjusted)",
+      "code": "WPSFD4",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "ppi_no_adj_m": {
+      "name": "PPI (Not Seasonally Adjusted)",
+      "code": "WPUFD4",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "core_ppi_no_adj_m": {
+      "name": "Core PPI (Not Seasonally Adjusted)",
+      "code": "WPUFD49104",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "core_ppi_adj_m": {
+      "name": "Core PPI (Seasonally Adjusted)",
+      "code": "WPSFD49104",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "cpi_energy_m": {
+      "name": "CPI Energy",
+      "code": "CUUR0000SA0E",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "cpi_food_m": {
+      "name": "CPI Food",
+      "code": "CUUR0000SAF",
+      "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "cpi_shelter_m": {
+      "name": "CPI Shelter",
+      "code": "CUUR0000SAH1",
+      "needs_pct": true,
+      "needs_cleaning": false
+    }
+  },
+
+  "TE": {
+    "leading_eco_index_m": {
+      "name": "Leading Economic Index"
+    },
+    "nfib_business_optimism_index-m": {
+      "name" : "NFIB Business Optimism Index"
+    }
+  },
+
+  "ISM": {
+    "ism_manufacture_m": {
+      "name": "ISM manufacture"
+    },
+    "ism_service_m": {
+      "name": "ISM service"
+    }
+  },
+
+  "FedWatch": {
+    "fed_watch": {
+      "name": "FedWatch"
+    }
+  },
+
+  "DallasFed" : {
+    "dallas_fed_manufacture_unadj": {
+      "name": "Dallas Federal Manufacture unadjusted Index"
+    },
+    "dallas_fed_manufacture_adj": {
+      "name": "Dallas Federal Manufacture adjusted Index"
+    }
+  },
+
+  "NewYorkFed" : {
+    "NewYork_fed_debt_balance" : {
+      "name": "New York Federal Debt Balance"
+    }
+  },
+
+   "InflaNowcasting": {
+    "cleveland_inflation_nowcasting": {
+      "name": "Cleveland Inflation Nowcasting"
+    }
+  },
+
+  "Emini": {
+    "cme_emini_future_price_curve": {
+      "name": "CME E-mini Future Price Curve"
+    },
+
+    "cme_emini_future_vol_open_interest": {
+      "name": "CME E-mini Volume and Open Interest"
+    }
+  },
+
+  "ForexSwap": {
+    "usdcny_swap": {
+      "name": "USD/CNY Forex Swap"
+    },
+    "eurusd_swap": {
+      "name": "EUR/USD Forex Swap"
+    },
+    "usdjpy_swap": {
+      "name": "USD/JPY Forex Swap"
+    },
+    "gbpusd_swap": {
+      "name": "GBP/USD Forex Swap"
+    },
+    "audusd_swap": {
+      "name": "AUD/USD Forex Swap"
+    },
+    "foreign_ten_year_bonds_in_usd": {
+      "name": "Foreign 10Y Bonds in USD"
+    }
+  }
+}

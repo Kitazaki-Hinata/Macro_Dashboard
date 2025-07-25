@@ -3,4 +3,5 @@ name = "proj"
 version = "0.6.00_alpha"
 dependencies = [
     "pandas>=2.3.1",
+    "selenium>=4.34.2",
 ]
