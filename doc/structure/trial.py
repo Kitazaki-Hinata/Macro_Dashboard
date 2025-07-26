@@ -17,9 +17,10 @@ class DataDownloader(ABC):
 
 # ====================== 具体下载器类 ======================
 class BEADownloader(DataDownloader):
-    def __init__(self, json_dict: Dict, api_key: str):
+    def __init__(self, json_dict: Dict, api_key: str, request_year : int):
         self.json_dict = json_dict
         self.api_key = api_key  # to_db函数里面，request API时需要api key
+        self.request_year = request_year
 
     def to_db(self, return_df = False) -> None:
         url = "https://xxx.xxx"
@@ -50,8 +51,10 @@ class DownloaderFactory:
     def create_downloader(
             cls,
             source: str,
+            request_year : int,   # 获取数据的起始年份
             json_dict: Dict,
             api_key: str = None
+
     ) -> 'DataDownloader':
         """
         创建下载器实例（自动获取API Key）
@@ -74,7 +77,8 @@ class DownloaderFactory:
 
         return downloader_classes[source](
             json_dict=json_dict,
-            api_key=api_key
+            api_key=api_key,
+            request_year = request_year
         )
 
     @classmethod

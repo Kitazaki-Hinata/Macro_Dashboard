@@ -39,10 +39,16 @@ uv sync
 - FRED St. Louis：https://fredaccount.stlouisfed.org/apikeys <br>
 - BLS：https://data.bls.gov/registrationEngine/ <br>
 ###### 4. 使用方法：
-1. 打开文件
-2. 设置排列方式与数据
-3. 如果没有下载数据，选择开始年份（最早2020），并下载数据
-4. 等待下载完成后，点击绘制并展示
+1. 在文件夹中新建文件```.env```，使用文本文档方式打开并按以下方式写入API key：
+```angular2html
+bea = "XXXXXX-YOUR-API-KEY"
+fred = "YOURAPIKEY-123456"
+bls = "YOUR-API-KEY-000000"
+```
+2. 保存```.env```文件后打开入口文件
+3. 设置排列方式与数据
+4. 如果没有下载数据，选择开始年份（最早2020），并下载数据
+5. 等待下载完成后，点击绘制并展示
 
 ***
 

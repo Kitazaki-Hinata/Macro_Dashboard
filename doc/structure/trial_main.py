@@ -25,6 +25,7 @@ def read_json():
 if __name__ == "__main__":
     setup_logging()  # 初始化日志系统
     json_dict = read_json()
+    request_year = 2020  # 请求的开始年份
 
-    bea_downloader = DownloaderFactory.create_downloader('bea', json_dict = json_dict)
+    bea_downloader = DownloaderFactory.create_downloader('bea', json_dict = json_dict, request_year = request_year)
     input()

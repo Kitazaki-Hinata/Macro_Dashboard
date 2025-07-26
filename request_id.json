@@ -1,13 +1,13 @@
 {
-  "BEA": {
+  "bea": {
     "qoq_gdp_growth_q": {
-      "name": "GDP Growth QoQ%",
-      "code": "T10101",
-      "freq": "Q",
-      "category": "NIPA",
-      "needs_pct": false,
-      "needs_cleaning": false
-    },
+  "name": "GDP Growth QoQ%",
+  "code": "T10101",
+  "freq": "Q",
+  "category": "NIPA",
+  "needs_pct": false,
+  "needs_cleaning": false
+},
     "price_index_gdp_q": {
       "name": "Price Index GDP",
       "code": "T10104",
@@ -112,14 +112,6 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
-    "private_fixed_equip_investment_m": {
-      "name": "Private Fixed Equipment Investment",
-      "code": "U50505",
-      "freq": "M",
-      "category": "NIUnderlyingDetail",
-      "needs_pct": false,
-      "needs_cleaning": false
-    },
     "PCE_inflation_Index_m": {
       "name": "PCE Inflation Index",
       "code": "U20304",
@@ -154,7 +146,7 @@
     }
   },
 
-  "YF": {
+  "yf": {
     "sp500_d": {
       "name": "SPX 500",
       "code": "^GSPC",
@@ -175,7 +167,7 @@
     }
   },
 
-  "FRED": {
+  "fred": {
     "unemployment_rate_m": {
       "name": "Unemployment Rate",
       "code": "UNRATE",
@@ -364,7 +356,7 @@
     }
   },
 
-  "BLS": {
+  "bls": {
     "eci": {
       "name": "ECI - Employment Cost index",
       "code": "CIU1010000000000A",
@@ -475,7 +467,7 @@
     }
   },
 
-  "TE": {
+  "te": {
     "leading_eco_index_m": {
       "name": "Leading Economic Index"
     },
@@ -484,7 +476,7 @@
     }
   },
 
-  "ISM": {
+  "ism": {
     "ism_manufacture_m": {
       "name": "ISM manufacture"
     },
@@ -493,13 +485,13 @@
     }
   },
 
-  "FedWatch": {
+  "fw": {
     "fed_watch": {
       "name": "FedWatch"
     }
   },
 
-  "DallasFed" : {
+  "dfm" : {
     "dallas_fed_manufacture_unadj": {
       "name": "Dallas Federal Manufacture unadjusted Index"
     },
@@ -508,19 +500,19 @@
     }
   },
 
-  "NewYorkFed" : {
+  "nyf" : {
     "NewYork_fed_debt_balance" : {
       "name": "New York Federal Debt Balance"
     }
   },
 
-   "InflaNowcasting": {
+   "cin": {
     "cleveland_inflation_nowcasting": {
       "name": "Cleveland Inflation Nowcasting"
     }
   },
 
-  "Emini": {
+  "em": {
     "cme_emini_future_price_curve": {
       "name": "CME E-mini Future Price Curve"
     },
@@ -530,7 +522,7 @@
     }
   },
 
-  "ForexSwap": {
+  "fs": {
     "usdcny_swap": {
       "name": "USD/CNY Forex Swap"
     },

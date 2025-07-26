@@ -2,6 +2,10 @@
 name = "proj"
 version = "0.6.00_alpha"
 dependencies = [
+    "beaapi>=0.1.0",
+    "bs4>=0.0.2",
+    "dotenv>=0.9.9",
     "pandas>=2.3.1",
     "selenium>=4.34.2",
+    "yfinance==0.2.59"
 ]
