@@ -59,8 +59,8 @@
 所有继承DataSource的实例类必须包含两个方法：
 1. ```to_db```
    - 功能：将数据传入至 `data.db` 数据库  
-   - 返回值：None/dataframe <br>
-   (直接请求该方法，将会直接将数据传入data.db然后返回None; 当请求下载csv时，to_csv方法将修改参数使该方法返回dataframe)
+   - 返回值：None/Dict(name, dataframe) <br>
+   (直接请求该方法，将会直接将数据传入data.db然后返回None; 当请求下载csv时，to_csv方法将修改参数```return_df```为True，使该方法返回有dataframe的字典)
 
 2. ```to_csv```
    - 功能：下载 CSV 格式数据到 `csv` 文件夹。**后续会修改该方法，通过直接对接database。**

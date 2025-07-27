@@ -5,7 +5,7 @@ from download import DownloaderFactory
 def setup_logging():
     """配置日志系统"""
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s [line:%(lineno)d] - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
         handlers=[
@@ -37,12 +37,26 @@ if __name__ == "__main__":
     # )
     # bea_downloader.to_csv()
 
-    yf_downloader = DownloaderFactory.create_downloader(
-        source = "yf",
+    # yf_downloader = DownloaderFactory.create_downloader(
+    #     source = "yf",
+    #     json_data = json_data,
+    #     request_year = request_year
+    # )
+    # yf_downloader.to_csv()
+
+    # fred_downloader = DownloaderFactory.create_downloader(
+    #     source = "fred",
+    #     json_data = json_data,
+    #     request_year = request_year
+    # )
+    # fred_downloader.to_csv()
+
+    bls_downloader = DownloaderFactory.create_downloader(
+        source = "bls",
         json_data = json_data,
         request_year = request_year
     )
-    yf_downloader.to_csv()
+    bls_downloader.to_csv()
 
 
 

@@ -1,6 +1,9 @@
 import os
-import logging
+import json
 import beaapi
+import logging
+import numpy as np
+import requests
 import pandas as pd
 import yfinance as yf
 from datetime import  date
@@ -18,7 +21,7 @@ def write_into_db(df):
 
 class DataDownloader(ABC):
     @abstractmethod
-    def to_db(self):
+    def to_db(self, return_df = False):
         pass
 
     @abstractmethod
@@ -87,7 +90,12 @@ class BEADownloader(DataDownloader):
             return  None
 
     def to_csv(self) -> None:
-        df_dict : dict = self.to_db(return_df=True)
+        try:
+            df_dict : dict = self.to_db(return_df=True)
+        except:
+            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
+            return None
+
         for name, df in df_dict.items():
             try:
                 data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
@@ -127,9 +135,13 @@ class YFDownloader(DataDownloader):
         else:
             return None
 
-
     def to_csv(self) -> None:
-        df_dict : dict = self.to_db(return_df=True)
+        try:
+            df_dict : dict = self.to_db(return_df=True)
+        except:
+            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
+            return None
+
         for name, df in df_dict.items():
             try:
                 data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)  # 因为csv文件夹地址一样所以统一使用BEA类里面定义好的地址
@@ -140,6 +152,167 @@ class YFDownloader(DataDownloader):
             except Exception as e:
                 logging.error(f"{ name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
                 continue
+
+
+class FREDDownloader(DataDownloader):
+    url : str = r"https://api.stlouisfed.org/fred/series/observations"
+
+    def __init__(self, json_dict: dict, api_key, request_year : int):
+        self.json_dict : dict = json_dict
+        self.api_key : str = api_key
+        self.start_date : str  = str(request_year)+"-01-01"
+        self.end_date : str = str(date.today())
+
+    def to_db(self, return_df = False):
+        df_dict : dict = {}
+        for table_name, table_config in self.json_dict.items():
+            try:
+                params = {
+                    "series_id": table_config["code"],
+                    "api_key": self.api_key,
+                    "observation_start": self.start_date,
+                    "observation_end": self.end_date,
+                    "file_type": "json"
+                }
+                data  = requests.get(FREDDownloader.url, params=params).json()
+                df = pd.DataFrame(data["observations"])
+                try:
+                    df : pd.DataFrame = df.iloc[:, -2:]
+                except:
+                    logging.warning(f"{table_name} HAVEN'T REMOVE 2 realtime columns, but continue to operate")
+                    pass
+
+                if table_config["needs_pct"] is True:  # identify params in json and reformat based on bool value
+                    df["value"] = pd.to_numeric(df["value"])
+                    df["MoM_growth"] = df["value"].pct_change().dropna()
+                    df = df.drop(df.columns[-2], axis=1)
+                if table_config["needs_cleaning"] is True:
+                    df["value"] = df["value"].replace(".", np.nan)
+                    df["value"] = np.where(
+                        df["value"].isna(),
+                        df['value'].shift(1),
+                        df['value']
+                    )
+                    df["value"] = df["value"].ffill().dropna()
+
+                if return_df is True and isinstance(df, pd.DataFrame):
+                    df_dict[table_name] = df
+                    logging.info(f"{table_name} Successfully extracted!")
+                    continue
+                write_into_db(df)
+                logging.info(f"{table_name} Successfully extracted!")
+                continue
+
+            except Exception as e:
+                logging.error(f"{table_name} FAILED EXTRACT DATA from FRED"
+                              f"Probably due to extraction failure or df reformat failure.")
+                continue
+
+        return df_dict
+
+    def to_csv(self):
+        try:
+            df_dict: dict = self.to_db(return_df=True)
+        except:
+            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
+            return None
+
+        for name, df in df_dict.items():
+            try:
+                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)  # 因为csv文件夹地址一样所以统一使用BEA类里面定义好的地址
+                os.makedirs(data_folder_path, exist_ok= True)
+                csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                df.to_csv(csv_path, index=True)
+                logging.info(f"{name} saved to {csv_path} Successfully!")
+            except Exception as e:
+                logging.error(f"{ name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
+                continue
+
+
+class BLSDownloader(DataDownloader):
+    url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/"
+    headers: tuple = ('Content-type', 'application/json')
+
+    def __init__(self, json_dict: dict, api_key : str, request_year : int):
+        self.json_dict : dict = json_dict
+        self.api_key : str = api_key
+        self.start_year : int  = request_year
+
+    def to_db(self, return_df = False):
+        df_dict : dict = {}
+        for table_name, table_config in self.json_dict.items():
+            try:
+                params = json.dumps(
+                    {
+                        "seriesid": table_config["code"],
+                        "startyear": self.start_year,
+                        "endyear": date.today().year,
+                        "registrationKey": self.api_key
+                        }
+                    )
+                context = requests.post(
+                    BLSDownloader.url,
+                    data=params,
+                    headers=dict([BLSDownloader.headers])
+                )
+                json_data = json.loads(context.text)
+                logging.info(f"{table_name} Successfully download data")
+            except Exception as e:
+                logging.error(f"{table_name} FAILED EXTRACT DATA from BLS"
+                              f"Probably due to API extraction problems")
+                continue
+
+            # reformat data
+            try:
+                df = pd.DataFrame(json_data["Results"]["series"][0]["data"]).drop(
+                    columns=["periodName", "latest", "footnotes"])
+            except:
+                try:
+                    df = pd.DataFrame(json_data)
+                    logging.warning(f"{table_name} FAILED REFORMAT: DROP USELESS COLUMNS, continue")
+                except Exception as e:
+                    logging.error(f"{table_name} FAILED REFORMAT data from BLS, errors in df managing")
+                    continue
+
+            if table_config["needs_pct"] is True:
+                try:
+                    df["value"] = pd.to_numeric(df["value"])
+                    df["MoM_growth"] = ((df["value"] - df["value"].shift(1)) / (df["value"].shift(1)) * -1).shift(-1)
+                    df = df.drop(df.columns[-2], axis=1)
+                except Exception as e:
+                    logging.error(f"{table_name} FAILED REFORMAT PERCENTAGE, probably due to df error")
+                    continue
+
+            if return_df is True and isinstance(df, pd.DataFrame):
+                df_dict[table_name] = df
+                logging.info(f"{table_name} Successfully extracted!")
+                continue
+            write_into_db(df)
+            logging.info(f"{table_name} Successfully extracted!")
+            continue
+
+        return df_dict
+
+    def to_csv(self) -> None:
+        try:
+            df_dict: dict = self.to_db(return_df=True)
+        except:
+            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
+            return None
+
+        for name, df in df_dict.items():
+            try:
+                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)  # 因为csv文件夹地址一样所以统一使用BEA类里面定义好的地址
+                os.makedirs(data_folder_path, exist_ok=True)
+                csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                df.to_csv(csv_path, index=True)
+                logging.info(f"{name} saved to {csv_path} Successfully!")
+            except Exception as e:
+                logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
+                continue
+
+
+
 
 
 class DownloaderFactory:
@@ -166,8 +339,8 @@ class DownloaderFactory:
         downloader_classes = {
             'bea': BEADownloader,
             'yf': YFDownloader,
-            # 'fred': FREDDownloader,
-            # 'bls': BLSDownloader,
+            'fred': FREDDownloader,
+            'bls': BLSDownloader,
             # 'te': TEDownloader,
             # 'ism': ISMDownloader,
             # 'fw': FedWatchDownloader,
