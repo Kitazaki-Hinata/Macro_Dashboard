@@ -11,4 +11,5 @@ dependencies = [
     "cffi == 1.17.1",
     "certifi>=2025.7.14",
     "yfinance>=0.2.65",
+    "lxml>=6.0.0",
 ]

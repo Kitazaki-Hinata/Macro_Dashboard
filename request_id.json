@@ -469,10 +469,10 @@
 
   "te": {
     "leading_eco_index_m": {
-      "name": "Leading Economic Index"
+      "name": "leading-economic-index"
     },
     "nfib_business_optimism_index-m": {
-      "name" : "NFIB Business Optimism Index"
+      "name" : "nfib-business-optimism-index"
     }
   },
 

@@ -51,12 +51,19 @@ if __name__ == "__main__":
     # )
     # fred_downloader.to_csv()
 
-    bls_downloader = DownloaderFactory.create_downloader(
-        source = "bls",
+    # bls_downloader = DownloaderFactory.create_downloader(
+    #     source = "bls",
+    #     json_data = json_data,
+    #     request_year = request_year
+    # )
+    # bls_downloader.to_csv()
+
+    te_downloader = DownloaderFactory.create_downloader(
+        source = "te",
         json_data = json_data,
         request_year = request_year
     )
-    bls_downloader.to_csv()
+    te_downloader.to_csv()
 
 
 
