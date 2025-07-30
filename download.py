@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import time
 import beaapi
 import logging
@@ -20,14 +21,152 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+class DatabaseConverter():
+    _MONTH_MAP = {
+        "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4,
+        "May": 5, "Jun": 6, "Jul": 7, "Aug": 8,
+        "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
+    }
 
-def write_into_db(df):
-    '''input df into database'''
-    try:
+    def _convert_month_str_to_num(self, month_str):
+        """高性能版本，适合每秒百万次调用"""
+        return DatabaseConverter._MONTH_MAP.get(month_str.casefold(), None)
+
+    def _rename_bea_date_col(self, df: pd.DataFrame)-> pd.DataFrame:
+        '''modify time index, unify all time index in different dataframe(time series dataframe'''
+        try:
+            df.drop("TimePeriod", axis=1, inplace=True)  # remove original date index
+            date_col = df.pop("date")  # get date col
+            df.insert(0, "date", date_col)  # insert "date col" into first col
+            return df
+        except Exception as e:
+            logging.error(f"{e}, FAILED to write into database")
+            df = pd.DataFrame()
+            return df
+
+    def _format_converter(self, df: pd.DataFrame, data_name : str, is_pct_data : bool)-> pd.DataFrame:
+        try:
+            # 将index统一转换为2020/01/01
+            match df["TimePeriod"][1]:  # BEA
+                case bea_a if re.match(r"[0-9]{4}", bea_a):
+                    # 匹配： BEA_a 2020
+                    df["TimePeriod"] = df["TimePeriod"] + "/12/31"
+                    df["date"] = pd.to_datetime(df["TimePeriod"], format="%Y/%m/%d")
+                    df = self._rename_bea_date_col(df)
+                    return df
+
+                case bea_q if re.match(r"[0-9]{4}Q[0-9]{1}", bea_q):
+                    # 匹配：BEA_q 2020Q1
+                    def convert_q_format(date_str):
+                        # 匹配：BEA_q 2020Q1
+                        year, quarter = date_str.split("Q")
+                        quarter = int(quarter)
+                        year = int(year)
+
+                        month = quarter * 3 + 1
+                        if month > 12:
+                            year += 1
+                            month = 1
+                        return f"{year}/{month:02d}/01"
+
+                    df["date"] = list(map(convert_q_format, df["TimePeriod"]))
+                    df = self._rename_bea_date_col(df)
+                    return df
+
+                case bea_m if re.match(r"[0-9]{4}M[0-9]{2}", bea_m):
+                    # 匹配：BEA_m 2020M01
+                    def convert_m_format(date_str):
+                        # 转换月份格式，如果要是2020M12 -> 2021-01-01
+                        year, month = date_str.split("M")
+                        month = int(month)
+                        year = int(year)
+
+                        if month == 12:
+                            new_year = year + 1
+                            new_month = 1
+                        else:
+                            new_year = year
+                            new_month = month + 1
+
+                        return f"{new_year}/{new_month:02d}/01"
+
+                    df["date"] = list(map(convert_m_format, df["TimePeriod"]))
+                    df = self._rename_bea_date_col(df)
+                    return df
+
+                case _:
+                    logging.warning("Haven't MATCH DATA in method _format_converter, continue")
+                    pass
+
+            match df["Date"][1]:  # Yfinance
+                case yfinance if re.match("[0-9]{4}/[0-9]+/[0-9]+", yfinance):
+                    # 匹配：YFinance 2020/1/1
+                    df["date"] = pd.to_datetime(df["Date"], format="%Y/%m/%d").dt.strftime("%Y/%m/%d")
+                    df.drop(columns=["High", "Low", "Open", "Volume", "Date"], inplace=True)  # implace, 直接替换原来的df
+                    date_col = df.pop("date")
+                    df.insert(0, "date", date_col)  # 这里将date放到第一列
+                    if len(df.columns) > 1:  # rename col with data name
+                        second_col = df.columns[1]
+                        df = df.rename(columns={second_col: f"{data_name}"})
+                    else:
+                        logging.warning(f"FAILED TO RENAME COLUMN NAME {data_name}, in function write_to_db, continue")
+                    return df
+
+                case _:
+                    logging.warning("Haven't MATCH DATA in method _format_converter, continue")
+                    pass
+
+            match df["date"][1]:  # Fred data
+                case fred if re.match("[0-9]{4}/[0-9]+/[0-9]+", fred):
+                    # 匹配：FRED 2020/1/1
+                    df["date"] = pd.to_datetime(df["date"], format="%Y/%m/%d").dt.strftime("%Y/%m/%d")
+                    df = df.drop(columns=["realtime_start", "realtime_end"])
+
+                    # 判断列数是否大于1，且区分是不是百分比数据
+                    if len(df.columns) > 1 and is_pct_data == False:  # rename col with data name
+                        second_col = df.columns["value"]
+                        df = df.rename(columns={second_col: f"{data_name}"})
+                    elif len(df.columns) > 2 and is_pct_data == True:  # rename col, pct data
+                        df.drop(columns=["value"], inplace=True)
+                        second_col = df.columns["MoM_growth"]
+                        df = df.rename(columns={second_col: f"{data_name}_%MoM_change"})
+                    else:
+                        logging.warning(f"FAILED TO RENAME COLUMN NAME {data_name}, in function write_to_db, continue")
+                    return df
+
+                case _:
+                    logging.warning("Haven't MATCH DATA in method _format_converter, continue")
+                    pass
+
+            ################################ 没法下载BLS数据，所以暂时没法match这个数据
+            ###################  is_pct_data 区分一个True
+
+            match df["Date"][1]:  # Trading Economics data
+                case trading_eco if re.match("[A-Z][a-z]+_[0-9]{4}", trading_eco):
+                    split_data = df["Date"].str.split("_", expand=True)
+                    month_str = split_data[0]
+                    year = split_data[1].astype(int)  # 转换为整数
+                    if month_str == "Dec":
+                        year += 1
+                        month = 1
+                    else:
+                        month = month_str.apply(self._convert_month_str_to_num)  # 应用文件下面的函数
+                    df["date"] = f"{year}/{month:02d}/01"
+                    df.drop(columns=["Date"], inplace=True)
+                    date_col = df.pop("date")
+                    df.insert(0, "date", date_col)
+                    return df
+
+                case _:
+                    pass
+
+        except Exception as e:
+            logging.error(f"{e}, FAILED to write into database")
+            df = pd.DataFrame()
+            return df
+
+    def write_info_db(self, df):
         pass
-    except Exception as e:
-        logging.error(f"{e}, FAILED to write into database")
-        return None
 
 class DataDownloader(ABC):
     @abstractmethod

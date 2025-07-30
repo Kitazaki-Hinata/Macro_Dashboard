@@ -46,7 +46,10 @@
 ```
 <br>
 
-#### <u>**外置的独立封装函数**</u><br>
+#### <u>**DatabaseConverter方法类：集合所有用于转换成database的方法和变量**</u><br>
+- ```_convert_month_str_to_num``` : 将月份字符串转换为数字，内部函数
+- ```_rename_bea_date_col``` : 统一时间轴的函数，输入df，输出修改完日期格式的df ；统一所有的数据时间戳在第一列且名称叫date；```data_name```参数: 数据名称，用于报错与列名
+- ```_format_converter``` : 统一数据格式，输入df，输出统一格式的df
 - ```write_info_db``` : 封装输出dataframe数据到data.db数据库，包含统一不同数据dataframe的时间戳的功能。
 
 
