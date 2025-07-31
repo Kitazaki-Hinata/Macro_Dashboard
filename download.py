@@ -4,12 +4,13 @@ import re
 import time
 import beaapi
 import logging
+import sqlite3
 import random
 import numpy as np
 import requests
 import pandas as pd
 import yfinance as yf
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 from abc import ABC, abstractmethod
 
@@ -27,15 +28,23 @@ class DatabaseConverter():
         "May": 5, "Jun": 6, "Jul": 7, "Aug": 8,
         "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
     }
+    end_date: date = date.today()
 
-    def _convert_month_str_to_num(self, month_str):
+    def __init__(self, db_file: str = 'data.db'):
+        self.db_file = db_file
+        self.conn = sqlite3.connect(db_file)   # 参数是数据库的本地地址，后续可以只用一次cursor
+        self.cursor = self.conn.cursor()
+
+    @staticmethod
+    def _convert_month_str_to_num(month_str):
         """高性能版本，适合每秒百万次调用"""
         return DatabaseConverter._MONTH_MAP.get(month_str.casefold(), None)
 
-    def _rename_bea_date_col(self, df: pd.DataFrame)-> pd.DataFrame:
+    @staticmethod
+    def _rename_bea_date_col(df: pd.DataFrame)-> pd.DataFrame:
         '''modify time index, unify all time index in different dataframe(time series dataframe'''
         try:
-            df.drop("TimePeriod", axis=1, inplace=True)  # remove original date index
+            # df.drop("TimePeriod", axis=1, inplace=True)  # remove original date index
             date_col = df.pop("date")  # get date col
             df.insert(0, "date", date_col)  # insert "date col" into first col
             return df
@@ -44,18 +53,19 @@ class DatabaseConverter():
             df = pd.DataFrame()
             return df
 
-    def _format_converter(self, df: pd.DataFrame, data_name : str, is_pct_data : bool)-> pd.DataFrame:
+    @staticmethod
+    def _format_converter(df: pd.DataFrame, data_name : str, is_pct_data : bool)-> pd.DataFrame:
         try:
-            # 将index统一转换为2020/01/01
-            match df["TimePeriod"][1]:  # BEA
-                case bea_a if re.match(r"[0-9]{4}", bea_a):
+            # 将index统一转换为2020-01-01
+            match df.index[1]:  # BEA
+                case bea_a if re.fullmatch(r"[0-9]{4}", bea_a):
                     # 匹配： BEA_a 2020
-                    df["TimePeriod"] = df["TimePeriod"] + "/12/31"
-                    df["date"] = pd.to_datetime(df["TimePeriod"], format="%Y/%m/%d")
-                    df = self._rename_bea_date_col(df)
+                    df.index = df.index + "-12-31"
+                    df["date"] = pd.to_datetime(df.index, format="%Y-%m-%d")
+                    df = DatabaseConverter._rename_bea_date_col(df)
                     return df
 
-                case bea_q if re.match(r"[0-9]{4}Q[0-9]{1}", bea_q):
+                case bea_q if re.fullmatch(r"[0-9]{4}Q[0-9]{1}", bea_q):
                     # 匹配：BEA_q 2020Q1
                     def convert_q_format(date_str):
                         # 匹配：BEA_q 2020Q1
@@ -67,13 +77,13 @@ class DatabaseConverter():
                         if month > 12:
                             year += 1
                             month = 1
-                        return f"{year}/{month:02d}/01"
+                        return f"{year}-{month:02d}-01"
 
-                    df["date"] = list(map(convert_q_format, df["TimePeriod"]))
-                    df = self._rename_bea_date_col(df)
+                    df["date"] = list(map(convert_q_format, df.index))
+                    df = DatabaseConverter._rename_bea_date_col(df)
                     return df
 
-                case bea_m if re.match(r"[0-9]{4}M[0-9]{2}", bea_m):
+                case bea_m if re.fullmatch(r"[0-9]{4}M[0-9]{2}", bea_m):
                     # 匹配：BEA_m 2020M01
                     def convert_m_format(date_str):
                         # 转换月份格式，如果要是2020M12 -> 2021-01-01
@@ -88,10 +98,10 @@ class DatabaseConverter():
                             new_year = year
                             new_month = month + 1
 
-                        return f"{new_year}/{new_month:02d}/01"
+                        return f"{new_year}-{new_month:02d}-01"
 
-                    df["date"] = list(map(convert_m_format, df["TimePeriod"]))
-                    df = self._rename_bea_date_col(df)
+                    df["date"] = list(map(convert_m_format, df.index))
+                    df = DatabaseConverter._rename_bea_date_col(df)
                     return df
 
                 case _:
@@ -101,7 +111,7 @@ class DatabaseConverter():
             match df["Date"][1]:  # Yfinance
                 case yfinance if re.match("[0-9]{4}/[0-9]+/[0-9]+", yfinance):
                     # 匹配：YFinance 2020/1/1
-                    df["date"] = pd.to_datetime(df["Date"], format="%Y/%m/%d").dt.strftime("%Y/%m/%d")
+                    df["date"] = pd.to_datetime(df["Date"], format="%Y-%m-%d").dt.strftime("%Y-%m-%d")
                     df.drop(columns=["High", "Low", "Open", "Volume", "Date"], inplace=True)  # implace, 直接替换原来的df
                     date_col = df.pop("date")
                     df.insert(0, "date", date_col)  # 这里将date放到第一列
@@ -119,7 +129,7 @@ class DatabaseConverter():
             match df["date"][1]:  # Fred data
                 case fred if re.match("[0-9]{4}/[0-9]+/[0-9]+", fred):
                     # 匹配：FRED 2020/1/1
-                    df["date"] = pd.to_datetime(df["date"], format="%Y/%m/%d").dt.strftime("%Y/%m/%d")
+                    df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d").dt.strftime("%Y-%m-%d")
                     df = df.drop(columns=["realtime_start", "realtime_end"])
 
                     # 判断列数是否大于1，且区分是不是百分比数据
@@ -150,7 +160,7 @@ class DatabaseConverter():
                         year += 1
                         month = 1
                     else:
-                        month = month_str.apply(self._convert_month_str_to_num)  # 应用文件下面的函数
+                        month = month_str.apply(DatabaseConverter._convert_month_str_to_num)  # 应用文件下面的函数
                     df["date"] = f"{year}/{month:02d}/01"
                     df.drop(columns=["Date"], inplace=True)
                     date_col = df.pop("date")
@@ -165,8 +175,94 @@ class DatabaseConverter():
             df = pd.DataFrame()
             return df
 
-    def write_info_db(self, df):
-        pass
+    def _create_ts_sheet(self, start_date : str):
+        """If time_series_table does not exist, then create new db
+        如果sheet不存在，创建sheet"""
+        cursor = self.cursor
+
+        # 尝试寻找database中是否存在ts表，如果存在，则跳过create
+        cursor.execute("SELECT name FROM sqlite_master WHERE type= 'table' AND name  = 'Time_Series'")
+        table_exists = cursor.fetchone() is not None  # if table exists, return True
+
+        # 如果没有ts表，则尝试创建一个
+        try:
+            if not table_exists:
+                cursor.execute("CREATE TABLE IF NOT EXISTS Time_Series(date DATE PRIMARY KEY)")
+                current_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+                while current_date <= DatabaseConverter.end_date:  # 直接比较date对象   # 添加时间列，循环写入从设置的开始日期一直到今天的所有日期
+                    cursor.execute(
+                        "INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
+                        (current_date.strftime('%Y-%m-%d'),
+                         )
+                    )
+                    current_date += timedelta(days=1)
+                self.conn.commit()
+                return cursor
+            else:
+                logging.info("Time_Series table already exists, continue")
+                return cursor
+
+        except sqlite3.Error as e:
+            logging.error(f"FAILED to create Time_Series table, since {e}")
+            return cursor
+
+    def write_into_db(
+            self,
+            df: pd.DataFrame,
+            data_name: str,
+            start_date : str,
+            is_time_series: bool = False,
+            is_pct_data: bool = False
+    ) -> None:
+        '''params df: df that used to write into db
+        params data_name: used in db columns and errors
+        params start_date, start date of  all data, used when create db sheet
+        params is_time_series: judge whether it is time series data, incl. BEA, BLS, YF, TE, FRED
+        params is_pct_data: input json data, bool value, "needs_pct"
+        '''
+        self._create_ts_sheet(start_date = start_date)
+        try:
+            if df.empty:
+                logging.error(f"{data_name} is empty, FAILED INSERT, locate in write_into_db")
+            else:
+                if is_time_series:  # check whether Time_Series table exists
+                    df_after_modify_time : pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
+
+                    # 获取现有表结构
+                    table_info = pd.read_sql("PRAGMA table_info(Time_Series)", self.conn)
+                    existing_columns = table_info["name"].tolist()
+
+                    # 添加缺失列
+                    for col in df_after_modify_time.columns:
+                        if col not in existing_columns and col != "date":
+                            self.cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {col} REAL")
+
+                    df_db = pd.read_sql("SELECT date FROM Time_Series", self.conn)  # 只读取日期列
+                    result_db = df_db.merge(df_after_modify_time, on="date", how="left")
+                    result_db.to_sql(
+                        name="Time_Series",  # 同一张表或新表
+                        con=self.conn,
+                        if_exists="append",
+                        index=False
+                    )
+
+                    self.conn.commit()
+                    return
+                else:
+                    # 其他数据则直接生成新sheet存入database当中
+                    df.to_sql(
+                        name=data_name,
+                        con=self.conn,
+                        if_exists='replace',  # if sheet exist, then replace
+                        index=False
+                    )
+                    self.conn.commit()
+                    self.conn.close()
+                    return
+
+        except Exception as e:
+            logging.error(f"FAILED to write into database, in method write_into_db, since {e}")
+            return
 
 class DataDownloader(ABC):
     @abstractmethod
@@ -186,6 +282,7 @@ class BEADownloader(DataDownloader):
     def __init__(self, json_dict: dict, api_key: str, request_year : int):
         self.json_dict : dict = json_dict
         self.api_key : str = api_key
+        self.request_year : int = request_year
         self.time_range : str= ",".join(map(str, range(request_year, BEADownloader.current_year + 1)))
         self.time_range_lag : str = self.time_range[:-5]  # 去除最后5个字符，即去除最后一年
 
@@ -221,6 +318,7 @@ class BEADownloader(DataDownloader):
                 df : pd.DataFrame = pd.DataFrame(bea_tbl)
                 df_filtered : pd.DataFrame = df[df["LineDescription"].isin([df["LineDescription"][1], ""])]   # 提取首列数据/isin后面使用list和""的原因是不允许输入str
                 df_modified : pd.DataFrame= df_filtered.pivot(index="TimePeriod", columns="LineDescription", values="DataValue") # 重新排序
+                df_modified.index.name = "TimePeriod"
                 logging.info(f"BEA_{table_name} Successfully extracted!")
                 if return_df is True and isinstance(df_modified, pd.DataFrame):  # used for to_csv method
                     df_dict[table_name] = df_modified
@@ -228,7 +326,17 @@ class BEADownloader(DataDownloader):
                         break
                     continue
                 elif return_df is False:
-                    write_into_db(df_modified)
+                    if df_modified.empty:
+                        logging.error(f"{table_name} is empty, FAILED INSERT, locate in to_db")
+                        continue
+                    converter = DatabaseConverter()
+                    converter.write_into_db(
+                        df = df_modified,
+                        data_name=table_name,
+                        start_date  = str(date(self.request_year, 1, 1)),
+                        is_time_series=True,
+                        is_pct_data=table_config["needs_pct"]
+                    )
                     continue
             except Exception as e:
                 logging.error(f"{table_name} FAILED REFORMAT to dataframe in method 'to_db', since {e}")
@@ -264,17 +372,25 @@ class YFDownloader(DataDownloader):
         self.end_date : str = str(date.today())
 
     def to_db(self, return_df = False):
+        '''NOTE : data is pd.dataframe'''
         df_dict : dict = {}  # create list for future df storage and output  (return df_list)
         for table_name, table_config in self.json_dict.items():
             try:
                 index = table_config["code"]
-                data = yf.download(index, start=self.start_date, end=self.end_date, interval="1d")
+                data : pd.DataFrame = yf.download(index, start=self.start_date, end=self.end_date, interval="1d")
                 data.columns = data.columns.droplevel(1)
                 if return_df is True and isinstance(data, pd.DataFrame):  # used for to_csv method
                     df_dict[table_name] = data
                     continue
                 elif return_df is False:
-                    write_into_db(data)
+                    converter = DatabaseConverter()
+                    converter.write_into_db(
+                        df=data,
+                        data_name=table_name,
+                        start_date=self.start_date,
+                        is_time_series=True,
+                        is_pct_data=table_config["needs_pct"]
+                    )
                     continue
             except Exception as e:
                 logging.error(f"to_db, {table_name} FAILED EXTRACT DATA from Yfinance, {e}")
@@ -348,9 +464,17 @@ class FREDDownloader(DataDownloader):
                     df_dict[table_name] = df
                     logging.info(f"{table_name} Successfully extracted!")
                     continue
-                write_into_db(df)
-                logging.info(f"{table_name} Successfully extracted!")
-                continue
+                elif return_df is False:
+                    converter = DatabaseConverter()
+                    converter.write_into_db(
+                        df=df,
+                        data_name=table_name,
+                        start_date=self.start_date,
+                        is_time_series=True,
+                        is_pct_data=table_config["needs_pct"]
+                    )
+                    logging.info(f"{table_name} Successfully extracted!")
+                    continue
             except Exception as e:
                 logging.error(f"{table_name} FAILED EXTRACT DATA from FRED"
                               f"Probably due to extraction failure or df reformat failure.")
@@ -388,6 +512,7 @@ class BLSDownloader(DataDownloader):
         self.json_dict : dict = json_dict
         self.api_key : str = api_key
         self.start_year : int  = request_year
+        self.start_date : str  = str(request_year)+"-01-01"
 
     def to_db(self, return_df = False):
         df_dict : dict = {}
@@ -438,9 +563,17 @@ class BLSDownloader(DataDownloader):
                 df_dict[table_name] = df
                 logging.info(f"{table_name} Successfully extracted!")
                 continue
-            write_into_db(df)
-            logging.info(f"{table_name} Successfully extracted!")
-            continue
+            elif return_df is False:
+                converter = DatabaseConverter()
+                converter.write_into_db(
+                    df=df,
+                    data_name=table_name,
+                    start_date=self.start_date,
+                    is_time_series=True,
+                    is_pct_data=table_config["needs_pct"]
+                )
+                logging.info(f"{table_name} Successfully extracted!")
+                continue
 
         if return_df is True:
             return df_dict
@@ -474,6 +607,7 @@ class TEDownloader(DataDownloader):
     def __init__(self, json_dict: dict, api_key : str, request_year : int):
         self.json_dict : dict = json_dict
         self.start_year : int  = request_year
+        self.start_date: str = str(request_year) + "-01-01"
         options = Options()
         options.add_argument("--disable-blink-features=AutomationControlled")
         self.driver = webdriver.Chrome(options=options)
@@ -592,8 +726,20 @@ class TEDownloader(DataDownloader):
             if df is None:
                 logging.error(f"FAILED TO EXTRACT {table_name}, check PREVIOUS loggings")
                 continue
-            df_dict[table_name] = df
-            continue
+            if return_df is True and isinstance(df, pd.DataFrame):
+                df_dict[table_name] = df
+                logging.info(f"{data_name} SUCCESSFULLY EXTRACT data from website TE")
+                continue
+            elif return_df is False:
+                converter = DatabaseConverter()
+                converter.write_into_db(
+                    df=df,
+                    data_name=table_name,
+                    start_date=self.start_date,
+                    is_time_series=True,
+                    is_pct_data=table_config["needs_pct"]
+                )
+                continue
 
         if return_df is True:
             return df_dict
