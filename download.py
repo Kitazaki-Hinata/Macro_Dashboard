@@ -221,21 +221,18 @@ class DatabaseConverter():
         params is_pct_data: input json data, bool value, "needs_pct"
         '''
         self._create_ts_sheet(start_date = start_date)
+        cursor = self.cursor
         try:
             if df.empty:
                 logging.error(f"{data_name} is empty, FAILED INSERT, locate in write_into_db")
             else:
                 if is_time_series:  # check whether Time_Series table exists
                     df_after_modify_time : pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
-
-                    # 获取现有表结构
-                    table_info = pd.read_sql("PRAGMA table_info(Time_Series)", self.conn)
-                    existing_columns = table_info["name"].tolist()
-
-                    # 添加缺失列
-                    for col in df_after_modify_time.columns:
-                        if col not in existing_columns and col != "date":
-                            self.cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {col} REAL")
+                    try:
+                        cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {data_name} DOUBLE")
+                        self.conn.commit()
+                    except:
+                        logging.warning(f"{data_name} col name already exists in Time_Series, continue")
 
                     df_db = pd.read_sql("SELECT date FROM Time_Series", self.conn)  # 只读取日期列
                     result_db = df_db.merge(df_after_modify_time, on="date", how="left")
@@ -318,6 +315,7 @@ class BEADownloader(DataDownloader):
                 df : pd.DataFrame = pd.DataFrame(bea_tbl)
                 df_filtered : pd.DataFrame = df[df["LineDescription"].isin([df["LineDescription"][1], ""])]   # 提取首列数据/isin后面使用list和""的原因是不允许输入str
                 df_modified : pd.DataFrame= df_filtered.pivot(index="TimePeriod", columns="LineDescription", values="DataValue") # 重新排序
+                df_modified.columns = [f"{table_config['name']}"]   # rename
                 df_modified.index.name = "TimePeriod"
                 logging.info(f"BEA_{table_name} Successfully extracted!")
                 if return_df is True and isinstance(df_modified, pd.DataFrame):  # used for to_csv method
@@ -332,7 +330,7 @@ class BEADownloader(DataDownloader):
                     converter = DatabaseConverter()
                     converter.write_into_db(
                         df = df_modified,
-                        data_name=table_name,
+                        data_name=table_config["name"],
                         start_date  = str(date(self.request_year, 1, 1)),
                         is_time_series=True,
                         is_pct_data=table_config["needs_pct"]
