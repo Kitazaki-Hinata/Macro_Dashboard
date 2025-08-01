@@ -30,19 +30,19 @@ if __name__ == "__main__":
     json_data: dict = read_json()
     request_year : int = 2020  # 请求的开始年份
 
-    bea_downloader = DownloaderFactory.create_downloader(
-        source='bea',
-        json_data = json_data,
-        request_year = request_year
-    )
-    bea_downloader.to_db()
-
-    # yf_downloader = DownloaderFactory.create_downloader(
-    #     source = "yf",
+    # bea_downloader = DownloaderFactory.create_downloader(
+    #     source='bea',
     #     json_data = json_data,
     #     request_year = request_year
     # )
-    # yf_downloader.to_csv()
+    # bea_downloader.to_db()
+
+    yf_downloader = DownloaderFactory.create_downloader(
+        source = "yf",
+        json_data = json_data,
+        request_year = request_year
+    )
+    yf_downloader.to_csv()
 
     # fred_downloader = DownloaderFactory.create_downloader(
     #     source = "fred",

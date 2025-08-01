@@ -234,12 +234,22 @@ class DatabaseConverter():
                     except:
                         logging.warning(f"{data_name} col name already exists in Time_Series, continue")
 
-                    df_db = pd.read_sql("SELECT date FROM Time_Series", self.conn)  # 只读取日期列
+                    df_db = pd.read_sql("SELECT * FROM Time_Series", self.conn)  # 只读取日期列
                     result_db = df_db.merge(df_after_modify_time, on="date", how="left")
+
+                    for col in df_after_modify_time.columns:
+                        if col == 'date':
+                            continue  # 跳过日期列
+                        if f"{col}_x" in result_db.columns and f"{col}_y" in result_db.columns:
+                            # 使用combine_first: y列优先，没有y时用x
+                            result_db[col] = result_db[f"{col}_y"].combine_first(result_db[f"{col}_x"])
+                            # 删除临时列
+                            result_db.drop([f"{col}_x", f"{col}_y"], axis=1, inplace=True)
+
                     result_db.to_sql(
                         name="Time_Series",  # 同一张表或新表
                         con=self.conn,
-                        if_exists="append",
+                        if_exists="replace",
                         index=False
                     )
 
@@ -260,6 +270,7 @@ class DatabaseConverter():
         except Exception as e:
             logging.error(f"FAILED to write into database, in method write_into_db, since {e}")
             return
+
 
 class DataDownloader(ABC):
     @abstractmethod
