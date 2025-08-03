@@ -465,10 +465,14 @@
   },
   "te": {
     "leading_eco_index_m": {
-      "name": "leading_economic_index"
+      "name": "leading_economic_index",
+      "needs_pct": false,
+      "needs_cleaning": false
     },
     "nfib_business_optimism_index-m": {
-      "name": "nfib_business_optimism_index"
+      "name": "nfib_business_optimism_index",
+      "needs_pct": false,
+      "needs_cleaning": false
     }
   },
   "ism": {

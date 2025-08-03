@@ -37,19 +37,19 @@ if __name__ == "__main__":
     # )
     # bea_downloader.to_db()
 
-    yf_downloader = DownloaderFactory.create_downloader(
-        source = "yf",
-        json_data = json_data,
-        request_year = request_year
-    )
-    yf_downloader.to_csv()
+    # yf_downloader = DownloaderFactory.create_downloader(
+    #     source = "yf",
+    #     json_data = json_data,
+    #     request_year = request_year
+    # )
+    # yf_downloader.to_db()
 
     # fred_downloader = DownloaderFactory.create_downloader(
     #     source = "fred",
     #     json_data = json_data,
     #     request_year = request_year
     # )
-    # fred_downloader.to_csv()
+    # fred_downloader.to_db()
 
     # bls_downloader = DownloaderFactory.create_downloader(
     #     source = "bls",
@@ -58,12 +58,12 @@ if __name__ == "__main__":
     # )
     # bls_downloader.to_csv()
 
-    # te_downloader = DownloaderFactory.create_downloader(
-    #     source = "te",
-    #     json_data = json_data,
-    #     request_year = request_year
-    # )
-    # te_downloader.to_csv()
+    te_downloader = DownloaderFactory.create_downloader(
+        source = "te",
+        json_data = json_data,
+        request_year = request_year
+    )
+    te_downloader.to_db()
 
 
 

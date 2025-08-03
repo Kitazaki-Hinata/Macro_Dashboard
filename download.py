@@ -24,9 +24,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class DatabaseConverter():
     _MONTH_MAP = {
-        "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4,
-        "May": 5, "Jun": 6, "Jul": 7, "Aug": 8,
-        "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
+        "jan": 1, "feb": 2, "mar": 3, "apr": 4,
+        "may": 5, "jun": 6, "jul": 7, "aug": 8,
+        "sep": 9, "oct": 10, "nov": 11, "dec": 12
     }
     end_date: date = date.today()
 
@@ -37,7 +37,6 @@ class DatabaseConverter():
 
     @staticmethod
     def _convert_month_str_to_num(month_str):
-        """高性能版本，适合每秒百万次调用"""
         return DatabaseConverter._MONTH_MAP.get(month_str.casefold(), None)
 
     @staticmethod
@@ -107,15 +106,42 @@ class DatabaseConverter():
                 case _:
                     logging.warning("Haven't MATCH DATA in method _format_converter, continue")
                     pass
+        except Exception as e:
+            logging.warning(f"{e}, not match BEA, continue")
+            pass
 
-            match df["Date"][1]:  # Yfinance
-                case yfinance if re.match("[0-9]{4}/[0-9]+/[0-9]+", yfinance):
-                    # 匹配：YFinance 2020/1/1
-                    df["date"] = pd.to_datetime(df["Date"], format="%Y-%m-%d").dt.strftime("%Y-%m-%d")
-                    df.drop(columns=["High", "Low", "Open", "Volume", "Date"], inplace=True)  # implace, 直接替换原来的df
-                    date_col = df.pop("date")
-                    df.insert(0, "date", date_col)  # 这里将date放到第一列
-                    if len(df.columns) > 1:  # rename col with data name
+        try:   # match yfinance
+            if df.columns.tolist() == ["Close", "High", "Low", "Open", "Volume"]:
+                df["date"] = pd.to_datetime(
+                    pd.Series(df.index).astype(str).str.split().str[0],
+                    errors="coerce"
+                ).dt.strftime("%Y-%m-%d")
+                df = df.reset_index(drop=True)
+                df.drop(columns=["High", "Low", "Open", "Volume", "Date"], inplace=True)  # implace, 直接替换原来的df
+                date_col = df.pop("date")
+                df.insert(0, "date", date_col)  # 这里将date放到第一列
+                if len(df.columns) > 1:  # rename col with data name
+                    second_col = df.columns[1]
+                    df = df.rename(columns={second_col: f"{data_name}"})
+                else:
+                    logging.warning(f"FAILED TO RENAME COLUMN NAME {data_name}, in function write_to_db, continue")
+                return df
+
+        except Exception as e:
+            logging.warning(f"{e}, not match YFinance, continue")
+            pass
+
+        try:
+            match df["date"][1]:  # Fred data
+                case fred if re.match("[0-9]{4}-[0-9]+-[0-9]+", fred):
+                    # 匹配：FRED 2020-01-01
+                    df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d").dt.strftime("%Y-%m-%d")
+
+                    # 判断列数是否大于1，且区分是不是百分比数据
+                    if len(df.columns) > 1 and is_pct_data == False:  # rename col with data name
+                        second_col = df.columns[1]
+                        df = df.rename(columns={second_col: f"{data_name}"})
+                    elif len(df.columns) > 1 and is_pct_data == True:  # rename col, pct data
                         second_col = df.columns[1]
                         df = df.rename(columns={second_col: f"{data_name}"})
                     else:
@@ -125,43 +151,28 @@ class DatabaseConverter():
                 case _:
                     logging.warning("Haven't MATCH DATA in method _format_converter, continue")
                     pass
-
-            match df["date"][1]:  # Fred data
-                case fred if re.match("[0-9]{4}/[0-9]+/[0-9]+", fred):
-                    # 匹配：FRED 2020/1/1
-                    df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d").dt.strftime("%Y-%m-%d")
-                    df = df.drop(columns=["realtime_start", "realtime_end"])
-
-                    # 判断列数是否大于1，且区分是不是百分比数据
-                    if len(df.columns) > 1 and is_pct_data == False:  # rename col with data name
-                        second_col = df.columns["value"]
-                        df = df.rename(columns={second_col: f"{data_name}"})
-                    elif len(df.columns) > 2 and is_pct_data == True:  # rename col, pct data
-                        df.drop(columns=["value"], inplace=True)
-                        second_col = df.columns["MoM_growth"]
-                        df = df.rename(columns={second_col: f"{data_name}_%MoM_change"})
-                    else:
-                        logging.warning(f"FAILED TO RENAME COLUMN NAME {data_name}, in function write_to_db, continue")
-                    return df
-
-                case _:
-                    logging.warning("Haven't MATCH DATA in method _format_converter, continue")
-                    pass
+        except Exception as e:
+            logging.warning(f"{e}, not match FRED, continue")
+            pass
 
             ################################ 没法下载BLS数据，所以暂时没法match这个数据
             ###################  is_pct_data 区分一个True
 
-            match df["Date"][1]:  # Trading Economics data
+        try:
+            match df["date"][1]:  # Trading Economics data
                 case trading_eco if re.match("[A-Z][a-z]+_[0-9]{4}", trading_eco):
-                    split_data = df["Date"].str.split("_", expand=True)
-                    month_str = split_data[0]
-                    year = split_data[1].astype(int)  # 转换为整数
-                    if month_str == "Dec":
-                        year += 1
-                        month = 1
-                    else:
-                        month = month_str.apply(DatabaseConverter._convert_month_str_to_num)  # 应用文件下面的函数
-                    df["date"] = f"{year}/{month:02d}/01"
+                    df.rename(columns = {"date": "Date"}, inplace=True )
+                    df.rename(columns = {"value": f"{data_name}"}, inplace=True)
+                    split_data = df["Date"].str.split("_", expand=True).replace()
+                    month_str : pd.Series = split_data[0]
+                    year : pd.Series = split_data[1].astype(int)  # 转换为整数
+
+                    dec_mask = (month_str == "Dec")  # 布尔掩码
+                    year = year.where(~dec_mask, year + 1)  # Dec 年份 +1
+                    month = month_str.apply(DatabaseConverter._convert_month_str_to_num)
+                    month = month.where(~dec_mask, 1)
+                    df["date"] = year.astype(str) + "-" + month.astype(str).str.zfill(2) + "-01"
+
                     df.drop(columns=["Date"], inplace=True)
                     date_col = df.pop("date")
                     df.insert(0, "date", date_col)
@@ -169,11 +180,9 @@ class DatabaseConverter():
 
                 case _:
                     pass
-
         except Exception as e:
-            logging.error(f"{e}, FAILED to write into database")
-            df = pd.DataFrame()
-            return df
+            logging.warning(f"{e}, not match TE, continue")
+            pass
 
     def _create_ts_sheet(self, start_date : str):
         """If time_series_table does not exist, then create new db
@@ -200,6 +209,21 @@ class DatabaseConverter():
                 return cursor
             else:
                 logging.info("Time_Series table already exists, continue")
+                cursor.execute("SELECT MAX(date) FROM Time_Series")
+                max_date_str = cursor.fetchone()[0]
+                max_date = datetime.strptime(max_date_str, '%Y-%m-%d').date()
+
+                # 计算需要添加的日期
+                current_date = datetime.now().date()
+                if current_date > max_date:
+                    dates_to_add = []
+                    while current_date > max_date:
+                        dates_to_add.append(current_date)
+                        current_date -= timedelta(days=1)
+                    # 插入数据
+                    for date in dates_to_add:
+                        cursor.execute("INSERT INTO Time_Series (date) VALUES (?)", (date.strftime('%Y-%m-%d'),))
+                    self.conn.commit()
                 return cursor
 
         except sqlite3.Error as e:
@@ -395,7 +419,7 @@ class YFDownloader(DataDownloader):
                     converter = DatabaseConverter()
                     converter.write_into_db(
                         df=data,
-                        data_name=table_name,
+                        data_name=table_config["name"],
                         start_date=self.start_date,
                         is_time_series=True,
                         is_pct_data=table_config["needs_pct"]
@@ -477,7 +501,7 @@ class FREDDownloader(DataDownloader):
                     converter = DatabaseConverter()
                     converter.write_into_db(
                         df=df,
-                        data_name=table_name,
+                        data_name=table_config["name"],
                         start_date=self.start_date,
                         is_time_series=True,
                         is_pct_data=table_config["needs_pct"]
@@ -576,7 +600,7 @@ class BLSDownloader(DataDownloader):
                 converter = DatabaseConverter()
                 converter.write_into_db(
                     df=df,
-                    data_name=table_name,
+                    data_name=table_config["name"],
                     start_date=self.start_date,
                     is_time_series=True,
                     is_pct_data=table_config["needs_pct"]
@@ -618,6 +642,7 @@ class TEDownloader(DataDownloader):
         self.start_year : int  = request_year
         self.start_date: str = str(request_year) + "-01-01"
         options = Options()
+        # options.add_argument("--headless")
         options.add_argument("--disable-blink-features=AutomationControlled")
         self.driver = webdriver.Chrome(options=options)
 
@@ -743,7 +768,7 @@ class TEDownloader(DataDownloader):
                 converter = DatabaseConverter()
                 converter.write_into_db(
                     df=df,
-                    data_name=table_name,
+                    data_name=table_config["name"],
                     start_date=self.start_date,
                     is_time_series=True,
                     is_pct_data=table_config["needs_pct"]

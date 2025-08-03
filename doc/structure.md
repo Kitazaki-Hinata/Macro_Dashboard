@@ -54,7 +54,7 @@
 - ```_convert_month_str_to_num``` : 将月份字符串转换为数字，内部函数
 - ```_rename_bea_date_col``` : 统一时间轴的函数，输入df，输出修改完日期格式的df ；统一所有的数据时间戳在第一列且名称叫date；
 - ```_format_converter``` : 统一数据格式，输入df，输出统一格式的df
-     - ```data_name``` 数据名称，用于报错与列名
+     - ```data_name``` 数据名称，用于报错与列名，```table_config["code"]```
      - ```is_pct_data``` 判断是否是百分比数据，默认为False，输入json的```needs_pct```。
 - ```_create_ts_sheet``` : 创建Time_Series表，如果存在则跳过
 - ```write_info_db``` : 封装输出dataframe数据到data.db数据库，包含统一不同数据dataframe的时间戳的功能。
