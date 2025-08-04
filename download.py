@@ -112,19 +112,11 @@ class DatabaseConverter():
 
         try:   # match yfinance
             if df.columns.tolist() == ["Close", "High", "Low", "Open", "Volume"]:
-                df["date"] = pd.to_datetime(
-                    pd.Series(df.index).astype(str).str.split().str[0],
-                    errors="coerce"
-                ).dt.strftime("%Y-%m-%d")
-                df = df.reset_index(drop=True)
-                df.drop(columns=["High", "Low", "Open", "Volume", "Date"], inplace=True)  # implace, 直接替换原来的df
-                date_col = df.pop("date")
-                df.insert(0, "date", date_col)  # 这里将date放到第一列
-                if len(df.columns) > 1:  # rename col with data name
-                    second_col = df.columns[1]
-                    df = df.rename(columns={second_col: f"{data_name}"})
-                else:
-                    logging.warning(f"FAILED TO RENAME COLUMN NAME {data_name}, in function write_to_db, continue")
+                df.index = pd.Series(df.index).astype(str).str.split().str[0]
+                df.drop(columns = ["High", "Low", "Open", "Volume"], inplace=True)  # implace, 直接替换原来的df
+                df["date"] = df.index
+                df = df.reindex(columns = ["date", "Close"]) # 这里将date放到第一列
+                df = df.rename(columns={"Close": f"{data_name}"})
                 return df
 
         except Exception as e:
