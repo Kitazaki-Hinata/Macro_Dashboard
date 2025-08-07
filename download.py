@@ -8,6 +8,7 @@ import sqlite3
 import random
 import numpy as np
 import requests
+import debug.mock_api as mock_api
 import pandas as pd
 import yfinance as yf
 from datetime import date, datetime, timedelta
@@ -56,15 +57,16 @@ class DatabaseConverter():
     def _format_converter(df: pd.DataFrame, data_name : str, is_pct_data : bool)-> pd.DataFrame:
         try:
             # 将index统一转换为2020-01-01
-            match df.index[1]:  # BEA
-                case bea_a if re.fullmatch(r"[0-9]{4}", bea_a):
+            # match BEA
+            match df.index[1]:
+                case a if re.fullmatch(r"[0-9]{4}", a):
                     # 匹配： BEA_a 2020
                     df.index = df.index + "-12-31"
                     df["date"] = pd.to_datetime(df.index, format="%Y-%m-%d")
                     df = DatabaseConverter._rename_bea_date_col(df)
                     return df
 
-                case bea_q if re.fullmatch(r"[0-9]{4}Q[0-9]{1}", bea_q):
+                case q if re.fullmatch(r"[0-9]{4}Q[0-9]{1}", q):
                     # 匹配：BEA_q 2020Q1
                     def convert_q_format(date_str):
                         # 匹配：BEA_q 2020Q1
@@ -82,7 +84,7 @@ class DatabaseConverter():
                     df = DatabaseConverter._rename_bea_date_col(df)
                     return df
 
-                case bea_m if re.fullmatch(r"[0-9]{4}M[0-9]{2}", bea_m):
+                case m if re.fullmatch(r"[0-9]{4}M[0-9]{2}", m):
                     # 匹配：BEA_m 2020M01
                     def convert_m_format(date_str):
                         # 转换月份格式，如果要是2020M12 -> 2021-01-01
@@ -104,13 +106,11 @@ class DatabaseConverter():
                     return df
 
                 case _:
-                    logging.warning("Haven't MATCH DATA in method _format_converter, continue")
                     pass
         except Exception as e:
-            logging.warning(f"{e}, not match BEA, continue")
-            pass
-
-        try:   # match yfinance
+            logging.warning(f"{e} can't match any in function _format_converter")
+        try:
+            # match yfinance
             if df.columns.tolist() == ["Close", "High", "Low", "Open", "Volume"]:
                 df.index = pd.Series(df.index).astype(str).str.split().str[0]
                 df.drop(columns = ["High", "Low", "Open", "Volume"], inplace=True)  # implace, 直接替换原来的df
@@ -118,15 +118,12 @@ class DatabaseConverter():
                 df = df.reindex(columns = ["date", "Close"]) # 这里将date放到第一列
                 df = df.rename(columns={"Close": f"{data_name}"})
                 return df
-
         except Exception as e:
-            logging.warning(f"{e}, not match YFinance, continue")
-            pass
-
+            logging.warning(f"{e} can't match any in function _format_converter")
         try:
-            match df["date"][1]:  # Fred data
+            # match FRED
+            match df["date"][1]:
                 case fred if re.match("[0-9]{4}-[0-9]+-[0-9]+", fred):
-                    # 匹配：FRED 2020-01-01
                     df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d").dt.strftime("%Y-%m-%d")
 
                     # 判断列数是否大于1，且区分是不是百分比数据
@@ -139,20 +136,50 @@ class DatabaseConverter():
                     else:
                         logging.warning(f"FAILED TO RENAME COLUMN NAME {data_name}, in function write_to_db, continue")
                     return df
-
                 case _:
-                    logging.warning("Haven't MATCH DATA in method _format_converter, continue")
                     pass
         except Exception as e:
-            logging.warning(f"{e}, not match FRED, continue")
-            pass
-
-            ################################ 没法下载BLS数据，所以暂时没法match这个数据
-            ###################  is_pct_data 区分一个True
-
+            logging.warning(f"{e} can't match any in function _format_converter")
         try:
-            match df["date"][1]:  # Trading Economics data
-                case trading_eco if re.match("[A-Z][a-z]+_[0-9]{4}", trading_eco):
+            # match BLS
+            if list(df.columns) == ["year", "period", "value"] or list(df.columns) == ["year", "period", "MoM_growth"]:
+                # change month num
+                if df["period"][1][0] == "M":
+                    df["period"] = (
+                        df["period"].str[1:].astype(int).apply(
+                            lambda x : 1 if x == 12 else x + 1
+                        ).astype(str).str.zfill(2)
+                    )
+                elif df["period"][1][0] == "Q":
+                    def month_map(num : int) -> int:
+                        if num == 1:  # Q1
+                            return 4
+                        elif num == 2:  # Q2
+                            return 7
+                        elif num == 3:  # Q3
+                            return 10
+                        elif num == 4:  # Q4
+                            return 1
+                    df["period"] =  (
+                        df["period"].str[1:].astype(int).apply(month_map).astype(str).str.zfill(2)
+                    )
+                mask = df["period"] == "01"
+                df.loc[mask, "year"] = df.loc[mask, "year"].astype(int) + 1  # 只更新这些行的年份
+                df["year"] = df["year"].astype(int)
+
+                # reformat df
+                df.rename(columns={"value": f"{data_name}"}, inplace=True)
+                df.rename(columns = {"MoM_growth": f"{data_name}"}, inplace=True)
+                df["date"] = df["year"].astype(str) + "-" + df["period"].astype(str) + "-01"
+                df = df.drop(columns=["period", "year"])
+                df = df.reindex(columns = ["date", f"{data_name}"])
+                return df
+        except Exception as e:
+            logging.warning(f"{e} can't match any in function _format_converter")
+        try:
+            # match TE
+            match df["date"][1]:
+                case te if re.match("[A-Z][a-z]+_[0-9]{4}", te):
                     df.rename(columns = {"date": "Date"}, inplace=True )
                     df.rename(columns = {"value": f"{data_name}"}, inplace=True)
                     split_data = df["Date"].str.split("_", expand=True).replace()
@@ -169,12 +196,10 @@ class DatabaseConverter():
                     date_col = df.pop("date")
                     df.insert(0, "date", date_col)
                     return df
-
                 case _:
                     pass
         except Exception as e:
-            logging.warning(f"{e}, not match TE, continue")
-            pass
+            logging.error(f"{e} can't match any in function _format_converter")
 
     def _create_ts_sheet(self, start_date : str):
         """If time_series_table does not exist, then create new db
@@ -539,71 +564,82 @@ class BLSDownloader(DataDownloader):
         self.start_year : int  = request_year
         self.start_date : str  = str(request_year)+"-01-01"
 
-    def to_db(self, return_df = False):
+    def to_db(self, return_df : bool = False, debug : bool = False):
         df_dict : dict = {}
-        for table_name, table_config in self.json_dict.items():
-            try:
-                params = json.dumps(
-                    {
-                        "seriesid": table_config["code"],
-                        "startyear": self.start_year,
-                        "endyear": date.today().year,
-                        "registrationKey": self.api_key
-                        }
+        if debug is True:
+            # debug --- mock df
+            converter = DatabaseConverter()
+            converter.write_into_db(
+                df=mock_api.return_bls_data(),
+                data_name="Trial",
+                start_date=self.start_date,
+                is_time_series=True,
+                is_pct_data=False
+            )
+        else:   # None debug mode
+            for table_name, table_config in self.json_dict.items():
+                try:
+                    params = json.dumps(
+                        {
+                            "seriesid": [table_config["code"]],
+                            "startyear": self.start_year,
+                            "endyear": date.today().year,
+                            "registrationKey": self.api_key
+                            }
+                        )
+                    context = requests.post(
+                        BLSDownloader.url,
+                        data=params,
+                        headers=dict([BLSDownloader.headers])
                     )
-                context = requests.post(
-                    BLSDownloader.url,
-                    data=params,
-                    headers=dict([BLSDownloader.headers])
-                )
-                json_data = json.loads(context.text)
-                logging.info(f"{table_name} Successfully download data")
-            except Exception as e:
-                logging.error(f"{table_name} FAILED EXTRACT DATA from BLS"
-                              f"Probably due to API extraction problems, {e}")
-                continue
-
-            # reformat data
-            try:
-                df = pd.DataFrame(json_data["Results"]["series"][0]["data"]).drop(
-                    columns=["periodName", "latest", "footnotes"])
-            except:
-                try:
-                    df = pd.DataFrame(json_data)
-                    logging.warning(f"{table_name} FAILED REFORMAT: DROP USELESS COLUMNS, continue")
+                    json_data = json.loads(context.text)
+                    logging.info(f"{table_name} Successfully download data")
                 except Exception as e:
-                    logging.error(f"{table_name} FAILED REFORMAT data from BLS, errors in df managing, {e}")
+                    logging.error(f"{table_name} FAILED EXTRACT DATA from BLS"
+                                  f"Probably due to API extraction problems, {e}")
                     continue
 
-            if table_config["needs_pct"] is True:
+                # reformat data
                 try:
-                    df["value"] = pd.to_numeric(df["value"])
-                    df["MoM_growth"] = ((df["value"] - df["value"].shift(1)) / (df["value"].shift(1)) * -1).shift(-1)
-                    df = df.drop(df.columns[-2], axis=1)
-                except Exception as e:
-                    logging.error(f"{table_name} FAILED REFORMAT PERCENTAGE, probably due to df error, {e}")
+                    df = pd.DataFrame(json_data["Results"]["series"][0]["data"]).drop(
+                        columns=["periodName", "latest", "footnotes"])
+                except:
+                    try:
+                        df = pd.DataFrame(json_data)
+                        logging.warning(f"{table_name} FAILED REFORMAT: DROP USELESS COLUMNS, continue")
+                    except Exception as e:
+                        logging.error(f"{table_name} FAILED REFORMAT data from BLS, errors in df managing, {e}")
+                        continue
+
+                if table_config["needs_pct"] is True:
+                    try:
+                        df["value"] = pd.to_numeric(df["value"])
+                        df["MoM_growth"] = ((df["value"] - df["value"].shift(1)) / (df["value"].shift(1)) * -1).shift(-1)
+                        df = df.drop(df.columns[-2], axis=1)
+                    except Exception as e:
+                        logging.error(f"{table_name} FAILED REFORMAT PERCENTAGE, probably due to df error, {e}")
+                        continue
+
+                if return_df is True and isinstance(df, pd.DataFrame):
+                    df_dict[table_name] = df
+                    logging.info(f"{table_name} Successfully extracted!")
+                    continue
+                elif return_df is False:
+                    converter = DatabaseConverter()
+                    converter.write_into_db(
+                        df=df,
+                        data_name=table_config["name"],
+                        start_date=self.start_date,
+                        is_time_series=True,
+                        is_pct_data=table_config["needs_pct"]
+                    )
+                    logging.info(f"{table_name} Successfully extracted!")
                     continue
 
-            if return_df is True and isinstance(df, pd.DataFrame):
-                df_dict[table_name] = df
-                logging.info(f"{table_name} Successfully extracted!")
-                continue
-            elif return_df is False:
-                converter = DatabaseConverter()
-                converter.write_into_db(
-                    df=df,
-                    data_name=table_config["name"],
-                    start_date=self.start_date,
-                    is_time_series=True,
-                    is_pct_data=table_config["needs_pct"]
-                )
-                logging.info(f"{table_name} Successfully extracted!")
-                continue
-
-        if return_df is True:
-            return df_dict
-        else:
-            return None
+            if return_df is True:
+                return df_dict
+            else:
+                return None
 
     def to_csv(self) -> None:
         try:

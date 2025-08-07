@@ -58,7 +58,8 @@ bls = "YOUR-API-KEY-000000"
 - Yahoo Finance API
 - BEA API
 - FRED API
-- BLS API
+- BLS API  **（注意: 此API需要非中国IP进行访问）**
+- TradingEconomics
 - 其他来源的数据
 
 ###### 正在更新的数据源
