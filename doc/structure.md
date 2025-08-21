@@ -4,7 +4,7 @@
 **序：完整程序结构与流程图**
 1. **download.py：通过API或者抓取方式获取数据并存入数据库**
 2. data.db：数据库，存储每次下载的数据
-3. pyqt交互界面，数据可视化
+3. pyside6 交互界面，数据可视化
 4. pyproject.toml 环境依赖配置文档
 5. request_id.json 储存用于API请求的参数
 6. 其他：日志文件，md文档，架构图与html展示性页面
