@@ -6,17 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>791</width>
-    <height>445</height>
+    <width>831</width>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Macro Data Dashboard</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color : #33363a;</string>
+   <string notr="true">background-color: #33363a;</string>
   </property>
   <widget class="QWidget" name="style_sheet">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <property name="spacing">
      <number>0</number>
@@ -35,6 +38,9 @@
     </property>
     <item>
      <widget class="QWidget" name="self_sized_main_widget" native="true">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="spacing">
         <number>0</number>
@@ -73,11 +79,19 @@
 }
 
 QPushButton:hover{
-	background-color : #000000;
+	background-color : #33363a;
 	border-radius : 0;
 	margin :0;
 	border :0;
 }
+
+QPushButton:pressed{
+	background-color : #90b6e7;
+	border-radius : 0;
+	margin :0;
+	border :0;
+}
+
 </string>
            </property>
            <property name="lineWidth">
@@ -129,8 +143,13 @@ QPushButton:hover{
                 <height>40</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-image: url(./assets/svg/one.svg);
+background-position : center;
+background-repeat : no-repeat;</string>
+              </property>
               <property name="text">
-               <string>PushButton</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -148,8 +167,13 @@ QPushButton:hover{
                 <height>40</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-image: url(./assets/svg/four.svg);
+background-position : center;
+background-repeat : no-repeat;</string>
+              </property>
               <property name="text">
-               <string>PushButton</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -163,12 +187,17 @@ QPushButton:hover{
               </property>
               <property name="maximumSize">
                <size>
-                <width>70</width>
+                <width>60</width>
                 <height>40</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-image: url(./assets/svg/table.svg);
+background-position : center;
+background-repeat : no-repeat;</string>
+              </property>
               <property name="text">
-               <string>PushButton</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -176,18 +205,24 @@ QPushButton:hover{
              <widget class="QPushButton" name="note_btn">
               <property name="minimumSize">
                <size>
-                <width>50</width>
+                <width>60</width>
                 <height>40</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>70</width>
+                <width>60</width>
                 <height>40</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-image: url(./assets/svg/notebtn2.svg);
+background-position : center;
+background-repeat : no-repeat;
+</string>
+              </property>
               <property name="text">
-               <string>PushButton</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -218,12 +253,39 @@ QPushButton:hover{
                 <height>40</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-image: url(./assets/svg/settings.svg);
+background-position : center;
+background-repeat : no-repeat;
+</string>
+              </property>
               <property name="text">
-               <string>PushButton</string>
+               <string/>
               </property>
              </widget>
             </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Policy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
+           <zorder>four_page_btn</zorder>
+           <zorder>table_btn</zorder>
+           <zorder>note_btn</zorder>
+           <zorder>settings</zorder>
+           <zorder>one_page_btn</zorder>
           </widget>
          </item>
         </layout>
@@ -254,41 +316,142 @@ QPushButton:hover{
           </property>
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
-            <property name="lineWidth">
-             <number>0</number>
-            </property>
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="one_chart_interface">
-             <property name="styleSheet">
-              <string notr="true"/>
+            <widget class="QWidget" name="page_one_container">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
-             <widget class="QTabWidget" name="tabWidget">
-              <property name="geometry">
-               <rect>
-                <x>90</x>
-                <y>90</y>
-                <width>127</width>
-                <height>80</height>
-               </rect>
-              </property>
-              <property name="currentIndex">
+             <property name="styleSheet">
+              <string notr="true">background-color: #2a2f39;</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <property name="spacing">
                <number>0</number>
               </property>
-              <widget class="QWidget" name="tab_5">
-               <attribute name="title">
-                <string>Tab 1</string>
-               </attribute>
-              </widget>
-              <widget class="QWidget" name="tab_6">
-               <attribute name="title">
-                <string>Tab 2</string>
-               </attribute>
-              </widget>
-             </widget>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QTabWidget" name="tabWidget">
+                <property name="font">
+                 <font>
+                  <family>Comfortaa</family>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">* {
+	background-color : #33363a;
+	font-family : &quot;Comfortaa&quot;;
+	border : 0;
+}
+
+QTabBar::tab {
+    background-color: #2a2f39;
+	color: #90b6e7;
+    padding: 6px 12px;
+	border-radius : 10px;
+}
+
+QTabBar::tab:hover {
+    background-color: #90b6e7;
+    color: #252526;
+	border-radius : 0;
+	border-radius : 10px;
+}
+
+QTabWidget::pane{
+	
+}</string>
+                </property>
+                <property name="tabPosition">
+                 <enum>QTabWidget::TabPosition::North</enum>
+                </property>
+                <property name="tabShape">
+                 <enum>QTabWidget::TabShape::Rounded</enum>
+                </property>
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>10</height>
+                 </size>
+                </property>
+                <property name="elideMode">
+                 <enum>Qt::TextElideMode::ElideNone</enum>
+                </property>
+                <property name="usesScrollButtons">
+                 <bool>true</bool>
+                </property>
+                <property name="documentMode">
+                 <bool>true</bool>
+                </property>
+                <property name="tabsClosable">
+                 <bool>true</bool>
+                </property>
+                <property name="movable">
+                 <bool>true</bool>
+                </property>
+                <property name="tabBarAutoHide">
+                 <bool>false</bool>
+                </property>
+                <widget class="QWidget" name="tab">
+                 <attribute name="title">
+                  <string>Tab Box 1</string>
+                 </attribute>
+                </widget>
+                <widget class="QWidget" name="tab_2">
+                 <attribute name="title">
+                  <string>Tab 2</string>
+                 </attribute>
+                </widget>
+               </widget>
+              </item>
+             </layout>
             </widget>
-            <widget class="QWidget" name="four_chart_interface"/>
+            <widget class="QWidget" name="page_four_container">
+             <layout class="QVBoxLayout" name="verticalLayout_3"/>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="author_name">
+            <property name="font">
+             <font>
+              <family>Comfortaa</family>
+              <pointsize>-1</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color:#90b6e7;
+font-family:&quot;Comfortaa&quot;;
+padding:3px;
+border: 0;
+font-size:10px;</string>
+            </property>
+            <property name="text">
+             <string>Love from : Kitazaki Hinata</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+            </property>
            </widget>
           </item>
          </layout>
