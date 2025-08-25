@@ -20,7 +20,11 @@
     <file>png/true.png</file>
   </qresource>
   <qresource prefix="svg">
+    <file>svg/delete.svg</file>
+    <file>svg/save.svg</file>
+    <file>svg/expand.svg</file>
     <file>svg/add_page.svg</file>
+    <file>svg/fold.svg</file>
     <file>svg/set_preference.svg</file>
     <file>svg/close_2.svg</file>
   </qresource>

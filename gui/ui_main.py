@@ -16,8 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QPushButton, QSizePolicy, QSpacerItem, QStackedWidget,
+    QGroupBox, QHBoxLayout, QHeaderView, QLabel,
+    QLineEdit, QMainWindow, QPlainTextEdit, QPushButton,
+    QScrollArea, QSizePolicy, QSpacerItem, QStackedWidget,
     QTabWidget, QTableView, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
@@ -269,7 +270,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
         self.title_label = QLabel(self.text_container)
         self.title_label.setObjectName(u"title_label")
-        self.title_label.setMaximumSize(QSize(16777215, 18))
+        self.title_label.setMaximumSize(QSize(16777215, 20))
         font1 = QFont()
         font1.setFamilies([u"Comfortaa"])
         font1.setPointSize(14)
@@ -398,26 +399,26 @@ class Ui_MainWindow(object):
         self.text_container_2.setMinimumSize(QSize(0, 0))
         self.text_container_2.setMaximumSize(QSize(16777215, 40))
         self.verticalLayout_9 = QVBoxLayout(self.text_container_2)
-        self.verticalLayout_9.setSpacing(0)
+        self.verticalLayout_9.setSpacing(6)
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
         self.verticalLayout_9.setContentsMargins(0, 0, 0, 0)
-        self.title_label_2 = QLabel(self.text_container_2)
-        self.title_label_2.setObjectName(u"title_label_2")
-        self.title_label_2.setMaximumSize(QSize(16777215, 18))
-        self.title_label_2.setFont(font1)
-        self.title_label_2.setStyleSheet(u"color: #ffffff; \n"
+        self.table_title_label = QLabel(self.text_container_2)
+        self.table_title_label.setObjectName(u"table_title_label")
+        self.table_title_label.setMaximumSize(QSize(16777215, 20))
+        self.table_title_label.setFont(font1)
+        self.table_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
-        self.verticalLayout_9.addWidget(self.title_label_2)
+        self.verticalLayout_9.addWidget(self.table_title_label)
 
-        self.update_label_2 = QLabel(self.text_container_2)
-        self.update_label_2.setObjectName(u"update_label_2")
-        self.update_label_2.setMaximumSize(QSize(16777215, 12))
-        self.update_label_2.setFont(font2)
-        self.update_label_2.setStyleSheet(u"margin-left : 10px; \n"
+        self.table_update_label = QLabel(self.text_container_2)
+        self.table_update_label.setObjectName(u"table_update_label")
+        self.table_update_label.setMaximumSize(QSize(16777215, 12))
+        self.table_update_label.setFont(font2)
+        self.table_update_label.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
 
-        self.verticalLayout_9.addWidget(self.update_label_2)
+        self.verticalLayout_9.addWidget(self.table_update_label)
 
 
         self.horizontalLayout_6.addWidget(self.text_container_2)
@@ -445,6 +446,7 @@ class Ui_MainWindow(object):
 "margin-left : 10px;\n"
 "margin-right : 10px;")
         self.verticalLayout_10 = QVBoxLayout(self.table_container)
+        self.verticalLayout_10.setSpacing(0)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
         self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
         self.tableView = QTableView(self.table_container)
@@ -491,7 +493,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.setContentsMargins(4, 0, 0, 0)
         self.four_title_label = QLabel(self.four_text_container)
         self.four_title_label.setObjectName(u"four_title_label")
-        self.four_title_label.setMaximumSize(QSize(16777215, 18))
+        self.four_title_label.setMaximumSize(QSize(16777215, 20))
         self.four_title_label.setFont(font1)
         self.four_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
@@ -536,7 +538,7 @@ class Ui_MainWindow(object):
         self.gridLayout = QGridLayout(self.chart_widget)
         self.gridLayout.setSpacing(8)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.gridLayout.setContentsMargins(15, 0, 15, 0)
+        self.gridLayout.setContentsMargins(10, 0, 10, 0)
         self.four_chart_one = QWidget(self.chart_widget)
         self.four_chart_one.setObjectName(u"four_chart_one")
         self.four_chart_one.setStyleSheet(u"QWidget {\n"
@@ -577,6 +579,645 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.chart_widget)
 
         self.stackedWidget.addWidget(self.page_four_container)
+        self.page_note_container = QWidget()
+        self.page_note_container.setObjectName(u"page_note_container")
+        self.horizontalLayout_7 = QHBoxLayout(self.page_note_container)
+        self.horizontalLayout_7.setSpacing(0)
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.note_list = QWidget(self.page_note_container)
+        self.note_list.setObjectName(u"note_list")
+        self.note_list.setMinimumSize(QSize(0, 0))
+        self.note_list.setMaximumSize(QSize(200, 16777215))
+        self.note_list.setStyleSheet(u"* {\n"
+"background-color: #3e4146;\n"
+"border : 0;\n"
+"margin :0;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"/* scroll bar*/\n"
+" QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: #303030;\n"
+"    width: 8px;\n"
+"    margin: 21px 0 21px 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+" QScrollBar::handle:vertical {	\n"
+"	background: #90b6e7;\n"
+"    min-height: 25px;\n"
+"	border-radius: 4px\n"
+" }\n"
+"\n"
+"\n"
+"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6309\u94ae*/\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-bottom-left-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+"\n"
+"\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc"
+                        "\u666f\u989c\u8272*/\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"     background: none;\n"
+" }\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"     background: none;\n"
+" }\n"
+"")
+        self.verticalLayout_15 = QVBoxLayout(self.note_list)
+        self.verticalLayout_15.setSpacing(0)
+        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
+        self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
+        self.expand_btn_container = QFrame(self.note_list)
+        self.expand_btn_container.setObjectName(u"expand_btn_container")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.expand_btn_container.sizePolicy().hasHeightForWidth())
+        self.expand_btn_container.setSizePolicy(sizePolicy1)
+        self.expand_btn_container.setMinimumSize(QSize(0, 50))
+        self.expand_btn_container.setMaximumSize(QSize(16777215, 50))
+        self.expand_btn_container.setStyleSheet(u"QPushButton {\n"
+"\n"
+"	background-color : #3e4146;\n"
+"	border : 0;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color : #515660;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color : #2b2e32;\n"
+"}\n"
+"")
+        self.expand_btn_container.setFrameShape(QFrame.Shape.NoFrame)
+        self.expand_btn_container.setFrameShadow(QFrame.Shadow.Plain)
+        self.expand_btn_container.setLineWidth(0)
+        self.expand_fold = QPushButton(self.expand_btn_container)
+        self.expand_fold.setObjectName(u"expand_fold")
+        self.expand_fold.setGeometry(QRect(0, 0, 200, 50))
+        self.expand_fold.setMinimumSize(QSize(0, 50))
+        self.expand_fold.setStyleSheet(u" image: url(:svg/svg/fold.svg);\n"
+" padding : 15px;")
+
+        self.verticalLayout_15.addWidget(self.expand_btn_container)
+
+        self.note_list_text_container = QWidget(self.note_list)
+        self.note_list_text_container.setObjectName(u"note_list_text_container")
+        self.note_list_text_container.setMinimumSize(QSize(0, 50))
+        self.note_list_text_container.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.note_list_text_container.setStyleSheet(u"background : #3a3b43;")
+        self.verticalLayout_17 = QVBoxLayout(self.note_list_text_container)
+        self.verticalLayout_17.setSpacing(0)
+        self.verticalLayout_17.setObjectName(u"verticalLayout_17")
+        self.verticalLayout_17.setContentsMargins(0, 0, 0, 0)
+        self.note_text_container_3 = QWidget(self.note_list_text_container)
+        self.note_text_container_3.setObjectName(u"note_text_container_3")
+        self.note_text_container_3.setMaximumSize(QSize(16777215, 40))
+        self.note_text_container_3.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.verticalLayout_16 = QVBoxLayout(self.note_text_container_3)
+        self.verticalLayout_16.setSpacing(0)
+        self.verticalLayout_16.setObjectName(u"verticalLayout_16")
+        self.verticalLayout_16.setContentsMargins(0, 0, 0, 0)
+        self.four_title_label_3 = QLabel(self.note_text_container_3)
+        self.four_title_label_3.setObjectName(u"four_title_label_3")
+        self.four_title_label_3.setMaximumSize(QSize(16777215, 18))
+        font3 = QFont()
+        font3.setFamilies([u"Comfortaa"])
+        font3.setPointSize(10)
+        font3.setBold(True)
+        self.four_title_label_3.setFont(font3)
+        self.four_title_label_3.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.four_title_label_3.setStyleSheet(u"color: #ffffff; \n"
+"margin-left : 7px; ")
+        self.four_title_label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_16.addWidget(self.four_title_label_3)
+
+        self.four_update_label_3 = QLabel(self.note_text_container_3)
+        self.four_update_label_3.setObjectName(u"four_update_label_3")
+        self.four_update_label_3.setMaximumSize(QSize(16777215, 12))
+        font4 = QFont()
+        font4.setFamilies([u"Comfortaa"])
+        font4.setPointSize(6)
+        font4.setBold(True)
+        self.four_update_label_3.setFont(font4)
+        self.four_update_label_3.setStyleSheet(u"margin-left : 10px; \n"
+"color : #90b6e7;")
+        self.four_update_label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_16.addWidget(self.four_update_label_3)
+
+
+        self.verticalLayout_17.addWidget(self.note_text_container_3)
+
+
+        self.verticalLayout_15.addWidget(self.note_list_text_container)
+
+        self.scrollArea = QScrollArea(self.note_list)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setStyleSheet(u"QPushButton {\n"
+"	min-height : 50px;\n"
+"	font-family : \"Comfortaa\";\n"
+"	font-weight : Bold;\n"
+"	color : white;\n"
+"\n"
+"}")
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 192, 780))
+        self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
+"background:#3a3d43;\n"
+"}\n"
+"\n"
+"QPushButton {\n"
+"	background-color : #3e4146;\n"
+"	border : 0;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color : #515660;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color : #2b2e32;\n"
+"}\n"
+"")
+        self.verticalLayout_18 = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_18.setSpacing(2)
+        self.verticalLayout_18.setObjectName(u"verticalLayout_18")
+        self.verticalLayout_18.setContentsMargins(0, 1, 0, 1)
+        self.text_1 = QPushButton(self.scrollAreaWidgetContents)
+        self.text_1.setObjectName(u"text_1")
+
+        self.verticalLayout_18.addWidget(self.text_1)
+
+        self.text_2 = QPushButton(self.scrollAreaWidgetContents)
+        self.text_2.setObjectName(u"text_2")
+
+        self.verticalLayout_18.addWidget(self.text_2)
+
+        self.pushButton_9 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_9.setObjectName(u"pushButton_9")
+
+        self.verticalLayout_18.addWidget(self.pushButton_9)
+
+        self.pushButton = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.verticalLayout_18.addWidget(self.pushButton)
+
+        self.pushButton_3 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_3.setObjectName(u"pushButton_3")
+
+        self.verticalLayout_18.addWidget(self.pushButton_3)
+
+        self.pushButton_15 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_15.setObjectName(u"pushButton_15")
+
+        self.verticalLayout_18.addWidget(self.pushButton_15)
+
+        self.pushButton_2 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+
+        self.verticalLayout_18.addWidget(self.pushButton_2)
+
+        self.pushButton_5 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_5.setObjectName(u"pushButton_5")
+
+        self.verticalLayout_18.addWidget(self.pushButton_5)
+
+        self.pushButton_11 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_11.setObjectName(u"pushButton_11")
+
+        self.verticalLayout_18.addWidget(self.pushButton_11)
+
+        self.pushButton_14 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_14.setObjectName(u"pushButton_14")
+
+        self.verticalLayout_18.addWidget(self.pushButton_14)
+
+        self.pushButton_4 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_4.setObjectName(u"pushButton_4")
+
+        self.verticalLayout_18.addWidget(self.pushButton_4)
+
+        self.pushButton_7 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_7.setObjectName(u"pushButton_7")
+
+        self.verticalLayout_18.addWidget(self.pushButton_7)
+
+        self.pushButton_12 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_12.setObjectName(u"pushButton_12")
+
+        self.verticalLayout_18.addWidget(self.pushButton_12)
+
+        self.pushButton_6 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_6.setObjectName(u"pushButton_6")
+
+        self.verticalLayout_18.addWidget(self.pushButton_6)
+
+        self.pushButton_13 = QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_13.setObjectName(u"pushButton_13")
+
+        self.verticalLayout_18.addWidget(self.pushButton_13)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+        self.verticalLayout_15.addWidget(self.scrollArea)
+
+        self.note_add_del_container = QWidget(self.note_list)
+        self.note_add_del_container.setObjectName(u"note_add_del_container")
+        self.note_add_del_container.setMinimumSize(QSize(0, 40))
+        self.note_add_del_container.setStyleSheet(u"* {\n"
+"background : #3a3b43;\n"
+"}\n"
+"\n"
+"/*\u6bcf\u4e2a\u6309\u94ae\u7684\u6837\u5f0f\u5728\u8fd9\u91cc*/\n"
+"\n"
+"QPushButton {\n"
+"	background-color : #252526;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color : #33363a;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color : #90b6e7;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"")
+        self.horizontalLayout_9 = QHBoxLayout(self.note_add_del_container)
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.note_add_btn = QPushButton(self.note_add_del_container)
+        self.note_add_btn.setObjectName(u"note_add_btn")
+        self.note_add_btn.setMaximumSize(QSize(25, 25))
+        self.note_add_btn.setStyleSheet(u" image: url(:svg/svg/add_page.svg);\n"
+" padding : 4px;")
+
+        self.horizontalLayout_9.addWidget(self.note_add_btn)
+
+        self.note_delete_btn = QPushButton(self.note_add_del_container)
+        self.note_delete_btn.setObjectName(u"note_delete_btn")
+        self.note_delete_btn.setMaximumSize(QSize(25, 25))
+        self.note_delete_btn.setStyleSheet(u" image: url(:svg/svg/delete.svg);\n"
+" padding : 4px;")
+
+        self.horizontalLayout_9.addWidget(self.note_delete_btn)
+
+
+        self.verticalLayout_15.addWidget(self.note_add_del_container)
+
+
+        self.horizontalLayout_7.addWidget(self.note_list)
+
+        self.content_area = QWidget(self.page_note_container)
+        self.content_area.setObjectName(u"content_area")
+        self.verticalLayout_11 = QVBoxLayout(self.content_area)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.text_enter_container = QWidget(self.content_area)
+        self.text_enter_container.setObjectName(u"text_enter_container")
+        self.text_enter_container.setMinimumSize(QSize(0, 80))
+        self.text_enter_container.setMaximumSize(QSize(16777215, 80))
+        self.text_enter_container.setStyleSheet(u"QPushButton {\n"
+"	background-color : #252526;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color : #33363a;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color : #90b6e7;\n"
+"	border-radius : 9px;\n"
+"}")
+        self.horizontalLayout_8 = QHBoxLayout(self.text_enter_container)
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.note_text_container = QWidget(self.text_enter_container)
+        self.note_text_container.setObjectName(u"note_text_container")
+        self.note_text_container.setMaximumSize(QSize(16777215, 40))
+        self.verticalLayout_12 = QVBoxLayout(self.note_text_container)
+        self.verticalLayout_12.setSpacing(6)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.note_title_label = QLabel(self.note_text_container)
+        self.note_title_label.setObjectName(u"note_title_label")
+        self.note_title_label.setMaximumSize(QSize(16777215, 20))
+        self.note_title_label.setFont(font1)
+        self.note_title_label.setStyleSheet(u"color: #ffffff; \n"
+"margin-left : 7px; ")
+
+        self.verticalLayout_12.addWidget(self.note_title_label)
+
+        self.note_update_label = QLabel(self.note_text_container)
+        self.note_update_label.setObjectName(u"note_update_label")
+        self.note_update_label.setMaximumSize(QSize(16777215, 12))
+        self.note_update_label.setFont(font2)
+        self.note_update_label.setStyleSheet(u"margin-left : 10px; \n"
+"color : #90b6e7;")
+
+        self.verticalLayout_12.addWidget(self.note_update_label)
+
+
+        self.horizontalLayout_8.addWidget(self.note_text_container)
+
+        self.save_text = QPushButton(self.text_enter_container)
+        self.save_text.setObjectName(u"save_text")
+        self.save_text.setMaximumSize(QSize(25, 25))
+        self.save_text.setStyleSheet(u" image: url(:svg/svg/save.svg);\n"
+" padding : 4px;")
+
+        self.horizontalLayout_8.addWidget(self.save_text)
+
+        self.horizontalSpacer_3 = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_8.addItem(self.horizontalSpacer_3)
+
+
+        self.verticalLayout_11.addWidget(self.text_enter_container)
+
+        self.note_title_container = QWidget(self.content_area)
+        self.note_title_container.setObjectName(u"note_title_container")
+        self.verticalLayout_13 = QVBoxLayout(self.note_title_container)
+        self.verticalLayout_13.setSpacing(0)
+        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.verticalLayout_13.setContentsMargins(0, 0, 0, 0)
+        self.text_edit_container = QWidget(self.note_title_container)
+        self.text_edit_container.setObjectName(u"text_edit_container")
+        self.text_edit_container.setStyleSheet(u"background-color : #262a2f;\n"
+"border-radius:30px;\n"
+"margin-left : 10px;\n"
+"margin-right : 10px;")
+        self.verticalLayout_14 = QVBoxLayout(self.text_edit_container)
+        self.verticalLayout_14.setSpacing(0)
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.plainTextEdit = QPlainTextEdit(self.text_edit_container)
+        self.plainTextEdit.setObjectName(u"plainTextEdit")
+        self.plainTextEdit.setStyleSheet(u"color : white; \n"
+"font-family : \"Comfortaa\";")
+
+        self.verticalLayout_14.addWidget(self.plainTextEdit)
+
+
+        self.verticalLayout_13.addWidget(self.text_edit_container)
+
+
+        self.verticalLayout_11.addWidget(self.note_title_container)
+
+
+        self.horizontalLayout_7.addWidget(self.content_area)
+
+        self.stackedWidget.addWidget(self.page_note_container)
+        self.page_settings_container = QWidget()
+        self.page_settings_container.setObjectName(u"page_settings_container")
+        self.page_settings_container.setStyleSheet(u"")
+        self.verticalLayout_19 = QVBoxLayout(self.page_settings_container)
+        self.verticalLayout_19.setSpacing(12)
+        self.verticalLayout_19.setObjectName(u"verticalLayout_19")
+        self.verticalLayout_19.setContentsMargins(18, -1, 18, -1)
+        self.setting_text_container = QWidget(self.page_settings_container)
+        self.setting_text_container.setObjectName(u"setting_text_container")
+        self.setting_text_container.setMaximumSize(QSize(16777215, 80))
+        self.verticalLayout_22 = QVBoxLayout(self.setting_text_container)
+        self.verticalLayout_22.setSpacing(0)
+        self.verticalLayout_22.setObjectName(u"verticalLayout_22")
+        self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
+        self.note_text_container_2 = QWidget(self.setting_text_container)
+        self.note_text_container_2.setObjectName(u"note_text_container_2")
+        self.note_text_container_2.setMaximumSize(QSize(16777215, 40))
+        self.verticalLayout_21 = QVBoxLayout(self.note_text_container_2)
+        self.verticalLayout_21.setSpacing(6)
+        self.verticalLayout_21.setObjectName(u"verticalLayout_21")
+        self.verticalLayout_21.setContentsMargins(0, 0, 0, 0)
+        self.note_title_label_2 = QLabel(self.note_text_container_2)
+        self.note_title_label_2.setObjectName(u"note_title_label_2")
+        self.note_title_label_2.setMaximumSize(QSize(16777215, 20))
+        self.note_title_label_2.setFont(font1)
+        self.note_title_label_2.setStyleSheet(u"color: #ffffff; \n"
+"margin-left : 1px; ")
+
+        self.verticalLayout_21.addWidget(self.note_title_label_2)
+
+        self.note_update_label_2 = QLabel(self.note_text_container_2)
+        self.note_update_label_2.setObjectName(u"note_update_label_2")
+        self.note_update_label_2.setMaximumSize(QSize(16777215, 12))
+        self.note_update_label_2.setFont(font2)
+        self.note_update_label_2.setStyleSheet(u"margin-left : 1px; \n"
+"color : #90b6e7;")
+
+        self.verticalLayout_21.addWidget(self.note_update_label_2)
+
+
+        self.verticalLayout_22.addWidget(self.note_text_container_2)
+
+
+        self.verticalLayout_19.addWidget(self.setting_text_container)
+
+        self.setting_two_box_container = QWidget(self.page_settings_container)
+        self.setting_two_box_container.setObjectName(u"setting_two_box_container")
+        self.setting_two_box_container.setStyleSheet(u"QGroupBox {\n"
+"    border: 2px solid #303030;\n"
+"    border-radius: 25px;\n"
+"    margin-top: 1ex;\n"
+"    padding-top: 0px; \n"
+"}\n"
+"\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top center; \n"
+"    padding: 0 10px;\n"
+"	color : white;\n"
+"    margin-top: -0.5ex; /* \u5782\u76f4 */\n"
+"    font-family: \"Comfortaa\";\n"
+"    font-size: 14px;              \n"
+"    font-weight: bold; \n"
+"}\n"
+"\n"
+"")
+        self.horizontalLayout_10 = QHBoxLayout(self.setting_two_box_container)
+        self.horizontalLayout_10.setSpacing(12)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.api_group_box = QGroupBox(self.setting_two_box_container)
+        self.api_group_box.setObjectName(u"api_group_box")
+        self.api_group_box.setBaseSize(QSize(0, 0))
+        self.api_group_box.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.api_group_box.setStyleSheet(u"* {\n"
+"color :white;\n"
+"font-family : \"Comfortaa\";\n"
+"font-weight : Bold;\n"
+"}")
+        self.api_group_box.setFlat(False)
+        self.api_group_box.setCheckable(False)
+        self.verticalLayout_23 = QVBoxLayout(self.api_group_box)
+        self.verticalLayout_23.setSpacing(0)
+        self.verticalLayout_23.setObjectName(u"verticalLayout_23")
+        self.verticalLayout_23.setContentsMargins(15, 12, 15, 12)
+        self.label_4 = QLabel(self.api_group_box)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setMaximumSize(QSize(16777215, 30))
+        self.label_4.setFont(font3)
+        self.label_4.setStyleSheet(u"color : #90b6e7;")
+        self.label_4.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_23.addWidget(self.label_4)
+
+        self.enter_text_container = QWidget(self.api_group_box)
+        self.enter_text_container.setObjectName(u"enter_text_container")
+        self.enter_text_container.setMinimumSize(QSize(0, 0))
+        self.enter_text_container.setStyleSheet(u"")
+        self.horizontalLayout_14 = QHBoxLayout(self.enter_text_container)
+        self.horizontalLayout_14.setSpacing(0)
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.horizontalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.widget_2 = QWidget(self.enter_text_container)
+        self.widget_2.setObjectName(u"widget_2")
+        self.verticalLayout_25 = QVBoxLayout(self.widget_2)
+        self.verticalLayout_25.setObjectName(u"verticalLayout_25")
+        self.lineEdit = QLineEdit(self.widget_2)
+        self.lineEdit.setObjectName(u"lineEdit")
+
+        self.verticalLayout_25.addWidget(self.lineEdit)
+
+        self.lineEdit_2 = QLineEdit(self.widget_2)
+        self.lineEdit_2.setObjectName(u"lineEdit_2")
+
+        self.verticalLayout_25.addWidget(self.lineEdit_2)
+
+        self.lineEdit_3 = QLineEdit(self.widget_2)
+        self.lineEdit_3.setObjectName(u"lineEdit_3")
+
+        self.verticalLayout_25.addWidget(self.lineEdit_3)
+
+
+        self.horizontalLayout_14.addWidget(self.widget_2)
+
+        self.widget = QWidget(self.enter_text_container)
+        self.widget.setObjectName(u"widget")
+        self.widget.setMinimumSize(QSize(150, 0))
+        self.widget.setMaximumSize(QSize(16777215, 16777215))
+        self.verticalLayout_24 = QVBoxLayout(self.widget)
+        self.verticalLayout_24.setObjectName(u"verticalLayout_24")
+        self.label = QLabel(self.widget)
+        self.label.setObjectName(u"label")
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_24.addWidget(self.label)
+
+        self.label_2 = QLabel(self.widget)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_24.addWidget(self.label_2)
+
+        self.label_3 = QLabel(self.widget)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_24.addWidget(self.label_3)
+
+
+        self.horizontalLayout_14.addWidget(self.widget)
+
+
+        self.verticalLayout_23.addWidget(self.enter_text_container)
+
+        self.api_btn_frame = QFrame(self.api_group_box)
+        self.api_btn_frame.setObjectName(u"api_btn_frame")
+        self.api_btn_frame.setMaximumSize(QSize(16777215, 45))
+        self.api_btn_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.api_btn_frame.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_11 = QHBoxLayout(self.api_btn_frame)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalLayout_11.setContentsMargins(20, -1, 20, -1)
+        self.label_5 = QLabel(self.api_btn_frame)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setMaximumSize(QSize(250, 16777215))
+
+        self.horizontalLayout_11.addWidget(self.label_5)
+
+        self.pushButton_8 = QPushButton(self.api_btn_frame)
+        self.pushButton_8.setObjectName(u"pushButton_8")
+        self.pushButton_8.setMaximumSize(QSize(100, 70))
+
+        self.horizontalLayout_11.addWidget(self.pushButton_8)
+
+
+        self.verticalLayout_23.addWidget(self.api_btn_frame)
+
+
+        self.horizontalLayout_10.addWidget(self.api_group_box)
+
+        self.other_group_box = QGroupBox(self.setting_two_box_container)
+        self.other_group_box.setObjectName(u"other_group_box")
+        self.other_group_box.setMinimumSize(QSize(330, 0))
+
+        self.horizontalLayout_10.addWidget(self.other_group_box)
+
+
+        self.verticalLayout_19.addWidget(self.setting_two_box_container)
+
+        self.group_box_container = QFrame(self.page_settings_container)
+        self.group_box_container.setObjectName(u"group_box_container")
+        self.group_box_container.setStyleSheet(u"QGroupBox {\n"
+"    border: 2px solid #303030;\n"
+"    border-radius: 25px;\n"
+"    margin-top: 1ex;\n"
+"    padding-top: 0px; \n"
+"}\n"
+"\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top center; \n"
+"    padding: 0 10px;\n"
+"	color : white;\n"
+"    margin-top: -0.5ex; /* \u5782\u76f4 */\n"
+"    font-family: \"Comfortaa\";\n"
+"    font-size: 14px;              \n"
+"    font-weight: bold; \n"
+"}\n"
+"\n"
+"")
+        self.group_box_container.setFrameShape(QFrame.Shape.StyledPanel)
+        self.group_box_container.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_20 = QVBoxLayout(self.group_box_container)
+        self.verticalLayout_20.setObjectName(u"verticalLayout_20")
+        self.verticalLayout_20.setContentsMargins(0, 0, 0, 0)
+        self.download_data_box = QGroupBox(self.group_box_container)
+        self.download_data_box.setObjectName(u"download_data_box")
+
+        self.verticalLayout_20.addWidget(self.download_data_box)
+
+
+        self.verticalLayout_19.addWidget(self.group_box_container)
+
+        self.stackedWidget.addWidget(self.page_settings_container)
 
         self.verticalLayout_2.addWidget(self.stackedWidget)
 
@@ -602,7 +1243,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(4)
         self.tab_window.setCurrentIndex(0)
 
 
@@ -639,13 +1280,56 @@ class Ui_MainWindow(object):
         self.one_add_page.setText("")
         self.one_set_preference.setText("")
         self.tab_window.setTabText(self.tab_window.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Tab Box 1", None))
-        self.title_label_2.setText(QCoreApplication.translate("MainWindow", u"Table : Selected Table Name", None))
-        self.update_label_2.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.table_title_label.setText(QCoreApplication.translate("MainWindow", u"Table : Selected Table Name", None))
+        self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
         self.page_table_set_preference.setText("")
         self.four_title_label.setText(QCoreApplication.translate("MainWindow", u"Four Charts Interface", None))
         self.four_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
         self.connect_charts.setText(QCoreApplication.translate("MainWindow", u" Connect Charts", None))
         self.four_settings_button.setText("")
+#if QT_CONFIG(tooltip)
+        self.expand_fold.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.expand_fold.setText("")
+#if QT_CONFIG(tooltip)
+        self.note_list_text_container.setToolTip(QCoreApplication.translate("MainWindow", u"Feel free to write notes here ~", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.four_title_label_3.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.four_title_label_3.setText(QCoreApplication.translate("MainWindow", u"New Created Note", None))
+        self.four_update_label_3.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.text_1.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.text_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_9.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_15.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_5.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_11.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_14.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_7.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_12.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_6.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_13.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.note_add_btn.setText("")
+        self.note_delete_btn.setText("")
+        self.note_title_label.setText(QCoreApplication.translate("MainWindow", u"New Created Note", None))
+        self.note_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.save_text.setText("")
+        self.note_title_label_2.setText(QCoreApplication.translate("MainWindow", u"Settings Panel", None))
+        self.note_update_label_2.setText(QCoreApplication.translate("MainWindow", u"Set API // Download Data // Other Options", None))
+        self.api_group_box.setTitle("")
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Enter API key here and click \"Save\" button to save API key", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"BEA API key", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"FRED API key", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"BLS API key", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Status will be displayed here", None))
+        self.pushButton_8.setText(QCoreApplication.translate("MainWindow", u"Save", None))
+        self.other_group_box.setTitle("")
+        self.download_data_box.setTitle("")
         self.author_name.setText(QCoreApplication.translate("MainWindow", u"Love from : Kitazaki Hinata", None))
     # retranslateUi
 
