@@ -13,4 +13,5 @@ dependencies = [
     "yfinance>=0.2.65",
     "lxml>=6.0.0",
     "pyside6>=6.9.1",
+    "pyqtgraph>=0.13.7",
 ]

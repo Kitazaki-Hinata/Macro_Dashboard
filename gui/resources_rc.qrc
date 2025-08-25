@@ -1,0 +1,27 @@
+<RCC>
+  <qresource prefix="png">
+    <file>png/close_2.png</file>
+    <file>png/close_small.png</file>
+    <file>png/close.png</file>
+    <file>png/csv.png</file>
+    <file>png/delete.png</file>
+    <file>png/download.png</file>
+    <file>png/false.png</file>
+    <file>png/four.png</file>
+    <file>png/github.png</file>
+    <file>png/minimize.png</file>
+    <file>png/more_options.png</file>
+    <file>png/note_btn.png</file>
+    <file>png/note_btn2.png</file>
+    <file>png/one.png</file>
+    <file>png/settings.png</file>
+    <file>png/show_figure.png</file>
+    <file>png/table.png</file>
+    <file>png/true.png</file>
+  </qresource>
+  <qresource prefix="svg">
+    <file>svg/add_page.svg</file>
+    <file>svg/set_preference.svg</file>
+    <file>svg/close_2.svg</file>
+  </qresource>
+</RCC>

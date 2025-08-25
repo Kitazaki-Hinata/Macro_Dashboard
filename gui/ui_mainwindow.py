@@ -1,7 +1,5 @@
 from gui import *
 
-
-
 class mainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
