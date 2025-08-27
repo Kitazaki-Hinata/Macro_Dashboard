@@ -21,6 +21,7 @@
   </qresource>
   <qresource prefix="svg">
     <file>svg/delete.svg</file>
+    <file>svg/ico.svg</file>
     <file>svg/github.svg</file>
     <file>svg/save.svg</file>
     <file>svg/expand.svg</file>
