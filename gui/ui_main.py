@@ -1310,7 +1310,7 @@ class Ui_MainWindow(object):
         self.image_label.setObjectName(u"image_label")
         self.image_label.setMinimumSize(QSize(75, 75))
         self.image_label.setMaximumSize(QSize(75, 75))
-        self.image_label.setStyleSheet(u"image: url(:svg/svg/ico.svg);\n"
+        self.image_label.setStyleSheet(u"background-image: url(:/png/png/ico.png);\n"
 "")
 
         self.horizontalLayout_17.addWidget(self.image_label)

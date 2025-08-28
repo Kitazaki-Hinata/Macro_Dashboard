@@ -15,32 +15,23 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_btn.clicked.connect(self.left_bar_button_slot)
         self.settings_btn.clicked.connect(self.left_bar_button_slot)
 
-    def left_bar_button_slot(self, btn):
+    def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''
         btn = self.sender()
         btn_name = btn.objectName()
 
-        # SHOW HOME PAGE
+        # show stack pages
         if btn_name == "one_page_btn":
             self.stackedWidget.setCurrentWidget(self.page_one_container)
-
-        # SHOW WIDGETS PAGE
+            self.one_page_btn.setStyleSheet("icon: url(:/png/png/one.png);\nicon-size: 20px 20px;")
         if btn_name == "four_page_btn":
             self.stackedWidget.setCurrentWidget(self.page_four_container)
-
-        # SHOW NEW PAGE
         if btn_name == "table_btn":
             self.stackedWidget.setCurrentWidget(self.page_table_container)
-
         if btn_name == "note_btn":
             self.stackedWidget.setCurrentWidget(self.page_note_container)
-
         if btn_name == "settings_btn":
             self.stackedWidget.setCurrentWidget(self.page_settings_container)
-
-        # check whether identified button
-        print(f'Button "{btn_name}" pressed')
-
 
 
 

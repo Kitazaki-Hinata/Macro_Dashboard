@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="png">
+    <file>png/ico.png</file>
     <file>png/close_2.png</file>
     <file>png/close_small.png</file>
     <file>png/close.png</file>
@@ -19,9 +20,15 @@
     <file>png/table.png</file>
     <file>png/true.png</file>
   </qresource>
+  <qresource prefix="png_press">
+    <file>png/four_press.png</file>
+    <file>png/note_btn_press.png</file>
+    <file>png/one_press.png</file>
+    <file>png/settings_press.png</file>
+    <file>png/table_press.png</file>
+  </qresource>
   <qresource prefix="svg">
     <file>svg/delete.svg</file>
-    <file>svg/ico.svg</file>
     <file>svg/github.svg</file>
     <file>svg/save.svg</file>
     <file>svg/expand.svg</file>
