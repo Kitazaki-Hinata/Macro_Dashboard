@@ -503,7 +503,7 @@ QPushButton#settings_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>4</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -582,7 +582,7 @@ QTabWidget::pane{
 
 QTabBar::close-button {
     /* 设置背景图片，不重复 */
-	image:url(:svg/svg/close_2.svg);
+image:url(:/svg/svg/close_2.svg);
     background-repeat: no-repeat;
     background-position: center;
     border-radius: 10px;
@@ -600,10 +600,10 @@ QTabBar::close-button {
                  <number>0</number>
                 </property>
                 <property name="elideMode">
-                 <enum>Qt::TextElideMode::ElideNone</enum>
+                 <enum>Qt::TextElideMode::ElideRight</enum>
                 </property>
                 <property name="usesScrollButtons">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="documentMode">
                  <bool>true</bool>
@@ -1513,7 +1513,7 @@ QPushButton:pressed {
                      <string/>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true"> image: url(:svg/svg/fold.svg);
+                     <string notr="true"> image: url(:/svg/svg/fold.svg);
  padding : 15px;</string>
                     </property>
                     <property name="text">
@@ -1667,7 +1667,7 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>192</width>
+                      <width>92</width>
                       <height>780</height>
                      </rect>
                     </property>
@@ -3058,7 +3058,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="bea">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>BEA data API</string>
@@ -3071,7 +3071,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="yf">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>Yfinance API</string>
@@ -3084,7 +3084,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="fred">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>FRED data API</string>
@@ -3097,7 +3097,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="bls">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>BLS data API</string>
@@ -3110,7 +3110,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="te">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>TE data</string>
@@ -3408,6 +3408,9 @@ QPushButton#clear_lag_btn::pressed {
                                 </item>
                                 <item>
                                  <widget class="QPushButton" name="cancel_btn">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="font">
                                    <font>
                                     <family>Comfortaa</family>
@@ -3437,6 +3440,57 @@ QPushButton#clear_lag_btn::pressed {
                                   </property>
                                   <property name="text">
                                    <string>Clear logs</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                               </layout>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QWidget" name="parallel_opts_container" native="true">
+                               <layout class="QHBoxLayout" name="horizontalLayout_parallel">
+                                <property name="spacing">
+                                 <number>8</number>
+                                </property>
+                                <property name="leftMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="topMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="rightMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="bottomMargin">
+                                 <number>0</number>
+                                </property>
+                                <item>
+                                 <widget class="QCheckBox" name="parallel_download_check">
+                                  <property name="text">
+                                   <string>Enable parallel downloads</string>
+                                  </property>
+                                  <property name="checked">
+                                   <bool>true</bool>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLabel" name="max_threads_label">
+                                  <property name="text">
+                                   <string>Max threads</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QSpinBox" name="max_threads_spin">
+                                  <property name="minimum">
+                                   <number>1</number>
+                                  </property>
+                                  <property name="maximum">
+                                   <number>8</number>
+                                  </property>
+                                  <property name="value">
+                                   <number>4</number>
                                   </property>
                                  </widget>
                                 </item>
