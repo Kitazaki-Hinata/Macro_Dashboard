@@ -22,12 +22,13 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1152, 720)
-        MainWindow.setMinimumSize(QSize(1152, 720))
+        MainWindow.resize(1267, 792)
+        MainWindow.setMinimumSize(QSize(1267, 792))
         MainWindow.setStyleSheet(u"* {\n"
 "	background-color: #33363a;\n"
 "}\n"
@@ -42,7 +43,105 @@ class Ui_MainWindow(object):
 "    border-top-left-radius: 5px;\n"
 "    border-bottom-right-radius: 5px;\n"
 "    padding: 2px;\n"
-"}")
+"}\n"
+"\n"
+"\n"
+"/*================================== ====*/\n"
+"/*\u5168\u5c40checkbox\u6837\u5f0f \u591a\u9009\u6846*/\n"
+"QCheckBox {\n"
+"            spacing: 8px;    /*\u591a\u9009\u6846\u4e0e\u5b57\u4f53\u7684\u7a7a\u683c*/\n"
+"            font-size: 11px;\n"
+"        }\n"
+"        \n"
+"QCheckBox::indicator {\n"
+"            width: 12px;\n"
+"            height: 12px;\n"
+"            border: 1px solid #555555;\n"
+"            border-radius: 5px;\n"
+"            background: #202023;\n"
+"        }\n"
+"        \n"
+"QCheckBox::indicator:hover {\n"
+"            border: 1px solid #ffffff;\n"
+"        }\n"
+"\n"
+"        \n"
+"QCheckBox::indicator:checked {\n"
+" "
+                        "           border: 1px solid #90b6e7;\n"
+"            image: url(:/png/png/true.png);\n"
+"        }\n"
+"QCheckBox::indicator:disabled {\n"
+"            border: 1px solid #454555;\n"
+"            background: #454555;\n"
+"        }\n"
+"        \n"
+"        QCheckBox::indicator:checked:disabled {\n"
+"            background: #454555;\n"
+"            border: 2px solid #454555;\n"
+"        }\n"
+"\n"
+"\n"
+"\n"
+"/*================================== ====*/\n"
+"/* SpinBox\u57fa\u672c\u6837\u5f0f */\n"
+"        QSpinBox {\n"
+"            padding: 0px;\n"
+"            border: 1px solid #404043;\n"
+"            border-radius: 5px;\n"
+"            font-size: 12px;\n"
+"        }\n"
+"\n"
+"        QSpinBox:hover {\n"
+"            border: 1px solid #606063;\n"
+"        }\n"
+"        \n"
+"        QSpinBox:focus {\n"
+"            border: 1px solid #404043;\n"
+"        }\n"
+"        \n"
+"        \n"
+"        \n"
+"        QSpinBox::up-button {\n"
+"            subcontrol-origin: border;\n"
+"            subcontrol-position: top right"
+                        ";\n"
+"            width: 20px;\n"
+"            border-left: 1px solid #404043;\n"
+"            border-bottom: 1px solid #404043;\n"
+"            border-top-right-radius: 5px;\n"
+"            background: #404043;\n"
+"        }\n"
+"        \n"
+"        QSpinBox::up-button:hover {\n"
+"            background: #606063;\n"
+"        }\n"
+"        \n"
+"        QSpinBox::up-button:pressed {\n"
+"            background: #404043;\n"
+"        }\n"
+"      \n"
+"        \n"
+"        QSpinBox::down-button {\n"
+"            subcontrol-origin: border;\n"
+"            subcontrol-position: bottom right;\n"
+"            width: 20px;\n"
+"            border-left: 1px solid #404043;\n"
+"            border-top: 1px solid #404043;\n"
+"            border-bottom-right-radius: 5px;\n"
+"            background: #404043;\n"
+"        }\n"
+"        \n"
+"        QSpinBox::down-button:hover {\n"
+"            background: #606063;\n"
+"        }\n"
+"        \n"
+"        QSpinBox::down-button:pressed {\n"
+"            background: #404043;\n"
+"       "
+                        " }\n"
+"        \n"
+"")
         self.style_sheet = QWidget(MainWindow)
         self.style_sheet.setObjectName(u"style_sheet")
         self.style_sheet.setStyleSheet(u"")
@@ -1460,15 +1559,15 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_26.addWidget(self.textEdit)
 
-        self.checkBox_13 = QCheckBox(self.other_group_box)
-        self.checkBox_13.setObjectName(u"checkBox_13")
-        self.checkBox_13.setStyleSheet(u"* {\n"
+        self.read_and_agree_check = QCheckBox(self.other_group_box)
+        self.read_and_agree_check.setObjectName(u"read_and_agree_check")
+        self.read_and_agree_check.setStyleSheet(u"* {\n"
 "font-family : \"Comfortaa\"; \n"
 "color : #fa88aa; \n"
 "font-weight : Bold;\n"
 "}")
 
-        self.verticalLayout_26.addWidget(self.checkBox_13)
+        self.verticalLayout_26.addWidget(self.read_and_agree_check)
 
 
         self.horizontalLayout_10.addWidget(self.other_group_box)
@@ -1541,7 +1640,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_18.setContentsMargins(0, 0, 0, 0)
         self.download_options = QWidget(self.download_option_container)
         self.download_options.setObjectName(u"download_options")
-        self.download_options.setStyleSheet(u"color : #777785; ")
+        self.download_options.setStyleSheet(u"* {\n"
+"color : #777785; \n"
+"}\n"
+"")
         self.horizontalLayout_19 = QHBoxLayout(self.download_options)
         self.horizontalLayout_19.setObjectName(u"horizontalLayout_19")
         self.horizontalLayout_19.setContentsMargins(0, 0, 0, 0)
@@ -1552,31 +1654,36 @@ class Ui_MainWindow(object):
         self.verticalLayout_29.setContentsMargins(0, 0, 0, 0)
         self.bea = QCheckBox(self.ts_data)
         self.bea.setObjectName(u"bea")
-        self.bea.setCheckable(False)
+        self.bea.setEnabled(False)
+        self.bea.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bea)
 
         self.yf = QCheckBox(self.ts_data)
         self.yf.setObjectName(u"yf")
-        self.yf.setCheckable(False)
+        self.yf.setEnabled(False)
+        self.yf.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.yf)
 
         self.fred = QCheckBox(self.ts_data)
         self.fred.setObjectName(u"fred")
-        self.fred.setCheckable(False)
+        self.fred.setEnabled(False)
+        self.fred.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.fred)
 
         self.bls = QCheckBox(self.ts_data)
         self.bls.setObjectName(u"bls")
-        self.bls.setCheckable(False)
+        self.bls.setEnabled(False)
+        self.bls.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bls)
 
         self.te = QCheckBox(self.ts_data)
         self.te.setObjectName(u"te")
-        self.te.setCheckable(False)
+        self.te.setEnabled(False)
+        self.te.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.te)
 
@@ -1590,44 +1697,51 @@ class Ui_MainWindow(object):
         self.verticalLayout_31.setContentsMargins(0, 0, 0, 0)
         self.ism = QCheckBox(self.cs_data)
         self.ism.setObjectName(u"ism")
-        self.ism.setCheckable(False)
+        self.ism.setEnabled(False)
+        self.ism.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.ism)
 
         self.cme = QCheckBox(self.cs_data)
         self.cme.setObjectName(u"cme")
-        self.cme.setCheckable(False)
+        self.cme.setEnabled(False)
+        self.cme.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.cme)
 
         self.dallas = QCheckBox(self.cs_data)
         self.dallas.setObjectName(u"dallas")
-        self.dallas.setCheckable(False)
+        self.dallas.setEnabled(False)
+        self.dallas.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.dallas)
 
         self.nyf = QCheckBox(self.cs_data)
         self.nyf.setObjectName(u"nyf")
-        self.nyf.setCheckable(False)
+        self.nyf.setEnabled(False)
+        self.nyf.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.nyf)
 
         self.infla = QCheckBox(self.cs_data)
         self.infla.setObjectName(u"infla")
-        self.infla.setCheckable(False)
+        self.infla.setEnabled(False)
+        self.infla.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.infla)
 
         self.emini = QCheckBox(self.cs_data)
         self.emini.setObjectName(u"emini")
-        self.emini.setCheckable(False)
+        self.emini.setEnabled(False)
+        self.emini.setCheckable(True)
         self.emini.setChecked(False)
 
         self.verticalLayout_31.addWidget(self.emini)
 
         self.fxswap = QCheckBox(self.cs_data)
         self.fxswap.setObjectName(u"fxswap")
-        self.fxswap.setCheckable(False)
+        self.fxswap.setEnabled(False)
+        self.fxswap.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.fxswap)
 
@@ -1664,42 +1778,77 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.label)
 
-        self.spinBox = QSpinBox(self.year_selection)
-        self.spinBox.setObjectName(u"spinBox")
-        self.spinBox.setMinimum(2020)
-        self.spinBox.setMaximum(2025)
+        self.int_year_spinbox = QSpinBox(self.year_selection)
+        self.int_year_spinbox.setObjectName(u"int_year_spinbox")
+        self.int_year_spinbox.setMinimum(2020)
+        self.int_year_spinbox.setMaximum(2025)
 
-        self.horizontalLayout_12.addWidget(self.spinBox)
+        self.horizontalLayout_12.addWidget(self.int_year_spinbox)
 
 
         self.verticalLayout_32.addWidget(self.year_selection)
 
-        self.checkBox = QCheckBox(self.download_confirm_container)
-        self.checkBox.setObjectName(u"checkBox")
+        self.download_csv_check = QCheckBox(self.download_confirm_container)
+        self.download_csv_check.setObjectName(u"download_csv_check")
 
-        self.verticalLayout_32.addWidget(self.checkBox)
+        self.verticalLayout_32.addWidget(self.download_csv_check)
 
-        self.checkBox_2 = QCheckBox(self.download_confirm_container)
-        self.checkBox_2.setObjectName(u"checkBox_2")
-        self.checkBox_2.setChecked(True)
+        self.download_for_all_check = QCheckBox(self.download_confirm_container)
+        self.download_for_all_check.setObjectName(u"download_for_all_check")
+        self.download_for_all_check.setChecked(True)
 
-        self.verticalLayout_32.addWidget(self.checkBox_2)
+        self.verticalLayout_32.addWidget(self.download_for_all_check)
+
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_32.addItem(self.verticalSpacer_5)
 
         self.download_btn_container = QWidget(self.download_confirm_container)
         self.download_btn_container.setObjectName(u"download_btn_container")
+        self.download_btn_container.setMinimumSize(QSize(0, 130))
         self.download_btn_container.setStyleSheet(u"QPushButton {\n"
-"	background : #202023;\n"
 "	min-height : 30px;\n"
 "	border-radius : 9px\n"
 "}\n"
 "\n"
-"QPushButton::hover {\n"
+"/*download*/\n"
+"QPushButton#download_btn {\n"
+"	background : #202023;\n"
+"}\n"
+"QPushButton#download_btn::hover {\n"
 "	background : #454545;\n"
 "}\n"
-"QPushButton::pressed {\n"
+"QPushButton#download_btn::pressed {\n"
 "	background : #202023;\n"
+"}\n"
+"\n"
+"\n"
+"/*cancel*/\n"
+"QPushButton#cancel_btn {\n"
+"	background-color:#fa88aa;\n"
+"	color : #252526;\n"
+"}\n"
+"QPushButton#cancel_btn::hover {\n"
+"	background : #FFB6CC;\n"
+"}\n"
+"QPushButton#cancel_btn::pressed {\n"
+"	background : #fa88aa;\n"
+"}\n"
+"\n"
+"\n"
+"/*clear lags*/\n"
+"QPushButton#clear_lag_btn {\n"
+"	background-color:#fa88aa;\n"
+"	color : #252526;\n"
+"}\n"
+"QPushButton#clear_lag_btn::hover {\n"
+"	background : #FFB6CC;\n"
+"}\n"
+"QPushButton#clear_lag_btn::pressed {\n"
+"	background : #fa88aa;\n"
 "}")
         self.verticalLayout_27 = QVBoxLayout(self.download_btn_container)
+        self.verticalLayout_27.setSpacing(12)
         self.verticalLayout_27.setObjectName(u"verticalLayout_27")
         self.download_btn = QPushButton(self.download_btn_container)
         self.download_btn.setObjectName(u"download_btn")
@@ -1710,20 +1859,16 @@ class Ui_MainWindow(object):
         self.cancel_btn = QPushButton(self.download_btn_container)
         self.cancel_btn.setObjectName(u"cancel_btn")
         self.cancel_btn.setFont(font5)
-        self.cancel_btn.setStyleSheet(u"background-color:#fa88aa;\n"
-"color : #252526;\n"
-"font-weight : Bold;")
+        self.cancel_btn.setStyleSheet(u"")
 
         self.verticalLayout_27.addWidget(self.cancel_btn)
 
-        self.pushButton_8 = QPushButton(self.download_btn_container)
-        self.pushButton_8.setObjectName(u"pushButton_8")
-        self.pushButton_8.setFont(font5)
-        self.pushButton_8.setStyleSheet(u"background-color:#fa88aa;\n"
-"color : #252526;\n"
-"font-weight : Bold;")
+        self.clear_lag_btn = QPushButton(self.download_btn_container)
+        self.clear_lag_btn.setObjectName(u"clear_lag_btn")
+        self.clear_lag_btn.setFont(font5)
+        self.clear_lag_btn.setStyleSheet(u"")
 
-        self.verticalLayout_27.addWidget(self.pushButton_8)
+        self.verticalLayout_27.addWidget(self.clear_lag_btn)
 
 
         self.verticalLayout_32.addWidget(self.download_btn_container)
@@ -1906,7 +2051,7 @@ class Ui_MainWindow(object):
                         " style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">The software provides a dashboard for macroeconomic data learning and analysis.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">The source code is open and available under the MIT-Non Commercial (MIT-NC) License terms.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">Some UI elements (SVG and PNG icons, components) are sourced from [FAWZIUIUX]\uff1afawziuiux.com/#Home.  All rights belong to the original author.</span></p></body></html>", None))
-        self.checkBox_13.setText(QCoreApplication.translate("MainWindow", u"I have read and agree to the Terms and Conditions.", None))
+        self.read_and_agree_check.setText(QCoreApplication.translate("MainWindow", u"I have read and agree to the Terms and Conditions.", None))
         self.download_data_box.setTitle("")
         self.download_text.setText(QCoreApplication.translate("MainWindow", u"Select data resources and download data", None))
         self.bea.setText(QCoreApplication.translate("MainWindow", u"BEA data API", None))
@@ -1922,11 +2067,11 @@ class Ui_MainWindow(object):
         self.emini.setText(QCoreApplication.translate("MainWindow", u"CME EminiFuture", None))
         self.fxswap.setText(QCoreApplication.translate("MainWindow", u"Forex Swap", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Data Start Year", None))
-        self.checkBox.setText(QCoreApplication.translate("MainWindow", u"Download csv", None))
-        self.checkBox_2.setText(QCoreApplication.translate("MainWindow", u"Download ALL data", None))
+        self.download_csv_check.setText(QCoreApplication.translate("MainWindow", u"Download csv", None))
+        self.download_for_all_check.setText(QCoreApplication.translate("MainWindow", u"Download ALL data", None))
         self.download_btn.setText(QCoreApplication.translate("MainWindow", u"Download", None))
         self.cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Cancel Download", None))
-        self.pushButton_8.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
+        self.clear_lag_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
         self.console_text.setText(QCoreApplication.translate("MainWindow", u"Console & Logging Information", None))
         self.console_area.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"

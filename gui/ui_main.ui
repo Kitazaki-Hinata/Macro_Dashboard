@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1152</width>
-    <height>720</height>
+    <width>1267</width>
+    <height>792</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1152</width>
-    <height>720</height>
+    <width>1267</width>
+    <height>792</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,102 @@ QToolTip {
     border-top-left-radius: 5px;
     border-bottom-right-radius: 5px;
     padding: 2px;
-}</string>
+}
+
+
+/*================================== ====*/
+/*全局checkbox样式 多选框*/
+QCheckBox {
+            spacing: 8px;    /*多选框与字体的空格*/
+            font-size: 11px;
+        }
+        
+QCheckBox::indicator {
+            width: 12px;
+            height: 12px;
+            border: 1px solid #555555;
+            border-radius: 5px;
+            background: #202023;
+        }
+        
+QCheckBox::indicator:hover {
+            border: 1px solid #ffffff;
+        }
+
+        
+QCheckBox::indicator:checked {
+            border: 1px solid #90b6e7;
+            image: url(:/png/png/true.png);
+        }
+QCheckBox::indicator:disabled {
+            border: 1px solid #454555;
+            background: #454555;
+        }
+        
+        QCheckBox::indicator:checked:disabled {
+            background: #454555;
+            border: 2px solid #454555;
+        }
+
+
+
+/*================================== ====*/
+/* SpinBox基本样式 */
+        QSpinBox {
+            padding: 0px;
+            border: 1px solid #404043;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        QSpinBox:hover {
+            border: 1px solid #606063;
+        }
+        
+        QSpinBox:focus {
+            border: 1px solid #404043;
+        }
+        
+        
+        
+        QSpinBox::up-button {
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            width: 20px;
+            border-left: 1px solid #404043;
+            border-bottom: 1px solid #404043;
+            border-top-right-radius: 5px;
+            background: #404043;
+        }
+        
+        QSpinBox::up-button:hover {
+            background: #606063;
+        }
+        
+        QSpinBox::up-button:pressed {
+            background: #404043;
+        }
+      
+        
+        QSpinBox::down-button {
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            width: 20px;
+            border-left: 1px solid #404043;
+            border-top: 1px solid #404043;
+            border-bottom-right-radius: 5px;
+            background: #404043;
+        }
+        
+        QSpinBox::down-button:hover {
+            background: #606063;
+        }
+        
+        QSpinBox::down-button:pressed {
+            background: #404043;
+        }
+        
+</string>
   </property>
   <widget class="QWidget" name="style_sheet">
    <property name="styleSheet">
@@ -1150,6 +1245,7 @@ color : #90b6e7;</string>
                    <property name="font">
                     <font>
                      <family>Comfortaa</family>
+                     <pointsize>-1</pointsize>
                      <bold>true</bold>
                     </font>
                    </property>
@@ -2766,7 +2862,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="checkBox_13">
+                     <widget class="QCheckBox" name="read_and_agree_check">
                       <property name="styleSheet">
                        <string notr="true">* {
 font-family : &quot;Comfortaa&quot;; 
@@ -2926,7 +3022,10 @@ font-weight : Bold;
                           <item>
                            <widget class="QWidget" name="download_options" native="true">
                             <property name="styleSheet">
-                             <string notr="true">color : #777785; </string>
+                             <string notr="true">* {
+color : #777785; 
+}
+</string>
                             </property>
                             <layout class="QHBoxLayout" name="horizontalLayout_19">
                              <property name="leftMargin">
@@ -2958,51 +3057,66 @@ font-weight : Bold;
                                 </property>
                                 <item>
                                  <widget class="QCheckBox" name="bea">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>BEA data API</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="yf">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>Yfinance API</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="fred">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>FRED data API</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="bls">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>BLS data API</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="te">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>TE data</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
@@ -3026,61 +3140,79 @@ font-weight : Bold;
                                 </property>
                                 <item>
                                  <widget class="QCheckBox" name="ism">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>ISM</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="cme">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>CME FedWatch</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="dallas">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>Dallas Fed Manu.</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="nyf">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>NewYork Fed</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="infla">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>Infla. Nowcasting</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="emini">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>CME EminiFuture</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="checked">
                                    <bool>false</bool>
@@ -3089,11 +3221,14 @@ font-weight : Bold;
                                 </item>
                                 <item>
                                  <widget class="QCheckBox" name="fxswap">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="text">
                                    <string>Forex Swap</string>
                                   </property>
                                   <property name="checkable">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                  </widget>
                                 </item>
@@ -3160,7 +3295,7 @@ font-weight : Bold;
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QSpinBox" name="spinBox">
+                                 <widget class="QSpinBox" name="int_year_spinbox">
                                   <property name="minimum">
                                    <number>2020</number>
                                   </property>
@@ -3173,14 +3308,14 @@ font-weight : Bold;
                               </widget>
                              </item>
                              <item>
-                              <widget class="QCheckBox" name="checkBox">
+                              <widget class="QCheckBox" name="download_csv_check">
                                <property name="text">
                                 <string>Download csv</string>
                                </property>
                               </widget>
                              </item>
                              <item>
-                              <widget class="QCheckBox" name="checkBox_2">
+                              <widget class="QCheckBox" name="download_for_all_check">
                                <property name="text">
                                 <string>Download ALL data</string>
                                </property>
@@ -3190,22 +3325,73 @@ font-weight : Bold;
                               </widget>
                              </item>
                              <item>
+                              <spacer name="verticalSpacer_5">
+                               <property name="orientation">
+                                <enum>Qt::Orientation::Vertical</enum>
+                               </property>
+                               <property name="sizeHint" stdset="0">
+                                <size>
+                                 <width>20</width>
+                                 <height>40</height>
+                                </size>
+                               </property>
+                              </spacer>
+                             </item>
+                             <item>
                               <widget class="QWidget" name="download_btn_container" native="true">
+                               <property name="minimumSize">
+                                <size>
+                                 <width>0</width>
+                                 <height>130</height>
+                                </size>
+                               </property>
                                <property name="styleSheet">
                                 <string notr="true">QPushButton {
-	background : #202023;
 	min-height : 30px;
 	border-radius : 9px
 }
 
-QPushButton::hover {
+/*download*/
+QPushButton#download_btn {
+	background : #202023;
+}
+QPushButton#download_btn::hover {
 	background : #454545;
 }
-QPushButton::pressed {
+QPushButton#download_btn::pressed {
 	background : #202023;
+}
+
+
+/*cancel*/
+QPushButton#cancel_btn {
+	background-color:#fa88aa;
+	color : #252526;
+}
+QPushButton#cancel_btn::hover {
+	background : #FFB6CC;
+}
+QPushButton#cancel_btn::pressed {
+	background : #fa88aa;
+}
+
+
+/*clear lags*/
+QPushButton#clear_lag_btn {
+	background-color:#fa88aa;
+	color : #252526;
+}
+QPushButton#clear_lag_btn::hover {
+	background : #FFB6CC;
+}
+QPushButton#clear_lag_btn::pressed {
+	background : #fa88aa;
 }</string>
                                </property>
                                <layout class="QVBoxLayout" name="verticalLayout_27">
+                                <property name="spacing">
+                                 <number>12</number>
+                                </property>
                                 <item>
                                  <widget class="QPushButton" name="download_btn">
                                   <property name="font">
@@ -3230,9 +3416,7 @@ QPushButton::pressed {
                                    </font>
                                   </property>
                                   <property name="styleSheet">
-                                   <string notr="true">background-color:#fa88aa;
-color : #252526;
-font-weight : Bold;</string>
+                                   <string notr="true"/>
                                   </property>
                                   <property name="text">
                                    <string>Cancel Download</string>
@@ -3240,7 +3424,7 @@ font-weight : Bold;</string>
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QPushButton" name="pushButton_8">
+                                 <widget class="QPushButton" name="clear_lag_btn">
                                   <property name="font">
                                    <font>
                                     <family>Comfortaa</family>
@@ -3249,9 +3433,7 @@ font-weight : Bold;</string>
                                    </font>
                                   </property>
                                   <property name="styleSheet">
-                                   <string notr="true">background-color:#fa88aa;
-color : #252526;
-font-weight : Bold;</string>
+                                   <string notr="true"/>
                                   </property>
                                   <property name="text">
                                    <string>Clear logs</string>

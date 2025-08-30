@@ -158,7 +158,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         except Exception:
             pass
 
-        # left menu btn signal connection
+        # left menu btn signal connection  左边栏按钮信号定义
         self.one_page_btn.clicked.connect(self.left_bar_button_slot)
         self.four_page_btn.clicked.connect(self.left_bar_button_slot)
         self.table_btn.clicked.connect(self.left_bar_button_slot)
@@ -170,7 +170,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
 
 
-        # set window gui
+        # set window icon  设置窗口icon
         self.setWindowIcon(QIcon(":/png/png/ico.png"))
 
 
