@@ -2,12 +2,13 @@
 > 作者：Kitazaki Hinata
 
 **序：完整程序结构与流程图**
-1. **download.py：通过API或者抓取方式获取数据并存入数据库**
-2. data.db：数据库，存储每次下载的数据
-3. pyside6 交互界面，数据可视化
-4. pyproject.toml 环境依赖配置文档
-5. request_id.json 储存用于API请求的参数
-6. 其他：日志文件，md文档，架构图与html展示性页面
+1. main.py：主程序入口，包括初始化，调用pyside窗口
+2. download.py：通过API或者抓取方式获取数据并存入数据库
+3. data.db：数据库，存储每次下载的数据
+4. pyside6 交互界面，数据可视化
+5. pyproject.toml 环境依赖配置文档
+6. request_id.json 储存用于API请求的参数
+7. 其他：日志文件，md文档，架构图与html展示性页面
 
 ![Program Flow Chart](structure/program structure flow chart.png "program flow chart")
 ***
@@ -16,8 +17,8 @@
 #### <u>**python脚本介绍：** </u><br>
 * 功能：使用外部API或者抓取方式获取数据，并录入数据库/转存为csv格式的数据；
 提供接口方便请求下载特殊类型的数据。
-* 类文件：data_download.py
-* 入口：main.py
+* 类文件：download.py
+* 接口入口：database_importer.py
 * 设计架构：简单工厂模式
 * 环境与依赖：参考父级目录pyproject.toml文件  [查看文件](../pyproject.toml) <br>
 * 报错文件：doc/error.log [查看文件](error.log) <br>
@@ -50,14 +51,14 @@
 <details>
       <summary>【展开方法类说明】</summary>
 
-注：除了```write_info_db```函数，其余函数均用于内部调用
+注：除了```write_into_db```函数，其余函数均用于内部调用
 - ```_convert_month_str_to_num``` : 将月份字符串转换为数字，内部函数
 - ```_rename_bea_date_col``` : 统一时间轴的函数，输入df，输出修改完日期格式的df ；统一所有的数据时间戳在第一列且名称叫date；
 - ```_format_converter``` : 统一数据格式，输入df，输出统一格式的df
      - ```data_name``` 数据名称，用于报错与列名，```table_config["code"]```
      - ```is_pct_data``` 判断是否是百分比数据，默认为False，输入json的```needs_pct```。
 - ```_create_ts_sheet``` : 创建Time_Series表，如果存在则跳过
-- ```write_info_db``` : 封装输出dataframe数据到data.db数据库，包含统一不同数据dataframe的时间戳的功能。
+- ```write_into_db``` : 封装输出dataframe数据到data.db数据库，包含统一不同数据dataframe的时间戳的功能。
   - ```data_name``` df与db的列名，以及报错信息
   - ```start_date``` 起始日期，str类型而非date/datetime类型
   - ```is_time_series``` 判断是否是时序数据，如果True则数据进入Time_Series表，否则单独创建新表
