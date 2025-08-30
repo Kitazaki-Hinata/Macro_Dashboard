@@ -1,9 +1,12 @@
 <RCC>
   <qresource prefix="png">
+    <file>png/add_page.png</file>
+    <file>png/set_preference.png</file>
+    <file>png/expand.png</file>
+    <file>png/fold.png</file>
+    <file>png/save.png</file>
     <file>png/ico.png</file>
     <file>png/close_2.png</file>
-    <file>png/close_small.png</file>
-    <file>png/close.png</file>
     <file>png/csv.png</file>
     <file>png/delete.png</file>
     <file>png/download.png</file>
@@ -11,7 +14,6 @@
     <file>png/four.png</file>
     <file>png/github.png</file>
     <file>png/minimize.png</file>
-    <file>png/more_options.png</file>
     <file>png/note_btn.png</file>
     <file>png/note_btn2.png</file>
     <file>png/one.png</file>
@@ -21,6 +23,12 @@
     <file>png/true.png</file>
   </qresource>
   <qresource prefix="png_press">
+    <file>png/delete_press.png</file>
+    <file>png/add_page_press.png</file>
+    <file>png/expand_press.png</file>
+    <file>png/fold_press.png</file>
+    <file>png/save_press.png</file>
+    <file>png/set_preference_press.png</file>
     <file>png/four_press.png</file>
     <file>png/note_btn_press.png</file>
     <file>png/one_press.png</file>

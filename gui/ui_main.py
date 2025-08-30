@@ -71,8 +71,8 @@ class Ui_MainWindow(object):
 "	border:0;\n"
 "}\n"
 "\n"
-"/*\u6bcf\u4e2a\u6309\u94ae\u7684\u6837\u5f0f\u5728\u8fd9\u91cc*/\n"
 "\n"
+"/*\u6bcf\u4e2a\u6309\u94ae\u7684\u6837\u5f0f\u5728\u8fd9\u91cc*/\n"
 "QPushButton {\n"
 "    background-position: center;\n"
 "    background-repeat: no-repeat;\n"
@@ -94,6 +94,57 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "\n"
+"/*\u56fe\u7247\u6837\u5f0f*/\n"
+"QPushButton#one_page_btn {\n"
+"    icon: url(:/png/png/one.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"QPushButton#one_page_btn:pressed {\n"
+"    icon: url(:/png_press/png/one_press.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"\n"
+"\n"
+"QPushButton#four_page_btn {\n"
+"    icon: url(:/png/png/four.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"QPushButton#four_page_btn:pressed {\n"
+"    icon: url(:/png_press/png/four_press.p"
+                        "ng);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"\n"
+"\n"
+"QPushButton#table_btn {\n"
+"    icon: url(:/png/png/table.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"QPushButton#table_btn:pressed {\n"
+"    icon: url(:/png_press/png/table_press.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"\n"
+"\n"
+"QPushButton#note_btn {\n"
+"    icon: url(:/png/png/note_btn.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"QPushButton#note_btn:pressed {\n"
+"    icon: url(:/png_press/png/note_btn_press.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"\n"
+"\n"
+"QPushButton#settings_btn {\n"
+"    icon: url(:/png/png/settings.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"QPushButton#settings_btn:pressed {\n"
+"    icon: url(:/png_press/png/settings_press.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"\n"
 "\n"
 "\n"
 "\n"
@@ -111,8 +162,7 @@ class Ui_MainWindow(object):
         self.one_page_btn.setObjectName(u"one_page_btn")
         self.one_page_btn.setMinimumSize(QSize(0, 40))
         self.one_page_btn.setMaximumSize(QSize(70, 40))
-        self.one_page_btn.setStyleSheet(u"icon: url(:/png/png/one.png);\n"
-"icon-size: 20px 20px;")
+        self.one_page_btn.setStyleSheet(u"")
 
         self.left_up_four_frame.addWidget(self.one_page_btn)
 
@@ -121,8 +171,7 @@ class Ui_MainWindow(object):
         self.four_page_btn.setMinimumSize(QSize(0, 40))
         self.four_page_btn.setMaximumSize(QSize(70, 16777215))
         self.four_page_btn.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
-        self.four_page_btn.setStyleSheet(u"icon: url(:/png/png/four.png);\n"
-"icon-size: 20px 20px;")
+        self.four_page_btn.setStyleSheet(u"")
 
         self.left_up_four_frame.addWidget(self.four_page_btn)
 
@@ -130,8 +179,7 @@ class Ui_MainWindow(object):
         self.table_btn.setObjectName(u"table_btn")
         self.table_btn.setMinimumSize(QSize(0, 40))
         self.table_btn.setMaximumSize(QSize(60, 40))
-        self.table_btn.setStyleSheet(u"icon: url(:/png/png/table.png);\n"
-"icon-size: 20px 20px;")
+        self.table_btn.setStyleSheet(u"")
 
         self.left_up_four_frame.addWidget(self.table_btn)
 
@@ -139,8 +187,7 @@ class Ui_MainWindow(object):
         self.note_btn.setObjectName(u"note_btn")
         self.note_btn.setMinimumSize(QSize(60, 40))
         self.note_btn.setMaximumSize(QSize(60, 40))
-        self.note_btn.setStyleSheet(u"icon: url(:/png/png/note_btn.png);\n"
-"icon-size: 20px 20px;")
+        self.note_btn.setStyleSheet(u"")
 
         self.left_up_four_frame.addWidget(self.note_btn)
 
@@ -152,8 +199,7 @@ class Ui_MainWindow(object):
         self.settings_btn.setObjectName(u"settings_btn")
         self.settings_btn.setMinimumSize(QSize(0, 40))
         self.settings_btn.setMaximumSize(QSize(70, 40))
-        self.settings_btn.setStyleSheet(u"icon: url(:/png/png/settings.png);\n"
-"icon-size: 20px 20px;")
+        self.settings_btn.setStyleSheet(u"")
 
         self.left_up_four_frame.addWidget(self.settings_btn)
 
@@ -315,6 +361,24 @@ class Ui_MainWindow(object):
 "QPushButton:pressed {\n"
 "	background-color : #90b6e7;\n"
 "	border-radius : 9px;\n"
+"}\n"
+"\n"
+"\n"
+"QPushButton#one_add_page {\n"
+"    icon: url(:/png/png/add_page.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#one_add_page:pressed {\n"
+"    icon: url(:/png_press/png/add_page_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#one_set_preference {\n"
+"    icon: url(:/png/png/set_preference.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#one_set_preference:pressed {\n"
+"    icon: url(:/png_press/png/set_preference_press.png);\n"
+"    icon-size: 17px 17px;\n"
 "}")
         self.btn_frame.setFrameShape(QFrame.Shape.NoFrame)
         self.btn_frame.setFrameShadow(QFrame.Shadow.Plain)
@@ -326,19 +390,14 @@ class Ui_MainWindow(object):
         self.one_add_page = QPushButton(self.btn_frame)
         self.one_add_page.setObjectName(u"one_add_page")
         self.one_add_page.setMaximumSize(QSize(25, 25))
-        self.one_add_page.setStyleSheet(u" * {	\n"
-"	image: url(:svg/svg/add_page.svg);\n"
-" 	padding : 4px;\n"
-"}\n"
-"")
+        self.one_add_page.setStyleSheet(u"")
 
         self.horizontalLayout_4.addWidget(self.one_add_page)
 
         self.one_set_preference = QPushButton(self.btn_frame)
         self.one_set_preference.setObjectName(u"one_set_preference")
         self.one_set_preference.setMaximumSize(QSize(25, 25))
-        self.one_set_preference.setStyleSheet(u" image: url(:svg/svg/set_preference.svg);\n"
-" padding : 4px;")
+        self.one_set_preference.setStyleSheet(u"")
 
         self.horizontalLayout_4.addWidget(self.one_set_preference)
 
@@ -428,8 +487,14 @@ class Ui_MainWindow(object):
         self.page_table_set_preference = QPushButton(self.text_and_btn)
         self.page_table_set_preference.setObjectName(u"page_table_set_preference")
         self.page_table_set_preference.setMaximumSize(QSize(25, 25))
-        self.page_table_set_preference.setStyleSheet(u" image: url(:svg/svg/set_preference.svg);\n"
-" padding : 4px;")
+        self.page_table_set_preference.setStyleSheet(u"QPushButton#page_table_set_preference {\n"
+"    icon: url(:/png/png/set_preference.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#page_table_set_preference:pressed {\n"
+"    icon: url(:/png_press/png/set_preference_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}")
 
         self.horizontalLayout_6.addWidget(self.page_table_set_preference)
 
@@ -481,7 +546,18 @@ class Ui_MainWindow(object):
 "QPushButton:pressed {\n"
 "	background-color : #90b6e7;\n"
 "	border-radius : 9px;\n"
-"}")
+"}\n"
+"\n"
+"\n"
+"QPushButton#four_settings_button {\n"
+"    icon: url(:/png/png/set_preference.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#four_settings_button:pressed {\n"
+"    icon: url(:/png_press/png/set_preference_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"")
         self.horizontalLayout_5 = QHBoxLayout(self.four_text_widget)
         self.horizontalLayout_5.setSpacing(0)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
@@ -525,8 +601,7 @@ class Ui_MainWindow(object):
         self.four_settings_button = QPushButton(self.four_text_widget)
         self.four_settings_button.setObjectName(u"four_settings_button")
         self.four_settings_button.setMaximumSize(QSize(25, 25))
-        self.four_settings_button.setStyleSheet(u" image: url(:svg/svg/set_preference.svg);\n"
-" padding : 4px;")
+        self.four_settings_button.setStyleSheet(u"")
 
         self.horizontalLayout_5.addWidget(self.four_settings_button)
 
@@ -871,22 +946,39 @@ class Ui_MainWindow(object):
 "	background-color : #90b6e7;\n"
 "	border-radius : 9px;\n"
 "}\n"
+"\n"
+"\n"
+"QPushButton#note_add_btn {\n"
+"    icon: url(:/png/png/add_page.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#note_add_btn:pressed {\n"
+"    icon: url(:/png_press/png/add_page_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#note_delete_btn {\n"
+"    icon: url(:/png/png/delete.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#note_delete_btn:pressed {\n"
+"    icon: url(:/png_press/png/delete_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"\n"
 "")
         self.horizontalLayout_9 = QHBoxLayout(self.note_add_del_container)
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.note_add_btn = QPushButton(self.note_add_del_container)
         self.note_add_btn.setObjectName(u"note_add_btn")
         self.note_add_btn.setMaximumSize(QSize(25, 25))
-        self.note_add_btn.setStyleSheet(u" image: url(:svg/svg/add_page.svg);\n"
-" padding : 4px;")
+        self.note_add_btn.setStyleSheet(u"")
 
         self.horizontalLayout_9.addWidget(self.note_add_btn)
 
         self.note_delete_btn = QPushButton(self.note_add_del_container)
         self.note_delete_btn.setObjectName(u"note_delete_btn")
         self.note_delete_btn.setMaximumSize(QSize(25, 25))
-        self.note_delete_btn.setStyleSheet(u" image: url(:svg/svg/delete.svg);\n"
-" padding : 4px;")
+        self.note_delete_btn.setStyleSheet(u"")
 
         self.horizontalLayout_9.addWidget(self.note_delete_btn)
 
@@ -917,7 +1009,17 @@ class Ui_MainWindow(object):
 "QPushButton:pressed {\n"
 "	background-color : #90b6e7;\n"
 "	border-radius : 9px;\n"
-"}")
+"}\n"
+"\n"
+"QPushButton#save_text {\n"
+"    icon: url(:/png/png/save.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#save_text:pressed {\n"
+"    icon: url(:/png_press/png/save_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"")
         self.horizontalLayout_8 = QHBoxLayout(self.text_enter_container)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
         self.note_text_container = QWidget(self.text_enter_container)
@@ -951,8 +1053,7 @@ class Ui_MainWindow(object):
         self.save_text = QPushButton(self.text_enter_container)
         self.save_text.setObjectName(u"save_text")
         self.save_text.setMaximumSize(QSize(25, 25))
-        self.save_text.setStyleSheet(u" image: url(:svg/svg/save.svg);\n"
-" padding : 4px;")
+        self.save_text.setStyleSheet(u"")
 
         self.horizontalLayout_8.addWidget(self.save_text)
 
@@ -1147,30 +1248,41 @@ class Ui_MainWindow(object):
         self.horizontalLayout_14.setSpacing(0)
         self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
         self.horizontalLayout_14.setContentsMargins(0, 0, 0, 0)
-        self.widget_2 = QWidget(self.enter_text_container)
-        self.widget_2.setObjectName(u"widget_2")
-        self.verticalLayout_25 = QVBoxLayout(self.widget_2)
+        self.lapi_enter_container = QWidget(self.enter_text_container)
+        self.lapi_enter_container.setObjectName(u"lapi_enter_container")
+        self.lapi_enter_container.setStyleSheet(u"QLineEdit {\n"
+"        background-color: #33363a;\n"
+"        border-radius : 2px;\n"
+"	    max-height : 9px;\n"
+"        border-bottom: 1px solid #90b6e7;\n"
+"        padding: 5px;\n"
+"    }\n"
+"QLineEdit:focus {\n"
+"		background-color: #454555;\n"
+"        border-bottom: 1px solid #ffffff;\n"
+"    }")
+        self.verticalLayout_25 = QVBoxLayout(self.lapi_enter_container)
         self.verticalLayout_25.setObjectName(u"verticalLayout_25")
-        self.lineEdit = QLineEdit(self.widget_2)
-        self.lineEdit.setObjectName(u"lineEdit")
-        self.lineEdit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.bea_api = QLineEdit(self.lapi_enter_container)
+        self.bea_api.setObjectName(u"bea_api")
+        self.bea_api.setEchoMode(QLineEdit.EchoMode.Password)
 
-        self.verticalLayout_25.addWidget(self.lineEdit)
+        self.verticalLayout_25.addWidget(self.bea_api)
 
-        self.lineEdit_2 = QLineEdit(self.widget_2)
-        self.lineEdit_2.setObjectName(u"lineEdit_2")
-        self.lineEdit_2.setEchoMode(QLineEdit.EchoMode.Password)
+        self.fred_api = QLineEdit(self.lapi_enter_container)
+        self.fred_api.setObjectName(u"fred_api")
+        self.fred_api.setEchoMode(QLineEdit.EchoMode.Password)
 
-        self.verticalLayout_25.addWidget(self.lineEdit_2)
+        self.verticalLayout_25.addWidget(self.fred_api)
 
-        self.lineEdit_3 = QLineEdit(self.widget_2)
-        self.lineEdit_3.setObjectName(u"lineEdit_3")
-        self.lineEdit_3.setEchoMode(QLineEdit.EchoMode.Password)
+        self.bls_api = QLineEdit(self.lapi_enter_container)
+        self.bls_api.setObjectName(u"bls_api")
+        self.bls_api.setEchoMode(QLineEdit.EchoMode.Password)
 
-        self.verticalLayout_25.addWidget(self.lineEdit_3)
+        self.verticalLayout_25.addWidget(self.bls_api)
 
 
-        self.horizontalLayout_14.addWidget(self.widget_2)
+        self.horizontalLayout_14.addWidget(self.lapi_enter_container)
 
         self.widget = QWidget(self.enter_text_container)
         self.widget.setObjectName(u"widget")
@@ -1234,6 +1346,7 @@ class Ui_MainWindow(object):
         self.status_label = QLabel(self.api_btn_frame)
         self.status_label.setObjectName(u"status_label")
         self.status_label.setMaximumSize(QSize(250, 16777215))
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout_11.addWidget(self.status_label)
 

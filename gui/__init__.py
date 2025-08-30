@@ -4,16 +4,14 @@ from PySide6.QtGui import *
 from PySide6.QtSvgWidgets import *
 
 
-from ui_mainwindow import mainWindow
 from . import resources_rc
 from .ui_main import Ui_MainWindow
-from ui_function import UiFunctions
-from signal_function import SignalFunctions
+from .ui_function import UiFunctions
+from .gui_animation import GuiAnimation
 
 
 __all__ = [
     "QWidget",
-    "QApplication",
     "QMainWindow",
     "QPushButton",
 
@@ -27,8 +25,7 @@ __all__ = [
     "QSize",
 
     "resources_rc",
-    "mainWindow",
     "Ui_MainWindow",
     "UiFunctions",
-    "SignalFunctions"
+    "GuiAnimation"
 ]
