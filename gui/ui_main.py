@@ -22,7 +22,6 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -1704,13 +1703,27 @@ class Ui_MainWindow(object):
         self.verticalLayout_27.setObjectName(u"verticalLayout_27")
         self.download_btn = QPushButton(self.download_btn_container)
         self.download_btn.setObjectName(u"download_btn")
+        self.download_btn.setFont(font5)
 
         self.verticalLayout_27.addWidget(self.download_btn)
 
         self.cancel_btn = QPushButton(self.download_btn_container)
         self.cancel_btn.setObjectName(u"cancel_btn")
+        self.cancel_btn.setFont(font5)
+        self.cancel_btn.setStyleSheet(u"background-color:#fa88aa;\n"
+"color : #252526;\n"
+"font-weight : Bold;")
 
         self.verticalLayout_27.addWidget(self.cancel_btn)
+
+        self.pushButton_8 = QPushButton(self.download_btn_container)
+        self.pushButton_8.setObjectName(u"pushButton_8")
+        self.pushButton_8.setFont(font5)
+        self.pushButton_8.setStyleSheet(u"background-color:#fa88aa;\n"
+"color : #252526;\n"
+"font-weight : Bold;")
+
+        self.verticalLayout_27.addWidget(self.pushButton_8)
 
 
         self.verticalLayout_32.addWidget(self.download_btn_container)
@@ -1911,8 +1924,9 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"Data Start Year", None))
         self.checkBox.setText(QCoreApplication.translate("MainWindow", u"Download csv", None))
         self.checkBox_2.setText(QCoreApplication.translate("MainWindow", u"Download ALL data", None))
-        self.download_btn.setText(QCoreApplication.translate("MainWindow", u"Click here to Download", None))
-        self.cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Click here to Cancel", None))
+        self.download_btn.setText(QCoreApplication.translate("MainWindow", u"Download", None))
+        self.cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Cancel Download", None))
+        self.pushButton_8.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
         self.console_text.setText(QCoreApplication.translate("MainWindow", u"Console & Logging Information", None))
         self.console_area.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"

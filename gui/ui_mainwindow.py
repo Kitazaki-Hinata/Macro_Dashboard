@@ -170,6 +170,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
 
 
+        # set window gui
+        self.setWindowIcon(QIcon(":/png/png/ico.png"))
 
 
     def left_bar_button_slot(self):
