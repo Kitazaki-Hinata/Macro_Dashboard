@@ -164,7 +164,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.table_btn.clicked.connect(self.left_bar_button_slot)
         self.note_btn.clicked.connect(self.left_bar_button_slot)
         self.settings_btn.clicked.connect(self.left_bar_button_slot)
-
+        self.setWindowIcon(QIcon(":/png/png/ico.png"))
         # settings signals
         # 点击api确认按钮保存输入的API
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
@@ -194,6 +194,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 self.ui_functions.settings_api_load()
             except Exception:
                 pass
+            
 
     # ============== 自定义标题栏：最大化/还原与拖动 ==============
     def _toggle_max_restore(self):
