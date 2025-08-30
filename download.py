@@ -55,152 +55,153 @@ class DatabaseConverter():
             return df
 
     @staticmethod
-    def _format_converter(df: pd.DataFrame, data_name : str, is_pct_data : bool)-> pd.DataFrame:
+    def _format_converter(df: pd.DataFrame, data_name: str, is_pct_data: bool) -> pd.DataFrame:
+        """将不同来源的数据统一为两列: date(YYYY-MM-DD) + value 列名为 data_name。
+        足够健壮地应对 None/Timestamp/int 等类型，并容忍短表、重复、缺失。
+        """
+        if df is None or df.empty:
+            return df
+        df = df.copy()
+
+        def finalize_with_date_first(df_in: pd.DataFrame) -> pd.DataFrame:
+            # 统一 date 列为字符串 YYYY-MM-DD，去重、去空
+            if "date" not in df_in.columns:
+                return df_in
+            dates = pd.to_datetime(df_in["date"], errors="coerce")
+            df_in = df_in.assign(date=dates.dt.strftime("%Y-%m-%d"))
+            df_in = df_in.dropna(subset=["date"]).drop_duplicates(subset=["date"], keep="last")
+            # 将目标列移到首列
+            if data_name in df_in.columns:
+                cols = ["date"] + [c for c in df_in.columns if c != "date"]
+                df_in = df_in.reindex(columns=cols)
+            return df_in
+
+        # 1) BEA（索引为 'YYYY' | 'YYYYQn' | 'YYYYMM'）
         try:
-            # 将index统一转换为2020-01-01
-            # match BEA
-            match df.index[1]:
-                case a if re.fullmatch(r"[0-9]{4}", a):
-                    # 匹配： BEA_a 2020
-                    df.index = df.index + "-12-31"
-                    df["date"] = pd.to_datetime(df.index, format="%Y-%m-%d")
-                    df = DatabaseConverter._rename_bea_date_col(df)
-                    return df
-
-                case q if re.fullmatch(r"[0-9]{4}Q[0-9]{1}", q):
-                    # 匹配：BEA_q 2020Q1
-                    def convert_q_format(date_str):
-                        # 匹配：BEA_q 2020Q1
-                        year, quarter = date_str.split("Q")
-                        quarter = int(quarter)
-                        year = int(year)
-
-                        month = quarter * 3 + 1
-                        if month > 12:
-                            year += 1
-                            month = 1
-                        return f"{year}-{month:02d}-01"
-
-                    df["date"] = list(map(convert_q_format, df.index))
-                    df = DatabaseConverter._rename_bea_date_col(df)
-                    return df
-
-                case m if re.fullmatch(r"[0-9]{4}M[0-9]{2}", m):
-                    # 匹配：BEA_m 2020M01
-                    def convert_m_format(date_str):
-                        # 转换月份格式，如果要是2020M12 -> 2021-01-01
-                        year, month = date_str.split("M")
-                        month = int(month)
-                        year = int(year)
-
-                        if month == 12:
-                            new_year = year + 1
-                            new_month = 1
-                        else:
-                            new_year = year
-                            new_month = month + 1
-
-                        return f"{new_year}-{new_month:02d}-01"
-
-                    df["date"] = list(map(convert_m_format, df.index))
-                    df = DatabaseConverter._rename_bea_date_col(df)
-                    return df
-
-                case _:
-                    pass
-        except Exception as e:
-            logging.warning(f"{e} can't match any in function _format_converter")
-        try:
-            # match yfinance
-            if df.columns.tolist() == ["Close", "High", "Low", "Open", "Volume"]:
-                df.index = pd.Series(df.index).astype(str).str.split().str[0]
-                df.drop(columns = ["High", "Low", "Open", "Volume"], inplace=True)  # implace, 直接替换原来的df
-                df["date"] = df.index
-                df = df.reindex(columns = ["date", "Close"]) # 这里将date放到第一列
-                df = df.rename(columns={"Close": f"{data_name}"})
-                return df
-        except Exception as e:
-            logging.warning(f"{e} can't match any in function _format_converter")
-        try:
-            # match FRED
-            match df["date"][1]:
-                case fred if re.match("[0-9]{4}-[0-9]+-[0-9]+", fred):
-                    df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d").dt.strftime("%Y-%m-%d")
-
-                    # 判断列数是否大于1，且区分是不是百分比数据
-                    if len(df.columns) > 1 and is_pct_data == False:  # rename col with data name
-                        second_col = df.columns[1]
-                        df = df.rename(columns={second_col: f"{data_name}"})
-                    elif len(df.columns) > 1 and is_pct_data == True:  # rename col, pct data
-                        second_col = df.columns[1]
-                        df = df.rename(columns={second_col: f"{data_name}"})
+            sample = str(df.index[0]) if len(df.index) else ""
+            if re.fullmatch(r"\d{4}", sample):
+                # 年度：用当年末一天
+                df["date"] = [f"{int(y)}-12-31" for y in df.index.astype(str)]
+                df = DatabaseConverter._rename_bea_date_col(df)
+                return finalize_with_date_first(df.rename_axis(None, axis=1))
+            if re.fullmatch(r"\d{4}Q[1-4]", sample):
+                def q_to_date(s: str) -> str:
+                    y, q = s.split("Q"); y = int(y); q = int(q)
+                    m = q * 3 + 1
+                    if m > 12:
+                        y += 1; m = 1
+                    return f"{y}-{m:02d}-01"
+                df["date"] = [q_to_date(str(s)) for s in df.index]
+                df = DatabaseConverter._rename_bea_date_col(df)
+                return finalize_with_date_first(df)
+            if re.fullmatch(r"\d{4}M\d{2}", sample):
+                def m_to_date(s: str) -> str:
+                    y, m = s.split("M"); y = int(y); m = int(m)
+                    if m == 12:
+                        y += 1; m = 1
                     else:
-                        logging.warning(f"FAILED TO RENAME COLUMN NAME {data_name}, in function write_to_db, continue")
-                    return df
-                case _:
-                    pass
+                        m += 1
+                    return f"{y}-{m:02d}-01"
+                df["date"] = [m_to_date(str(s)) for s in df.index]
+                df = DatabaseConverter._rename_bea_date_col(df)
+                return finalize_with_date_first(df)
         except Exception as e:
-            logging.warning(f"{e} can't match any in function _format_converter")
+            logging.warning(f"BEA match failed in _format_converter: {e}")
+
+        # 2) yfinance（OHLCV）
         try:
-            # match BLS
-            if list(df.columns) == ["year", "period", "value"] or list(df.columns) == ["year", "period", "MoM_growth"]:
-                # change month num
-                if df["period"][1][0] == "M":
-                    df["period"] = (
-                        df["period"].str[1:].astype(int).apply(
-                            lambda x : 1 if x == 12 else x + 1
-                        ).astype(str).str.zfill(2)
-                    )
-                elif df["period"][1][0] == "Q":
-                    def month_map(num : int) -> int:
-                        if num == 1:  # Q1
-                            return 4
-                        elif num == 2:  # Q2
-                            return 7
-                        elif num == 3:  # Q3
-                            return 10
-                        elif num == 4:  # Q4
+            ohlcv = {"Open", "High", "Low", "Close", "Volume"}
+            if set(df.columns) >= ohlcv:
+                # 将索引转为日期字符串
+                if isinstance(df.index, pd.DatetimeIndex):
+                    dates = df.index.normalize().strftime("%Y-%m-%d")
+                else:
+                    dates = pd.to_datetime(pd.Series(df.index).astype(str), errors="coerce").dt.strftime("%Y-%m-%d")
+                df = df.assign(date=dates)
+                # 仅保留 Close => data_name
+                out = pd.DataFrame({
+                    "date": df["date"],
+                    data_name: df["Close"]
+                })
+                return finalize_with_date_first(out)
+        except Exception as e:
+            logging.warning(f"yfinance match failed in _format_converter: {e}")
+
+        # 3) FRED（包含 'date' 列 + 一个数值列）
+        try:
+            if "date" in df.columns:
+                # 找到第一个非 date 的数据列
+                value_cols = [c for c in df.columns if c != "date"]
+                if value_cols:
+                    col = value_cols[0]
+                    out = df[["date", col]].copy()
+                    out = out.rename(columns={col: data_name})
+                    return finalize_with_date_first(out)
+        except Exception as e:
+            logging.warning(f"FRED match failed in _format_converter: {e}")
+
+        # 4) BLS（year, period, value/MoM_growth）
+        try:
+            cols = list(df.columns)
+            if cols == ["year", "period", "value"] or cols == ["year", "period", "MoM_growth"]:
+                period = df["period"].astype(str)
+                if period.str.startswith("M").any():
+                    month = period.str[1:].astype(int)
+                    month = month.where(month != 12, 0) + 1
+                    month = month.astype(str).str.zfill(2)
+                elif period.str.startswith("Q").any():
+                    def q_to_month(s: str) -> int:
+                        try:
+                            q = int(s[1:])
+                            return {1: 4, 2: 7, 3: 10, 4: 1}.get(q, 1)
+                        except Exception:
                             return 1
-                    df["period"] =  (
-                        df["period"].str[1:].astype(int).apply(month_map).astype(str).str.zfill(2)
-                    )
-                mask = df["period"] == "01"
-                df.loc[mask, "year"] = df.loc[mask, "year"].astype(int) + 1  # 只更新这些行的年份
-                df["year"] = df["year"].astype(int)
+                    month = period.apply(q_to_month).astype(str).str.zfill(2)
+                else:
+                    month = "01"
 
-                # reformat df
-                df.rename(columns={"value": f"{data_name}"}, inplace=True)
-                df.rename(columns = {"MoM_growth": f"{data_name}"}, inplace=True)
-                df["date"] = df["year"].astype(str) + "-" + df["period"].astype(str) + "-01"
-                df = df.drop(columns=["period", "year"])
-                df = df.reindex(columns = ["date", f"{data_name}"])
-                return df
+                year = pd.to_numeric(df["year"], errors="coerce")
+                year = year.where(month != "01", year + 1)
+                df["date"] = year.astype("Int64").astype(str) + "-" + month + "-01"
+                # 选择数值列
+                val_col = "value" if "value" in df.columns else "MoM_growth"
+                out = df[["date", val_col]].copy().rename(columns={val_col: data_name})
+                return finalize_with_date_first(out)
         except Exception as e:
-            logging.warning(f"{e} can't match any in function _format_converter")
+            logging.warning(f"BLS match failed in _format_converter: {e}")
+
+        # 5) TE（月名_年份）
         try:
-            # match TE
-            match df["date"][1]:
-                case te if re.match("[A-Z][a-z]+_[0-9]{4}", te):
-                    df.rename(columns = {"date": "Date"}, inplace=True )
-                    df.rename(columns = {"value": f"{data_name}"}, inplace=True)
-                    split_data = df["Date"].str.split("_", expand=True).replace()
-                    month_str : pd.Series = split_data[0]
-                    year : pd.Series = split_data[1].astype(int)  # 转换为整数
-
-                    dec_mask = (month_str == "Dec")  # 布尔掩码
-                    year = year.where(~dec_mask, year + 1)  # Dec 年份 +1
-                    month = month_str.apply(DatabaseConverter._convert_month_str_to_num)
-                    month = month.where(~dec_mask, 1)
-                    df["date"] = year.astype(str) + "-" + month.astype(str).str.zfill(2) + "-01"
-
-                    df.drop(columns=["Date"], inplace=True)
-                    date_col = df.pop("date")
-                    df.insert(0, "date", date_col)
-                    return df
-                case _:
-                    pass
+            if "date" in df.columns and df["date"].astype(str).str.contains(r"^[A-Za-z]{3}_[0-9]{4}$").any():
+                df = df.rename(columns={"value": data_name, "date": "Date"})
+                split_data = df["Date"].astype(str).str.split("_", expand=True)
+                month_str = split_data[0]
+                year = pd.to_numeric(split_data[1], errors="coerce")
+                dec_mask = (month_str == "Dec")
+                year = year.where(~dec_mask, year + 1)
+                month = month_str.apply(DatabaseConverter._convert_month_str_to_num)
+                month = month.where(~dec_mask, 1)
+                df["date"] = year.astype("Int64").astype(str) + "-" + month.astype("Int64").astype(str).str.zfill(2) + "-01"
+                df = df.drop(columns=["Date"], errors="ignore")
+                date_col = df.pop("date")
+                df.insert(0, "date", date_col)
+                return finalize_with_date_first(df)
         except Exception as e:
-            logging.error(f"{e} can't match any in function _format_converter")
+            logging.warning(f"TE match failed in _format_converter: {e}")
+
+        # 兜底：如果已有 date 列，则标准化；若无，则尝试从索引转
+        try:
+            if "date" in df.columns:
+                return finalize_with_date_first(df.rename(columns={df.columns[1]: data_name}) if len(df.columns) > 1 else df)
+            else:
+                dates = pd.to_datetime(pd.Series(df.index).astype(str), errors="coerce").dt.strftime("%Y-%m-%d")
+                out = pd.DataFrame({"date": dates})
+                if df.shape[1] >= 1:
+                    out[data_name] = list(df.iloc[:, 0])
+                return finalize_with_date_first(out)
+        except Exception as e:
+            logging.warning(f"fallback in _format_converter failed: {e}")
+            return df
 
     def _create_ts_sheet(self, start_date : str):
         """If time_series_table does not exist, then create new db
@@ -229,7 +230,11 @@ class DatabaseConverter():
                 logging.info("Time_Series table already exists, continue")
                 cursor.execute("SELECT MAX(date) FROM Time_Series")
                 max_date_str = cursor.fetchone()[0]
-                max_date = datetime.strptime(max_date_str, '%Y-%m-%d').date()
+                if not max_date_str:
+                    # 表存在但没有行的极端情况：初始化最小日期
+                    max_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                else:
+                    max_date = datetime.strptime(max_date_str, '%Y-%m-%d').date()
 
                 # 计算需要添加的日期
                 current_date = datetime.now().date()
@@ -269,7 +274,14 @@ class DatabaseConverter():
                 logging.error(f"{data_name} is empty, FAILED INSERT, locate in write_into_db")
             else:
                 if is_time_series:  # check whether Time_Series table exists
-                    df_after_modify_time : pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
+                    df_after_modify_time: pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
+                    if df_after_modify_time is None or df_after_modify_time.empty or 'date' not in df_after_modify_time.columns:
+                        logging.error(f"{data_name} reformat produced empty/invalid dataframe, skip writing")
+                        return
+                    # 标准化和去重
+                    df_after_modify_time = df_after_modify_time.copy()
+                    df_after_modify_time['date'] = pd.to_datetime(df_after_modify_time['date'], errors='coerce').dt.strftime('%Y-%m-%d')
+                    df_after_modify_time = df_after_modify_time.dropna(subset=['date']).drop_duplicates(subset=['date'], keep='last')
                     try:
                         cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {data_name} DOUBLE")
                         self.conn.commit()
@@ -365,10 +377,23 @@ class BEADownloader(DataDownloader):
                 continue
 
             try:
-                df : pd.DataFrame = pd.DataFrame(bea_tbl)
-                df_filtered : pd.DataFrame = df[df["LineDescription"].isin([df["LineDescription"][1], ""])]   # 提取首列数据/isin后面使用list和""的原因是不允许输入str
-                df_modified : pd.DataFrame= df_filtered.pivot(index="TimePeriod", columns="LineDescription", values="DataValue") # 重新排序
-                df_modified.columns = [f"{table_config['name']}"]   # rename
+                df: pd.DataFrame = pd.DataFrame(bea_tbl)
+                # 选择一个可用的行描述（优先第二行，否则第一行，否则空串）
+                try:
+                    ld_series = df["LineDescription"].fillna("")
+                    pick = ld_series.iloc[1] if len(ld_series) > 1 else (ld_series.iloc[0] if len(ld_series) else "")
+                except Exception:
+                    pick = ""
+                df_filtered: pd.DataFrame = df[df["LineDescription"].isin([pick, ""])].copy()
+                # 处理重复 TimePeriod 时使用最后一个值
+                df_modified: pd.DataFrame = pd.pivot_table(
+                    df_filtered,
+                    index="TimePeriod",
+                    columns="LineDescription",
+                    values="DataValue",
+                    aggfunc="last"
+                )
+                df_modified.columns = [f"{table_config['name']}"]
                 df_modified.index.name = "TimePeriod"
                 logging.info(f"BEA_{table_name} Successfully extracted!")
                 if return_df is True and isinstance(df_modified, pd.DataFrame):  # used for to_csv method
@@ -428,8 +453,12 @@ class YFDownloader(DataDownloader):
         for table_name, table_config in self.json_dict.items():
             try:
                 index = table_config["code"]
-                data : pd.DataFrame = yf.download(index, start=self.start_date, end=self.end_date, interval="1d")
-                data.columns = data.columns.droplevel(1)
+                data: pd.DataFrame = yf.download(index, start=self.start_date, end=self.end_date, interval="1d")
+                # 针对单层列名的容错
+                try:
+                    data.columns = data.columns.droplevel(1)
+                except Exception:
+                    pass
                 if return_df is True and isinstance(data, pd.DataFrame):  # used for to_csv method
                     df_dict[table_name] = data
                     continue
@@ -490,26 +519,26 @@ class FREDDownloader(DataDownloader):
                     "observation_end": self.end_date,
                     "file_type": "json"
                 }
-                data  = requests.get(FREDDownloader.url, params=params).json()
-                df = pd.DataFrame(data["observations"])
-                try:
-                    df : pd.DataFrame = df.iloc[:, -2:]
-                except:
-                    logging.warning(f"{table_name} HAVEN'T REMOVE 2 realtime columns, but continue to operate")
-                    pass
+                resp = requests.get(FREDDownloader.url, params=params)
+                data = resp.json()
+                df = pd.DataFrame(data.get("observations", []))
+                if df.empty:
+                    raise Exception("empty observations")
+                # 仅保留 date + value (或派生列)
+                # 兼容某些场景的多列返回
+                keep_cols = [c for c in df.columns if c in ("date", "value")]
+                df = df[keep_cols].copy()
 
-                if table_config["needs_pct"] is True:  # identify params in json and reformat based on bool value
-                    df["value"] = pd.to_numeric(df["value"])
-                    df["MoM_growth"] = df["value"].pct_change().dropna()
-                    df = df.drop(df.columns[-2], axis=1)
-                if table_config["needs_cleaning"] is True:
+                if table_config.get("needs_pct", False):
+                    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+                    df["MoM_growth"] = df["value"].pct_change()
+                    df = df[["date", "MoM_growth"]]
+                else:
                     df["value"] = df["value"].replace(".", np.nan)
-                    df["value"] = np.where(
-                        df["value"].isna(),
-                        df['value'].shift(1),
-                        df['value']
-                    )
-                    df["value"] = df["value"].ffill().dropna()
+                    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+                    if table_config.get("needs_cleaning", False):
+                        df["value"] = df["value"].ffill()
+                    df = df[["date", "value"]]
 
                 if return_df is True and isinstance(df, pd.DataFrame):
                     df_dict[table_name] = df
@@ -527,8 +556,7 @@ class FREDDownloader(DataDownloader):
                     logging.info(f"{table_name} Successfully extracted!")
                     continue
             except Exception as e:
-                logging.error(f"{table_name} FAILED EXTRACT DATA from FRED"
-                              f"Probably due to extraction failure or df reformat failure.")
+                logging.error(f"{table_name} FAILED EXTRACT DATA from FRED: {e}")
                 continue
 
         if return_df is True:

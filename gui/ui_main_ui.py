@@ -21,7 +21,12 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
-
+try:
+        # 当作为包导入（from gui import Ui_MainWindow）
+        from . import resources_rc  # type: ignore
+except Exception:
+        # 当直接运行此文件（python ui_main_ui.py）
+        import resources_rc  # type: ignore
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -376,7 +381,7 @@ class Ui_MainWindow(object):
 "\n"
 "QTabBar::close-button {\n"
 "    /* \u8bbe\u7f6e\u80cc\u666f\u56fe\u7247\uff0c\u4e0d\u91cd\u590d */\n"
-"	image:url(:svg/svg/close_2.svg);\n"
+"image:url(:/svg/svg/close_2.svg);\n"
 "    background-repeat: no-repeat;\n"
 "    background-position: center;\n"
 "    border-radius: 10px;\n"
@@ -385,8 +390,8 @@ class Ui_MainWindow(object):
 "")
         self.tab_window.setTabPosition(QTabWidget.TabPosition.North)
         self.tab_window.setTabShape(QTabWidget.TabShape.Rounded)
-        self.tab_window.setElideMode(Qt.TextElideMode.ElideNone)
-        self.tab_window.setUsesScrollButtons(True)
+        self.tab_window.setElideMode(Qt.TextElideMode.ElideRight)
+        self.tab_window.setUsesScrollButtons(False)
         self.tab_window.setDocumentMode(True)
         self.tab_window.setTabsClosable(True)
         self.tab_window.setMovable(True)
@@ -851,7 +856,7 @@ class Ui_MainWindow(object):
         self.expand_fold.setObjectName(u"expand_fold")
         self.expand_fold.setGeometry(QRect(0, 0, 200, 50))
         self.expand_fold.setMinimumSize(QSize(0, 50))
-        self.expand_fold.setStyleSheet(u" image: url(:svg/svg/fold.svg);\n"
+        self.expand_fold.setStyleSheet(u" image: url(:/svg/svg/fold.svg);\n"
 " padding : 15px;")
 
         self.verticalLayout_15.addWidget(self.expand_btn_container)
@@ -920,7 +925,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 192, 780))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 92, 780))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -1654,35 +1659,35 @@ class Ui_MainWindow(object):
         self.verticalLayout_29.setContentsMargins(0, 0, 0, 0)
         self.bea = QCheckBox(self.ts_data)
         self.bea.setObjectName(u"bea")
-        self.bea.setEnabled(False)
+        self.bea.setEnabled(True)
         self.bea.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bea)
 
         self.yf = QCheckBox(self.ts_data)
         self.yf.setObjectName(u"yf")
-        self.yf.setEnabled(False)
+        self.yf.setEnabled(True)
         self.yf.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.yf)
 
         self.fred = QCheckBox(self.ts_data)
         self.fred.setObjectName(u"fred")
-        self.fred.setEnabled(False)
+        self.fred.setEnabled(True)
         self.fred.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.fred)
 
         self.bls = QCheckBox(self.ts_data)
         self.bls.setObjectName(u"bls")
-        self.bls.setEnabled(False)
+        self.bls.setEnabled(True)
         self.bls.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bls)
 
         self.te = QCheckBox(self.ts_data)
         self.te.setObjectName(u"te")
-        self.te.setEnabled(False)
+        self.te.setEnabled(True)
         self.te.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.te)
@@ -1858,6 +1863,7 @@ class Ui_MainWindow(object):
 
         self.cancel_btn = QPushButton(self.download_btn_container)
         self.cancel_btn.setObjectName(u"cancel_btn")
+        self.cancel_btn.setEnabled(False)
         self.cancel_btn.setFont(font5)
         self.cancel_btn.setStyleSheet(u"")
 
@@ -1872,6 +1878,34 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_32.addWidget(self.download_btn_container)
+
+        self.parallel_opts_container = QWidget(self.download_confirm_container)
+        self.parallel_opts_container.setObjectName(u"parallel_opts_container")
+        self.horizontalLayout_parallel = QHBoxLayout(self.parallel_opts_container)
+        self.horizontalLayout_parallel.setSpacing(8)
+        self.horizontalLayout_parallel.setObjectName(u"horizontalLayout_parallel")
+        self.horizontalLayout_parallel.setContentsMargins(0, 0, 0, 0)
+        self.parallel_download_check = QCheckBox(self.parallel_opts_container)
+        self.parallel_download_check.setObjectName(u"parallel_download_check")
+        self.parallel_download_check.setChecked(True)
+
+        self.horizontalLayout_parallel.addWidget(self.parallel_download_check)
+
+        self.max_threads_label = QLabel(self.parallel_opts_container)
+        self.max_threads_label.setObjectName(u"max_threads_label")
+
+        self.horizontalLayout_parallel.addWidget(self.max_threads_label)
+
+        self.max_threads_spin = QSpinBox(self.parallel_opts_container)
+        self.max_threads_spin.setObjectName(u"max_threads_spin")
+        self.max_threads_spin.setMinimum(1)
+        self.max_threads_spin.setMaximum(8)
+        self.max_threads_spin.setValue(4)
+
+        self.horizontalLayout_parallel.addWidget(self.max_threads_spin)
+
+
+        self.verticalLayout_32.addWidget(self.parallel_opts_container)
 
 
         self.horizontalLayout_18.addWidget(self.download_confirm_container)
@@ -1946,7 +1980,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(4)
         self.tab_window.setCurrentIndex(0)
 
 
@@ -2072,6 +2106,8 @@ class Ui_MainWindow(object):
         self.download_btn.setText(QCoreApplication.translate("MainWindow", u"Download", None))
         self.cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Cancel Download", None))
         self.clear_lag_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
+        self.parallel_download_check.setText(QCoreApplication.translate("MainWindow", u"Enable parallel downloads", None))
+        self.max_threads_label.setText(QCoreApplication.translate("MainWindow", u"Max threads", None))
         self.console_text.setText(QCoreApplication.translate("MainWindow", u"Console & Logging Information", None))
         self.console_area.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
