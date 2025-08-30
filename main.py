@@ -20,21 +20,20 @@ def setup_logging():
         ]
     )
 
-def read_json() -> Dict[str, Any]:
+def read_json() ->  dict:
     '''read request_id.json file, return whole json context as a whole dictionary'''
     try:
         with open("request_id.json", "r", encoding="utf-8") as file:
             data_identity = json.load(file)
             logging.info( "read_json Successfully load json file")
         return data_identity
-    except Exception as e:
-        logging.error(f"read_json, ERROR: FAILED to LOAD json file: {e}")
-        return {}
+    except:
+        logging.error("read_json, ERROR: FAILED to LOAD json file")
 
 
 if __name__ == "__main__":
     setup_logging()  # 初始化日志系统
-    json_data: Dict[str, Any] = read_json()
+    json_data: dict = read_json()
     request_year : int = 2020  # 默认请求的开始年份
 
     app = QApplication([])
@@ -42,12 +41,6 @@ if __name__ == "__main__":
     window.show()
     app.exec()
 
-    # te_downloader = DownloaderFactory.create_downloader(
-    #     source = "te",
-    #     json_data = json_data,
-    #     request_year = request_year
-    # )
-    # te_downloader.to_db()
 
 
 

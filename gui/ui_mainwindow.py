@@ -165,13 +165,13 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_btn.clicked.connect(self.left_bar_button_slot)
         self.settings_btn.clicked.connect(self.left_bar_button_slot)
         self.setWindowIcon(QIcon(":/png/png/ico.png"))
+
         # settings signals
-        # 点击api确认按钮保存输入的API
+        # 点击api确认按钮，保存输入的API
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
 
-
-        # set window icon  设置窗口icon
-        self.setWindowIcon(QIcon(":/png/png/ico.png"))
+        # 重置日志文件按钮
+        self.clear_lag_btn.clicked.connect(self.ui_functions.clear_logs)
 
 
     def left_bar_button_slot(self):

@@ -16,6 +16,12 @@
     <height>792</height>
    </size>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>1920</width>
+    <height>1080</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Macro Data Dashboard</string>
   </property>
@@ -96,8 +102,6 @@ QCheckBox::indicator:disabled {
             subcontrol-origin: border;
             subcontrol-position: top right;
             width: 20px;
-            border-left: 1px solid #404043;
-            border-bottom: 1px solid #404043;
             border-top-right-radius: 5px;
             background: #404043;
         }
@@ -115,8 +119,6 @@ QCheckBox::indicator:disabled {
             subcontrol-origin: border;
             subcontrol-position: bottom right;
             width: 20px;
-            border-left: 1px solid #404043;
-            border-top: 1px solid #404043;
             border-bottom-right-radius: 5px;
             background: #404043;
         }
@@ -503,7 +505,7 @@ QPushButton#settings_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -582,7 +584,7 @@ QTabWidget::pane{
 
 QTabBar::close-button {
     /* 设置背景图片，不重复 */
-	image:url(:svg/svg/close_2.svg);
+image:url(:/svg/svg/close_2.svg);
     background-repeat: no-repeat;
     background-position: center;
     border-radius: 10px;
@@ -600,10 +602,10 @@ QTabBar::close-button {
                  <number>0</number>
                 </property>
                 <property name="elideMode">
-                 <enum>Qt::TextElideMode::ElideNone</enum>
+                 <enum>Qt::TextElideMode::ElideRight</enum>
                 </property>
                 <property name="usesScrollButtons">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="documentMode">
                  <bool>true</bool>
@@ -1513,7 +1515,7 @@ QPushButton:pressed {
                      <string/>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true"> image: url(:svg/svg/fold.svg);
+                     <string notr="true"> image: url(:/svg/svg/fold.svg);
  padding : 15px;</string>
                     </property>
                     <property name="text">
@@ -1938,11 +1940,11 @@ QPushButton:pressed {
 }
 
 QPushButton#save_text {
-    icon: url(:/png/png/save.png);
+    icon: url(:/png/png/save_2.png);
     icon-size: 17px 17px;
 }
 QPushButton#save_text:pressed {
-    icon: url(:/png_press/png/save_press.png);
+    icon: url(:/png_press/png/save_2_press.png);
     icon-size: 17px 17px;
 }
 </string>
@@ -2034,9 +2036,6 @@ color : #90b6e7;</string>
                       <property name="toolTip">
                        <string/>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true"/>
-                      </property>
                       <property name="text">
                        <string/>
                       </property>
@@ -2089,19 +2088,19 @@ margin-right : 10px;</string>
                       </property>
                       <layout class="QVBoxLayout" name="verticalLayout_14">
                        <property name="spacing">
-                        <number>0</number>
+                        <number>25</number>
                        </property>
                        <property name="leftMargin">
-                        <number>0</number>
+                        <number>25</number>
                        </property>
                        <property name="topMargin">
-                        <number>0</number>
+                        <number>25</number>
                        </property>
                        <property name="rightMargin">
-                        <number>0</number>
+                        <number>25</number>
                        </property>
                        <property name="bottomMargin">
-                        <number>0</number>
+                        <number>25</number>
                        </property>
                        <item>
                         <widget class="QPlainTextEdit" name="plainTextEdit">
@@ -2866,7 +2865,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <property name="styleSheet">
                        <string notr="true">* {
 font-family : &quot;Comfortaa&quot;; 
-color : #fa88aa; 
+color : #EE5C88; 
 font-weight : Bold;
 }</string>
                       </property>
@@ -3058,7 +3057,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="bea">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>BEA data API</string>
@@ -3071,7 +3070,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="yf">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>Yfinance API</string>
@@ -3084,7 +3083,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="fred">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>FRED data API</string>
@@ -3097,7 +3096,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="bls">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>BLS data API</string>
@@ -3110,7 +3109,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="te">
                                   <property name="enabled">
-                                   <bool>false</bool>
+                                   <bool>true</bool>
                                   </property>
                                   <property name="text">
                                    <string>TE data</string>
@@ -3287,6 +3286,9 @@ color : #777785;
                                 </size>
                                </property>
                                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                                <property name="spacing">
+                                 <number>6</number>
+                                </property>
                                 <item>
                                  <widget class="QLabel" name="label">
                                   <property name="text">
@@ -3296,6 +3298,18 @@ color : #777785;
                                 </item>
                                 <item>
                                  <widget class="QSpinBox" name="int_year_spinbox">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>17</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>17</height>
+                                   </size>
+                                  </property>
                                   <property name="minimum">
                                    <number>2020</number>
                                   </property>
@@ -3356,7 +3370,7 @@ QPushButton#download_btn {
 	background : #202023;
 }
 QPushButton#download_btn::hover {
-	background : #454545;
+	background : #353542;
 }
 QPushButton#download_btn::pressed {
 	background : #202023;
@@ -3365,27 +3379,27 @@ QPushButton#download_btn::pressed {
 
 /*cancel*/
 QPushButton#cancel_btn {
-	background-color:#fa88aa;
+	background-color:#EE5C88;
 	color : #252526;
 }
 QPushButton#cancel_btn::hover {
-	background : #FFB6CC;
+	background : #fa88aa;
 }
 QPushButton#cancel_btn::pressed {
-	background : #fa88aa;
+	background : #EE5C88;
 }
 
 
 /*clear lags*/
 QPushButton#clear_lag_btn {
-	background-color:#fa88aa;
+	background-color:#EE5C88;
 	color : #252526;
 }
 QPushButton#clear_lag_btn::hover {
-	background : #FFB6CC;
+	background : #fa88aa;
 }
 QPushButton#clear_lag_btn::pressed {
-	background : #fa88aa;
+	background : #EE5C88;
 }</string>
                                </property>
                                <layout class="QVBoxLayout" name="verticalLayout_27">
@@ -3408,6 +3422,9 @@ QPushButton#clear_lag_btn::pressed {
                                 </item>
                                 <item>
                                  <widget class="QPushButton" name="cancel_btn">
+                                  <property name="enabled">
+                                   <bool>false</bool>
+                                  </property>
                                   <property name="font">
                                    <font>
                                     <family>Comfortaa</family>
@@ -3437,6 +3454,69 @@ QPushButton#clear_lag_btn::pressed {
                                   </property>
                                   <property name="text">
                                    <string>Clear logs</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                               </layout>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QWidget" name="parallel_opts_container" native="true">
+                               <layout class="QHBoxLayout" name="horizontalLayout_parallel">
+                                <property name="spacing">
+                                 <number>8</number>
+                                </property>
+                                <property name="leftMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="topMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="rightMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="bottomMargin">
+                                 <number>0</number>
+                                </property>
+                                <item>
+                                 <widget class="QCheckBox" name="parallel_download_check">
+                                  <property name="text">
+                                   <string>Enable parallel downloads</string>
+                                  </property>
+                                  <property name="checked">
+                                   <bool>true</bool>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLabel" name="max_threads_label">
+                                  <property name="text">
+                                   <string>Max threads</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QSpinBox" name="max_threads_spin">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>17</height>
+                                   </size>
+                                  </property>
+                                  <property name="maximumSize">
+                                   <size>
+                                    <width>16777215</width>
+                                    <height>17</height>
+                                   </size>
+                                  </property>
+                                  <property name="minimum">
+                                   <number>1</number>
+                                  </property>
+                                  <property name="maximum">
+                                   <number>8</number>
+                                  </property>
+                                  <property name="value">
+                                   <number>4</number>
                                   </property>
                                  </widget>
                                 </item>
@@ -3509,7 +3589,7 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Comfortaa'; font-size:9pt; font-weight:700; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-weight:400;&quot;&gt;Console information&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                             </property>
                            </widget>
                           </item>
