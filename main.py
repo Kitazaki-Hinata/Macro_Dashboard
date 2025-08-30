@@ -4,7 +4,7 @@ import json
 import logging
 from PySide6.QtWidgets import QApplication
 from gui.ui_mainwindow import mainWindow
-from download import DownloaderFactory
+from typing import Dict, Any
 
 
 def setup_logging():
@@ -19,20 +19,21 @@ def setup_logging():
         ]
     )
 
-def read_json() ->  dict:
+def read_json() -> Dict[str, Any]:
     '''read request_id.json file, return whole json context as a whole dictionary'''
     try:
         with open("request_id.json", "r", encoding="utf-8") as file:
             data_identity = json.load(file)
             logging.info( "read_json Successfully load json file")
         return data_identity
-    except:
-        logging.error("read_json, ERROR: FAILED to LOAD json file")
+    except Exception as e:
+        logging.error(f"read_json, ERROR: FAILED to LOAD json file: {e}")
+        return {}
 
 
 if __name__ == "__main__":
     setup_logging()  # 初始化日志系统
-    json_data: dict = read_json()
+    json_data: Dict[str, Any] = read_json()
     request_year : int = 2020  # 默认请求的开始年份
 
     app = QApplication([])
