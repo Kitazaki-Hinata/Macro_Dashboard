@@ -26,6 +26,9 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 点击api确认按钮保存输入的API
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
 
+        # set window gui
+        self.setWindowIcon(QIcon(":/png/png/ico.png"))
+
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''
         btn = self.sender()
