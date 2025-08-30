@@ -5,6 +5,7 @@ import logging
 from PySide6.QtWidgets import QApplication
 from gui.ui_mainwindow import mainWindow
 from typing import Dict, Any
+from download import DownloaderFactory
 
 
 def setup_logging():
