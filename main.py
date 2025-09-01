@@ -34,7 +34,6 @@ def read_json() ->  dict:
 if __name__ == "__main__":
     setup_logging()  # 初始化日志系统
     json_data: dict = read_json()
-    request_year : int = 2020  # 默认请求的开始年份
 
     app = QApplication([])
     window = mainWindow()
