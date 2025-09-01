@@ -2123,15 +2123,14 @@ font-family : &quot;Comfortaa&quot;;</string>
             </widget>
             <widget class="QWidget" name="page_settings_container">
              <property name="styleSheet">
-              <string notr="true">
-QScrollBar:vertical {
+              <string notr="true">QScrollBar:vertical {
 	border: none;
     background: #ffffff;
     width: 17.5px;
     margin: 0;
 	border-radius: 0px;
  }
- QScrollBar::handle:vertical {	
+QScrollBar::handle:vertical {	
 	background: #90b6e7;
 	width :8px;
     min-height: 25px;
@@ -3538,7 +3537,10 @@ QPushButton#clear_lag_btn::pressed {
                           </size>
                          </property>
                          <property name="styleSheet">
-                          <string notr="true">border-radius : 20px; background :#202023; </string>
+                          <string notr="true">* {
+border-radius : 20px; background :#202023; 
+}
+</string>
                          </property>
                          <layout class="QVBoxLayout" name="verticalLayout_30">
                           <property name="leftMargin">
@@ -3575,8 +3577,12 @@ margin-left: 1px;</string>
                              </sizepolicy>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">border:0;
-color:white;</string>
+                             <string notr="true">color:white; 
+font-famlily:&quot;Comfortaa&quot;;
+border :0;
+background:transparent;
+padding :5px;
+</string>
                             </property>
                             <property name="readOnly">
                              <bool>true</bool>
