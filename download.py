@@ -20,6 +20,7 @@ from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Dict, List, Tuple
+from typing import cast
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
@@ -29,6 +30,13 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+# 新增: 并发与线程同步
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# 全局 DB 写锁，避免并发写入 SQLite 导致数据丢失或锁冲突
+DB_WRITE_LOCK = threading.Lock()
 
 
 class DatabaseConverter:
@@ -119,11 +127,8 @@ class DatabaseConverter:
         try:
             ohlcv = {"Open", "High", "Low", "Close", "Volume"}
             if set(df.columns) >= ohlcv:
-                # 将索引转为日期字符串
-                if isinstance(df.index, pd.DatetimeIndex):
-                    dates = df.index.normalize().strftime("%Y-%m-%d")
-                else:
-                    dates = pd.to_datetime(pd.Series(df.index).astype(str), errors="coerce").dt.strftime("%Y-%m-%d")
+                # 将索引转为日期字符串（统一使用 to_datetime）
+                dates = pd.to_datetime(df.index, errors="coerce").strftime("%Y-%m-%d")
                 df = df.assign(date=dates)
                 # 仅保留 Close => data_name
                 out = pd.DataFrame({
@@ -168,9 +173,11 @@ class DatabaseConverter:
                 else:
                     month_series = pd.Series(["01"] * len(df), index=df.index)
 
-                year = pd.to_numeric(df["year"], errors="coerce")
-                year = year.where(month_series != "01", year + 1)
-                df["date"] = year.astype("Int64").astype(str) + "-" + month_series + "-" + "01"
+                year_num = pd.to_numeric(df["year"], errors="coerce")
+                year_num = year_num.where(month_series != "01", year_num + 1)
+                month_num = pd.to_numeric(month_series, errors="coerce")
+                dt = pd.to_datetime({"year": year_num, "month": month_num, "day": 1}, errors="coerce")
+                df["date"] = dt.dt.strftime("%Y-%m-%d")
                 # 选择数值列
                 val_col = "value" if "value" in df.columns else "MoM_growth"
                 out = df[["date", val_col]].copy().rename(columns={val_col: data_name})
@@ -189,7 +196,9 @@ class DatabaseConverter:
                 year = year.where(~dec_mask, year + 1)
                 month = month_str.apply(DatabaseConverter._convert_month_str_to_num)
                 month = month.where(~dec_mask, 1)
-                df["date"] = year.astype("Int64").astype(str) + "-" + month.astype("Int64").astype(str).str.zfill(2) + "-01"
+                month_num = pd.to_numeric(month, errors="coerce")
+                dt = pd.to_datetime({"year": year, "month": month_num, "day": 1}, errors="coerce")
+                df["date"] = dt.dt.strftime("%Y-%m-%d")
                 df = df.drop(columns=["Date"], errors="ignore")
                 date_col = df.pop("date")
                 df.insert(0, "date", date_col)
@@ -275,70 +284,73 @@ class DatabaseConverter:
         params is_time_series: judge whether it is time series data, incl. BEA, BLS, YF, TE, FRED
         params is_pct_data: input json data, bool value, "needs_pct"
         '''
-        self._create_ts_sheet(start_date = start_date)
-        cursor = self.cursor
-        try:
-            if df.empty:
-                logging.error(f"{data_name} is empty, FAILED INSERT, locate in write_into_db")
-            else:
-                if is_time_series:  # check whether Time_Series table exists
-                    df_after_modify_time: pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
-                    if df_after_modify_time.empty or 'date' not in df_after_modify_time.columns:
-                        logging.error(f"{data_name} reformat produced empty/invalid dataframe, skip writing")
-                        return
-                    # 标准化和去重
-                    df_after_modify_time = df_after_modify_time.copy()
-                    df_after_modify_time['date'] = pd.to_datetime(df_after_modify_time['date'], errors='coerce').dt.strftime('%Y-%m-%d')
-                    df_after_modify_time = df_after_modify_time.dropna(subset=['date']).drop_duplicates(subset=['date'], keep='last')
-                    try:
-                        cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {data_name} DOUBLE")
-                        self.conn.commit()
-                    except:
-                        logging.warning(f"{data_name} col name already exists in Time_Series, continue")
-
-                    df_db = pd.read_sql("SELECT * FROM Time_Series", self.conn)  # 只读取日期列
-                    result_db = df_db.merge(df_after_modify_time, on="date", how="left")
-
-                    for col in df_after_modify_time.columns:
-                        if col == 'date':
-                            continue  # 跳过日期列
-                        if f"{col}_x" in result_db.columns and f"{col}_y" in result_db.columns:
-                            # 使用combine_first: y列优先，没有y时用x
-                            result_db[col] = result_db[f"{col}_y"].combine_first(result_db[f"{col}_x"])
-                            # 删除临时列
-                            result_db.drop([f"{col}_x", f"{col}_y"], axis=1, inplace=True)
-
-                    result_db.to_sql(
-                        name="Time_Series",  # 同一张表或新表
-                        con=self.conn,
-                        if_exists="replace",
-                        index=False
-                    )
-
-                    self.conn.commit()
-                    return
+        # 串行化整个写入过程，防止 Time_Series 全表替换时的竞态
+        with DB_WRITE_LOCK:
+            self._create_ts_sheet(start_date = start_date)
+            cursor = self.cursor
+            try:
+                if df.empty:
+                    logging.error(f"{data_name} is empty, FAILED INSERT, locate in write_into_db")
                 else:
-                    # 其他数据则直接生成新sheet存入database当中
-                    df.to_sql(
-                        name=data_name,
-                        con=self.conn,
-                        if_exists='replace',  # if sheet exist, then replace
-                        index=False
-                    )
-                    self.conn.commit()
-                    self.conn.close()
-                    return
+                    if is_time_series:  # check whether Time_Series table exists
+                        df_after_modify_time: pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
+                        if df_after_modify_time.empty or 'date' not in df_after_modify_time.columns:
+                            logging.error(f"{data_name} reformat produced empty/invalid dataframe, skip writing")
+                            return
+                        # 标准化和去重
+                        df_after_modify_time = df_after_modify_time.copy()
+                        df_after_modify_time['date'] = pd.to_datetime(df_after_modify_time['date'], errors='coerce').dt.strftime('%Y-%m-%d')
+                        df_after_modify_time = df_after_modify_time.dropna(subset=['date']).drop_duplicates(subset=['date'], keep='last')
+                        try:
+                            cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {data_name} DOUBLE")
+                            self.conn.commit()
+                        except:
+                            logging.warning(f"{data_name} col name already exists in Time_Series, continue")
 
-        except Exception as e:
-            logging.error(f"FAILED to write into database, in method write_into_db, since {e}")
-            return
+                        df_db = pd.read_sql("SELECT * FROM Time_Series", self.conn)  # 只读取日期列
+                        result_db = df_db.merge(df_after_modify_time, on="date", how="left")
+
+                        for col in df_after_modify_time.columns:
+                            if col == 'date':
+                                continue  # 跳过日期列
+                            if f"{col}_x" in result_db.columns and f"{col}_y" in result_db.columns:
+                                # 使用combine_first: y列优先，没有y时用x
+                                result_db[col] = result_db[f"{col}_y"].combine_first(result_db[f"{col}_x"])
+                                # 删除临时列
+                                result_db.drop([f"{col}_x", f"{col}_y"], axis=1, inplace=True)
+
+                        result_db.to_sql(
+                            name="Time_Series",  # 同一张表或新表
+                            con=self.conn,
+                            if_exists="replace",
+                            index=False
+                        )
+
+                        self.conn.commit()
+                        return
+                    else:
+                        # 其他数据则直接生成新sheet存入database当中
+                        df.to_sql(
+                            name=data_name,
+                            con=self.conn,
+                            if_exists='replace',  # if sheet exist, then replace
+                            index=False
+                        )
+                        self.conn.commit()
+                        self.conn.close()
+                        return
+
+            except Exception as e:
+                logging.error(f"FAILED to write into database, in method write_into_db, since {e}")
+                return
 
 
 class DataDownloader(ABC):
     @abstractmethod
-    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         """Download data and either write to DB or return DataFrames per table.
         If return_df=True, return a dict mapping table_name -> DataFrame; otherwise None.
+        max_workers: Optional[int] for concurrent downloads (None => sensible default).
         """
         raise NotImplementedError
 
@@ -359,20 +371,23 @@ class BEADownloader(DataDownloader):
         self.time_range : str= ",".join(map(str, range(request_year, BEADownloader.current_year + 1)))
         self.time_range_lag : str = self.time_range[:-5]  # 去除最后5个字符，即去除最后一年
 
-    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
-        total_items = len(self.json_dict)
-        for idx, (table_name, table_config) in enumerate(self.json_dict.items(), 1):
+        items = list(self.json_dict.items())
+        if not items:
+            return df_dict if return_df else None
+
+        def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
-                bea_tbl = beaapi.get_data(
-                    self.api_key,
-                    datasetname=table_config["category"],
-                    TableName=table_config["code"],
-                    Frequency=table_config["freq"],
-                    Year=self.time_range
-                )
-            except beaapi.beaapi_error.BEAAPIResponseError:
-                try:  # 如果在本年1-3月，未公布本年的数据，则跳转到这里，下载上一年到目标年份的数据
+                try:
+                    bea_tbl = beaapi.get_data(
+                        self.api_key,
+                        datasetname=table_config["category"],
+                        TableName=table_config["code"],
+                        Frequency=table_config["freq"],
+                        Year=self.time_range
+                    )
+                except beaapi.beaapi_error.BEAAPIResponseError:
                     bea_tbl = beaapi.get_data(
                         self.api_key,
                         datasetname=table_config["category"],
@@ -380,24 +395,13 @@ class BEADownloader(DataDownloader):
                         Frequency=table_config["freq"],
                         Year=self.time_range_lag
                     )
-                except Exception as e:
-                    logging.error(f"{table_name} FAILED DOWNLOAD from API, since {e}")
-                    continue
-            except Exception as e:
-                logging.error(f"{table_name} FAILED DOWNLOAD from API, since {e}")
-                continue
-
-            try:
                 df: pd.DataFrame = pd.DataFrame(bea_tbl)
-                # 选择一个可用的行描述（优先第二行，否则第一行，否则空串）
                 try:
                     ld_series = df["LineDescription"].fillna("")
                     pick = ld_series.iloc[1] if len(ld_series) > 1 else (ld_series.iloc[0] if len(ld_series) else "")
                 except Exception:
                     pick = ""
                 df_filtered: pd.DataFrame = df[df["LineDescription"].isin([pick, ""])].copy()
-                # 处理重复 TimePeriod 时使用最后一个值
-                # 使用具名聚合函数，便于类型检查
                 def _last_or_none(s: pd.Series) -> Any:
                     return s.iloc[-1] if len(s) else None
                 df_modified: pd.DataFrame = pd.pivot_table(
@@ -410,15 +414,12 @@ class BEADownloader(DataDownloader):
                 df_modified.columns = [f"{table_config['name']}"]
                 df_modified.index.name = "TimePeriod"
                 logging.info(f"BEA_{table_name} Successfully extracted!")
-                if return_df is True:  # used for to_csv method
-                    df_dict[table_name] = df_modified
-                    if idx == total_items:
-                        break
-                    continue
-                elif return_df is False:
+                if return_df:
+                    return table_name, df_modified
+                else:
                     if df_modified.empty:
                         logging.error(f"{table_name} is empty, FAILED INSERT, locate in to_db")
-                        continue
+                        return table_name, None
                     converter = DatabaseConverter()
                     converter.write_into_db(
                         df = df_modified,
@@ -427,14 +428,24 @@ class BEADownloader(DataDownloader):
                         is_time_series=True,
                         is_pct_data=table_config["needs_pct"]
                     )
-                    continue
+                    return table_name, None
             except Exception as e:
-                logging.error(f"{table_name} FAILED REFORMAT to dataframe in method 'to_db', since {e}")
-                continue
-        if return_df is True:
-            return df_dict
-        else:
-            return None
+                logging.error(f"{table_name} FAILED DOWNLOAD/REFORMAT in BEA worker: {e}")
+                return table_name, None
+
+        workers = max_workers or min(8, (os.cpu_count() or 4) * 2)
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
+            for fut in as_completed(future_map):
+                tn = future_map[fut]
+                try:
+                    name, df = fut.result()
+                    if return_df and df is not None:
+                        df_dict[name] = df
+                except Exception as e:
+                    logging.error(f"BEA future for {tn} raised: {e}")
+
+        return df_dict if return_df else None
 
     def to_csv(self) -> None:
         try:
@@ -461,24 +472,25 @@ class YFDownloader(DataDownloader):
         self.start_date : str  = str(request_year)+"-01-01"
         self.end_date : str = str(date.today())
 
-    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
-        '''NOTE : data is pd.dataframe'''
+    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
-        for table_name, table_config in self.json_dict.items():
+        items = list(self.json_dict.items())
+        if not items:
+            return df_dict if return_df else None
+
+        def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
                 index = table_config["code"]
                 data = pd.DataFrame(
                     yf.download(index, start=self.start_date, end=self.end_date, interval="1d")
                 )
-                # 针对单层列名的容错
                 try:
                     data.columns = data.columns.droplevel(1)
                 except Exception:
                     pass
-                if return_df is True:  # used for to_csv method
-                    df_dict[table_name] = data
-                    continue
-                elif return_df is False:
+                if return_df:
+                    return table_name, data
+                else:
                     converter = DatabaseConverter()
                     converter.write_into_db(
                         df=data,
@@ -487,14 +499,24 @@ class YFDownloader(DataDownloader):
                         is_time_series=True,
                         is_pct_data=table_config["needs_pct"]
                     )
-                    continue
+                    return table_name, None
             except Exception as e:
                 logging.error(f"to_db, {table_name} FAILED EXTRACT DATA from Yfinance, {e}")
-                continue
-        if return_df is True:
-            return df_dict
-        else:
-            return None
+                return table_name, None
+
+        workers = max_workers or min(12, (os.cpu_count() or 4) * 2)
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
+            for fut in as_completed(future_map):
+                tn = future_map[fut]
+                try:
+                    name, df = fut.result()
+                    if return_df and df is not None:
+                        df_dict[name] = df
+                except Exception as e:
+                    logging.error(f"YF future for {tn} raised: {e}")
+
+        return df_dict if return_df else None
 
     def to_csv(self) -> None:
         try:
@@ -524,9 +546,13 @@ class FREDDownloader(DataDownloader):
         self.start_date : str  = str(request_year)+"-01-01"
         self.end_date : str = str(date.today())
 
-    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
-        for table_name, table_config in self.json_dict.items():
+        items = list(self.json_dict.items())
+        if not items:
+            return df_dict if return_df else None
+
+        def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
                 params = {
                     "series_id": table_config["code"],
@@ -540,8 +566,6 @@ class FREDDownloader(DataDownloader):
                 df = pd.DataFrame(data.get("observations", []))
                 if df.empty:
                     raise Exception("empty observations")
-                # 仅保留 date + value (或派生列)
-                # 兼容某些场景的多列返回
                 keep_cols = [c for c in df.columns if c in ("date", "value")]
                 df = df[keep_cols].copy()
 
@@ -556,11 +580,10 @@ class FREDDownloader(DataDownloader):
                         df["value"] = df["value"].ffill()
                     df = df[["date", "value"]]
 
-                if return_df is True:
-                    df_dict[table_name] = df
+                if return_df:
                     logging.info(f"{table_name} Successfully extracted!")
-                    continue
-                elif return_df is False:
+                    return table_name, df
+                else:
                     converter = DatabaseConverter()
                     converter.write_into_db(
                         df=df,
@@ -570,15 +593,24 @@ class FREDDownloader(DataDownloader):
                         is_pct_data=table_config["needs_pct"]
                     )
                     logging.info(f"{table_name} Successfully extracted!")
-                    continue
+                    return table_name, None
             except Exception as e:
                 logging.error(f"{table_name} FAILED EXTRACT DATA from FRED: {e}")
-                continue
+                return table_name, None
 
-        if return_df is True:
-            return df_dict
-        else:
-            return None
+        workers = max_workers or min(12, (os.cpu_count() or 4) * 2)
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
+            for fut in as_completed(future_map):
+                tn = future_map[fut]
+                try:
+                    name, df = fut.result()
+                    if return_df and df is not None:
+                        df_dict[name] = df
+                except Exception as e:
+                    logging.error(f"FRED future for {tn} raised: {e}")
+
+        return df_dict if return_df else None
 
     def to_csv(self) -> None:
         try:
@@ -609,10 +641,9 @@ class BLSDownloader(DataDownloader):
         self.start_year: int  = request_year
         self.start_date : str  = str(request_year)+"-01-01"
 
-    def to_db(self, return_df : bool = False, debug : bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_df : bool = False, debug : bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         if debug is True:
-            # debug --- mock df
             converter = DatabaseConverter()
             converter.write_into_db(
                 df=mock_api.return_bls_data(),
@@ -621,8 +652,12 @@ class BLSDownloader(DataDownloader):
                 is_time_series=True,
                 is_pct_data=False
             )
-        else:   # None debug mode
-            for table_name, table_config in self.json_dict.items():
+        else:
+            items = list(self.json_dict.items())
+            if not items:
+                return df_dict if return_df else None
+
+            def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
                 try:
                     params = json.dumps(
                         {
@@ -640,21 +675,19 @@ class BLSDownloader(DataDownloader):
                     json_data = json.loads(context.text)
                     logging.info(f"{table_name} Successfully download data")
                 except Exception as e:
-                    logging.error(f"{table_name} FAILED EXTRACT DATA from BLS"
-                                  f"Probably due to API extraction problems, {e}")
-                    continue
+                    logging.error(f"{table_name} FAILED EXTRACT DATA from BLSProbably due to API extraction problems, {e}")
+                    return table_name, None
 
-                # reformat data
                 try:
                     df = pd.DataFrame(json_data["Results"]["series"][0]["data"]).drop(
                         columns=["periodName", "latest", "footnotes"])
-                except:
+                except Exception:
                     try:
                         df = pd.DataFrame(json_data)
                         logging.warning(f"{table_name} FAILED REFORMAT: DROP USELESS COLUMNS, continue")
                     except Exception as e:
                         logging.error(f"{table_name} FAILED REFORMAT data from BLS, errors in df managing, {e}")
-                        continue
+                        return table_name, None
 
                 if table_config["needs_pct"] is True:
                     try:
@@ -663,13 +696,12 @@ class BLSDownloader(DataDownloader):
                         df = df.drop(df.columns[-2], axis=1)
                     except Exception as e:
                         logging.error(f"{table_name} FAILED REFORMAT PERCENTAGE, probably due to df error, {e}")
-                        continue
+                        return table_name, None
 
-                if return_df is True:
-                    df_dict[table_name] = df
+                if return_df:
                     logging.info(f"{table_name} Successfully extracted!")
-                    continue
-                elif return_df is False:
+                    return table_name, df
+                else:
                     converter = DatabaseConverter()
                     converter.write_into_db(
                         df=df,
@@ -679,12 +711,24 @@ class BLSDownloader(DataDownloader):
                         is_pct_data=table_config["needs_pct"]
                     )
                     logging.info(f"{table_name} Successfully extracted!")
-                    continue
+                    return table_name, None
 
-            if return_df is True:
-                return df_dict
-            else:
-                return None
+            workers = max_workers or min(8, (os.cpu_count() or 4) * 2)
+            with ThreadPoolExecutor(max_workers=workers) as ex:
+                future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
+                for fut in as_completed(future_map):
+                    tn = future_map[fut]
+                    try:
+                        name, df = fut.result()
+                        if return_df and df is not None:
+                            df_dict[name] = df
+                    except Exception as e:
+                        logging.error(f"BLS future for {tn} raised: {e}")
+
+        if return_df is True:
+            return df_dict
+        else:
+            return None
 
     def to_csv(self) -> None:
         try:
@@ -723,7 +767,8 @@ class TEDownloader(DataDownloader):
         """解二元一次方程，用于计算数据 used for data calculation"""
         gradient = np.round((y1 - y2)/(x1-x2), 3)
         intercept = np.round((y1 - gradient*x1), 3)
-        return gradient, intercept
+        # 确保返回内置 float，避免类型检查告警
+        return float(gradient), float(intercept)
 
     def _get_data_from_trading_economics_month(self, data_name: str) -> Optional[pd.DataFrame]:
         """提取月度数据的代码，季度数据需要单独写
@@ -832,7 +877,9 @@ class TEDownloader(DataDownloader):
             logging.error(f"{data_name} FAILED TO EXTRACT data from html, but successfully get data from website, {e}")
             return None
 
-    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+        # 说明: 由于 Selenium WebDriver 复用同一 self.driver，不适合多线程并行。
+        # 如需并行，需要为每个任务创建独立 driver，成本较高，这里保持顺序执行。
         df_dict: Dict[str, pd.DataFrame] = {}
         for table_name, table_config in self.json_dict.items():
             data_name = table_config["name"]
@@ -900,6 +947,11 @@ class DownloaderFactory:
 
         api_key = cls._get_api_key(source)
         json_dict_data_index_info = json_data.get(source, None)
+        if not isinstance(json_dict_data_index_info, dict):
+            logging.error(f"DownloaderFactory: no config found for source '{source}'")
+            return None
+        # 类型断言，确保后续构造函数类型安全
+        cfg = cast(Dict[str, Dict[str, Any]], json_dict_data_index_info)
         downloader_classes = {
             'bea': BEADownloader,
             'yf': YFDownloader,
@@ -919,9 +971,8 @@ class DownloaderFactory:
             logging.error("INVALID SOURCE in downloader factory :" + source)
             return None
 
-
         return downloader_classes[source](
-            json_dict=json_dict_data_index_info,
+            json_dict=cfg,
             api_key=api_key,
             request_year=request_year
         )
