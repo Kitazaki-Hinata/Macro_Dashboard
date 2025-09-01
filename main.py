@@ -4,6 +4,7 @@ import json
 import logging
 from PySide6.QtWidgets import QApplication
 from gui.ui_mainwindow import mainWindow
+from typing import Dict, Any
 from download import DownloaderFactory
 
 
@@ -40,12 +41,6 @@ if __name__ == "__main__":
     window.show()
     app.exec()
 
-    # te_downloader = DownloaderFactory.create_downloader(
-    #     source = "te",
-    #     json_data = json_data,
-    #     request_year = request_year
-    # )
-    # te_downloader.to_db()
 
 
 

@@ -8,7 +8,7 @@ import logging
 import json
 from typing import Optional, Dict, Any, Protocol
 
-from PySide6.QtCore import QObject, Signal, QThread, QThreadPool, QTimer
+from gui import *
 from concurrent.futures import ThreadPoolExecutor, Future
 import subprocess
 import sys
@@ -35,9 +35,11 @@ class _MainWindowProto(Protocol):
     max_threads_spin: Any
     download_btn: Any
     cancel_btn: Any
+    read_and_agree_check : Any
 
 
 class _DownloadWorker(QObject):
+    '''用于执行数据下载任务的工作线程对象'''
     progress = Signal(str)
     finished = Signal()
     failed = Signal(str)
@@ -159,6 +161,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             # 如果控件不可用则忽略
             pass
+
     def settings_api_save(self):
         # find whether exist .env file
         print("save")
@@ -185,6 +188,13 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.status_label.setStyleSheet("color: #fa88aa")
             logging.error(f"Failed to create .env file at path: {path}, since {e}")
 
+    def clear_logs(self):
+        path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(path, "..", "doc", "error.log")
+        with open(path, 'w'):
+            pass
+        self._append_console("Log file cleared successfully")
+
     # ============ Download wiring ============
     def _append_console(self, text: str):
         try:
@@ -203,13 +213,16 @@ class UiFunctions():  # 删除:mainWindow
             return None
 
     def start_download(self):
-        # already has a running task?
+        if not self.main_window.read_and_agree_check.isChecked():
+            self._append_console("PLEASE READ AND AGREE TO THE TERMS AND CONDITIONS !!!")
+            return
         if self._dl_thread is not None or self._parallel_exec is not None:
             self._append_console("Download already running.")
             return
         json_data = self._load_request_json()
         if not isinstance(json_data, dict):
             return
+
         start_year = int(self.main_window.int_year_spinbox.value())
         # gather sources
         sources: list[str]
@@ -298,6 +311,7 @@ class UiFunctions():  # 删除:mainWindow
 
 
 class _ParallelExecutor(QObject):
+    '''并行执行多个数据下载任务'''
     progress = Signal(str)
     finished = Signal()
     failed = Signal(str)
@@ -438,4 +452,10 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
+
+
+
+
+
+
 

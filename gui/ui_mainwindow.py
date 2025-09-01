@@ -32,7 +32,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             self.title_bar.setObjectName("title_bar")
             self.title_bar.setFixedHeight(36)
             self.title_bar.setStyleSheet(
-                "#title_bar { background-color: #252526; }\n"
+                '#title_bar { background-color: #252526;}\n'
                 "#title_label { color: #90b6e7; font-weight: 600; padding-left: 8px; }\n"
                 "QToolButton { background-color: #252526; border: 0; border-radius: 9px; color: #90b6e7; }\n"
                 "QToolButton:hover { background-color: #33363a; }\n"
@@ -46,6 +46,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             self.title_label = QLabel(self.title_bar)
             self.title_label.setObjectName("title_label")
             self.title_label.setText("Macro Data Dashboard")
+            font = self.title_label.font()
+            font.setFamily("Comfortaa")
             hbox.addWidget(self.title_label)
 
             spacer = QWidget(self.title_bar)
@@ -64,7 +66,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             hbox.addWidget(self.btn_min)
 
             self.btn_max = QToolButton(self.title_bar)
-            self.btn_max.setIcon(QIcon(":/svg/svg/expand.svg"))
+            self.btn_max.setIcon(QIcon(":/svg/svg/big_window.svg"))
             self.btn_max.setIconSize(QSize(16, 16))
             self.btn_max.setFixedSize(28, 24)
             self.btn_max.setToolTip("Maximize / Restore")
@@ -75,7 +77,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             hbox.addWidget(self.btn_max)
 
             self.btn_close = QToolButton(self.title_bar)
-            self.btn_close.setIcon(QIcon(":/svg/svg/close.svg"))
+            self.btn_close.setIcon(QIcon(":/png/png/close.png"))
             self.btn_close.setIconSize(QSize(16, 16))
             self.btn_close.setFixedSize(28, 24)
             self.btn_close.setToolTip("Close")
@@ -165,13 +167,13 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_btn.clicked.connect(self.left_bar_button_slot)
         self.settings_btn.clicked.connect(self.left_bar_button_slot)
         self.setWindowIcon(QIcon(":/png/png/ico.png"))
+
         # settings signals
-        # 点击api确认按钮保存输入的API
+        # 点击api确认按钮，保存输入的API
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
 
-
-        # set window icon  设置窗口icon
-        self.setWindowIcon(QIcon(":/png/png/ico.png"))
+        # 重置日志文件按钮
+        self.clear_lag_btn.clicked.connect(self.ui_functions.clear_logs)
 
 
     def left_bar_button_slot(self):
@@ -205,11 +207,11 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 self.showNormal()
                 # 还原图标
                 from PySide6.QtGui import QIcon
-                self.btn_max.setIcon(QIcon(":/svg/svg/expand.svg"))
+                self.btn_max.setIcon(QIcon(":/svg/svg/big_window.svg"))
             else:
                 self.showMaximized()
                 from PySide6.QtGui import QIcon
-                self.btn_max.setIcon(QIcon(":/svg/svg/fold.svg"))
+                self.btn_max.setIcon(QIcon(":/svg/svg/small_window.svg"))
         except Exception:
             pass
 

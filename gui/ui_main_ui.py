@@ -21,12 +21,7 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
-try:
-        # 当作为包导入（from gui import Ui_MainWindow）
-        from . import resources_rc  # type: ignore
-except Exception:
-        # 当直接运行此文件（python ui_main_ui.py）
-        import resources_rc  # type: ignore
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -34,6 +29,7 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1267, 792)
         MainWindow.setMinimumSize(QSize(1267, 792))
+        MainWindow.setMaximumSize(QSize(1920, 1080))
         MainWindow.setStyleSheet(u"* {\n"
 "	background-color: #33363a;\n"
 "}\n"
@@ -112,8 +108,6 @@ class Ui_MainWindow(object):
 "            subcontrol-position: top right"
                         ";\n"
 "            width: 20px;\n"
-"            border-left: 1px solid #404043;\n"
-"            border-bottom: 1px solid #404043;\n"
 "            border-top-right-radius: 5px;\n"
 "            background: #404043;\n"
 "        }\n"
@@ -131,8 +125,6 @@ class Ui_MainWindow(object):
 "            subcontrol-origin: border;\n"
 "            subcontrol-position: bottom right;\n"
 "            width: 20px;\n"
-"            border-left: 1px solid #404043;\n"
-"            border-top: 1px solid #404043;\n"
 "            border-bottom-right-radius: 5px;\n"
 "            background: #404043;\n"
 "        }\n"
@@ -143,8 +135,7 @@ class Ui_MainWindow(object):
 "        \n"
 "        QSpinBox::down-button:pressed {\n"
 "            background: #404043;\n"
-"       "
-                        " }\n"
+"        }\n"
 "        \n"
 "")
         self.style_sheet = QWidget(MainWindow)
@@ -925,7 +916,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 92, 780))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 192, 780))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -1115,11 +1106,11 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QPushButton#save_text {\n"
-"    icon: url(:/png/png/save.png);\n"
+"    icon: url(:/png/png/save_2.png);\n"
 "    icon-size: 17px 17px;\n"
 "}\n"
 "QPushButton#save_text:pressed {\n"
-"    icon: url(:/png_press/png/save_press.png);\n"
+"    icon: url(:/png_press/png/save_2_press.png);\n"
 "    icon-size: 17px 17px;\n"
 "}\n"
 "")
@@ -1156,7 +1147,6 @@ class Ui_MainWindow(object):
         self.save_text = QPushButton(self.text_enter_container)
         self.save_text.setObjectName(u"save_text")
         self.save_text.setMaximumSize(QSize(25, 25))
-        self.save_text.setStyleSheet(u"")
 
         self.horizontalLayout_8.addWidget(self.save_text)
 
@@ -1180,9 +1170,9 @@ class Ui_MainWindow(object):
 "margin-left : 10px;\n"
 "margin-right : 10px;")
         self.verticalLayout_14 = QVBoxLayout(self.text_edit_container)
-        self.verticalLayout_14.setSpacing(0)
+        self.verticalLayout_14.setSpacing(25)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
-        self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_14.setContentsMargins(25, 25, 25, 25)
         self.plainTextEdit = QPlainTextEdit(self.text_edit_container)
         self.plainTextEdit.setObjectName(u"plainTextEdit")
         self.plainTextEdit.setStyleSheet(u"color : white; \n"
@@ -1568,7 +1558,7 @@ class Ui_MainWindow(object):
         self.read_and_agree_check.setObjectName(u"read_and_agree_check")
         self.read_and_agree_check.setStyleSheet(u"* {\n"
 "font-family : \"Comfortaa\"; \n"
-"color : #fa88aa; \n"
+"color : #EE5C88; \n"
 "font-weight : Bold;\n"
 "}")
 
@@ -1777,6 +1767,7 @@ class Ui_MainWindow(object):
         self.year_selection.setObjectName(u"year_selection")
         self.year_selection.setMaximumSize(QSize(16777215, 35))
         self.horizontalLayout_12 = QHBoxLayout(self.year_selection)
+        self.horizontalLayout_12.setSpacing(6)
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
         self.label = QLabel(self.year_selection)
         self.label.setObjectName(u"label")
@@ -1785,6 +1776,8 @@ class Ui_MainWindow(object):
 
         self.int_year_spinbox = QSpinBox(self.year_selection)
         self.int_year_spinbox.setObjectName(u"int_year_spinbox")
+        self.int_year_spinbox.setMinimumSize(QSize(0, 17))
+        self.int_year_spinbox.setMaximumSize(QSize(16777215, 17))
         self.int_year_spinbox.setMinimum(2020)
         self.int_year_spinbox.setMaximum(2025)
 
@@ -1821,7 +1814,7 @@ class Ui_MainWindow(object):
 "	background : #202023;\n"
 "}\n"
 "QPushButton#download_btn::hover {\n"
-"	background : #454545;\n"
+"	background : #353542;\n"
 "}\n"
 "QPushButton#download_btn::pressed {\n"
 "	background : #202023;\n"
@@ -1830,27 +1823,27 @@ class Ui_MainWindow(object):
 "\n"
 "/*cancel*/\n"
 "QPushButton#cancel_btn {\n"
-"	background-color:#fa88aa;\n"
+"	background-color:#EE5C88;\n"
 "	color : #252526;\n"
 "}\n"
 "QPushButton#cancel_btn::hover {\n"
-"	background : #FFB6CC;\n"
+"	background : #fa88aa;\n"
 "}\n"
 "QPushButton#cancel_btn::pressed {\n"
-"	background : #fa88aa;\n"
+"	background : #EE5C88;\n"
 "}\n"
 "\n"
 "\n"
 "/*clear lags*/\n"
 "QPushButton#clear_lag_btn {\n"
-"	background-color:#fa88aa;\n"
+"	background-color:#EE5C88;\n"
 "	color : #252526;\n"
 "}\n"
 "QPushButton#clear_lag_btn::hover {\n"
-"	background : #FFB6CC;\n"
+"	background : #fa88aa;\n"
 "}\n"
 "QPushButton#clear_lag_btn::pressed {\n"
-"	background : #fa88aa;\n"
+"	background : #EE5C88;\n"
 "}")
         self.verticalLayout_27 = QVBoxLayout(self.download_btn_container)
         self.verticalLayout_27.setSpacing(12)
@@ -1898,6 +1891,8 @@ class Ui_MainWindow(object):
 
         self.max_threads_spin = QSpinBox(self.parallel_opts_container)
         self.max_threads_spin.setObjectName(u"max_threads_spin")
+        self.max_threads_spin.setMinimumSize(QSize(40, 17))
+        self.max_threads_spin.setMaximumSize(QSize(40, 17))
         self.max_threads_spin.setMinimum(1)
         self.max_threads_spin.setMaximum(8)
         self.max_threads_spin.setValue(4)
@@ -2116,7 +2111,7 @@ class Ui_MainWindow(object):
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Comfortaa'; font-size:9pt; font-weight:700; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-weight:400;\">Console information</span></p></body></html>", None))
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
         self.author_name.setText(QCoreApplication.translate("MainWindow", u"Love from : Kitazaki Hinata", None))
     # retranslateUi
 
