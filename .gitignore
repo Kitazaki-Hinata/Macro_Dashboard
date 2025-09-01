@@ -69,6 +69,7 @@ htmlcov/
 
 # OS generated
 .DS_Store
+data.db
 Thumbs.db
 web_crawlers/__pycache__/
 /Macro-Data-Dashboard.GUI/Macro-Data-Dashboard.GUI/bin/
