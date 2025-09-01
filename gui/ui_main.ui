@@ -505,7 +505,7 @@ QPushButton#settings_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>3</number>
+             <number>4</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -3499,13 +3499,13 @@ QPushButton#clear_lag_btn::pressed {
                                  <widget class="QSpinBox" name="max_threads_spin">
                                   <property name="minimumSize">
                                    <size>
-                                    <width>0</width>
+                                    <width>40</width>
                                     <height>17</height>
                                    </size>
                                   </property>
                                   <property name="maximumSize">
                                    <size>
-                                    <width>16777215</width>
+                                    <width>40</width>
                                     <height>17</height>
                                    </size>
                                   </property>

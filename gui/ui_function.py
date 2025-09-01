@@ -35,6 +35,7 @@ class _MainWindowProto(Protocol):
     max_threads_spin: Any
     download_btn: Any
     cancel_btn: Any
+    read_and_agree_check : Any
 
 
 class _DownloadWorker(QObject):
@@ -160,6 +161,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             # 如果控件不可用则忽略
             pass
+
     def settings_api_save(self):
         # find whether exist .env file
         print("save")
@@ -192,7 +194,7 @@ class UiFunctions():  # 删除:mainWindow
         with open(path, 'w'):
             pass
         self._append_console("Log file cleared successfully")
-    
+
     # ============ Download wiring ============
     def _append_console(self, text: str):
         try:
@@ -211,13 +213,16 @@ class UiFunctions():  # 删除:mainWindow
             return None
 
     def start_download(self):
-        # already has a running task?
+        if not self.main_window.read_and_agree_check.isChecked():
+            self._append_console("PLEASE READ AND AGREE TO THE TERMS AND CONDITIONS !!!")
+            return
         if self._dl_thread is not None or self._parallel_exec is not None:
             self._append_console("Download already running.")
             return
         json_data = self._load_request_json()
         if not isinstance(json_data, dict):
             return
+
         start_year = int(self.main_window.int_year_spinbox.value())
         # gather sources
         sources: list[str]
