@@ -1891,8 +1891,8 @@ class Ui_MainWindow(object):
 
         self.max_threads_spin = QSpinBox(self.parallel_opts_container)
         self.max_threads_spin.setObjectName(u"max_threads_spin")
-        self.max_threads_spin.setMinimumSize(QSize(0, 17))
-        self.max_threads_spin.setMaximumSize(QSize(16777215, 17))
+        self.max_threads_spin.setMinimumSize(QSize(40, 17))
+        self.max_threads_spin.setMaximumSize(QSize(40, 17))
         self.max_threads_spin.setMinimum(1)
         self.max_threads_spin.setMaximum(8)
         self.max_threads_spin.setValue(4)
@@ -1975,7 +1975,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(4)
         self.tab_window.setCurrentIndex(0)
 
 
