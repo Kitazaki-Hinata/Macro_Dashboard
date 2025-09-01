@@ -21,7 +21,6 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
-# import resources_rc_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -1192,15 +1191,14 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.page_note_container)
         self.page_settings_container = QWidget()
         self.page_settings_container.setObjectName(u"page_settings_container")
-        self.page_settings_container.setStyleSheet(u"\n"
-"QScrollBar:vertical {\n"
+        self.page_settings_container.setStyleSheet(u"QScrollBar:vertical {\n"
 "	border: none;\n"
 "    background: #ffffff;\n"
 "    width: 17.5px;\n"
 "    margin: 0;\n"
 "	border-radius: 0px;\n"
 " }\n"
-" QScrollBar::handle:vertical {	\n"
+"QScrollBar::handle:vertical {	\n"
 "	background: #90b6e7;\n"
 "	width :8px;\n"
 "    min-height: 25px;\n"
@@ -1230,9 +1228,9 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc\u666f\u989c\u8272*/\n"
-" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {"
-                        "\n"
-"     background: none;\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+" "
+                        "    background: none;\n"
 " }\n"
 " QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
 "     background: none;\n"
@@ -1911,7 +1909,10 @@ class Ui_MainWindow(object):
         self.consolecontainer = QWidget(self.download_container)
         self.consolecontainer.setObjectName(u"consolecontainer")
         self.consolecontainer.setMinimumSize(QSize(400, 0))
-        self.consolecontainer.setStyleSheet(u"border-radius : 20px; background :#202023; ")
+        self.consolecontainer.setStyleSheet(u"* {\n"
+"border-radius : 20px; background :#202023; \n"
+"}\n"
+"")
         self.verticalLayout_30 = QVBoxLayout(self.consolecontainer)
         self.verticalLayout_30.setObjectName(u"verticalLayout_30")
         self.verticalLayout_30.setContentsMargins(13, 13, 13, 13)
@@ -1931,8 +1932,12 @@ class Ui_MainWindow(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.console_area.sizePolicy().hasHeightForWidth())
         self.console_area.setSizePolicy(sizePolicy2)
-        self.console_area.setStyleSheet(u"border:0;\n"
-"color:white;")
+        self.console_area.setStyleSheet(u"color:white; \n"
+"font-famlily:\"Comfortaa\";\n"
+"border :0;\n"
+"background:transparent;\n"
+"padding :5px;\n"
+"")
         self.console_area.setReadOnly(True)
 
         self.verticalLayout_30.addWidget(self.console_area)
