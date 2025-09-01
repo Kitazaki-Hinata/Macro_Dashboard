@@ -134,6 +134,8 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
+
+
     def _env_file_path(self) -> str:
         base = os.path.abspath(os.path.dirname(__file__))
         return os.path.abspath(os.path.join(base, "..", ".env"))

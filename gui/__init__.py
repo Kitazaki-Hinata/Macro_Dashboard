@@ -3,7 +3,6 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtSvgWidgets import *
 
-
 from . import resources_rc
 
 from .ui_main import Ui_MainWindow  # type: ignore
@@ -24,6 +23,8 @@ __all__ = [
     "QSvgWidget",
     "QPainter",
     "QSize",
+    "QFont",
+    "QPoint",
     "QObject",
     "Signal",
     "QThread",

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="png">
+    <file>png/ico_small.png</file>
     <file>png/big_window.png</file>
     <file>png/save_2.png</file>
     <file>png/small_window.png</file>
@@ -41,6 +42,8 @@
   </qresource>
   <qresource prefix="svg">
     <file>svg/big_window.svg</file>
+    <file>svg/false.svg</file>
+    <file>svg/minimize.svg</file>
     <file>svg/small_window.svg</file>
     <file>svg/save_2.svg</file>
     <file>svg/delete.svg</file>

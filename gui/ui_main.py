@@ -22,14 +22,13 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1267, 792)
         MainWindow.setMinimumSize(QSize(1267, 792))
-        MainWindow.setMaximumSize(QSize(1920, 1080))
+        MainWindow.setMaximumSize(QSize(1000000, 1000000))
         MainWindow.setStyleSheet(u"* {\n"
 "	background-color: #33363a;\n"
 "}\n"
@@ -140,13 +139,118 @@ class Ui_MainWindow(object):
 "")
         self.style_sheet = QWidget(MainWindow)
         self.style_sheet.setObjectName(u"style_sheet")
-        self.style_sheet.setStyleSheet(u"")
-        self.horizontalLayout_2 = QHBoxLayout(self.style_sheet)
+        self.style_sheet.setStyleSheet(u"QWidget#header_bar {\n"
+"background : #2b2e32;\n"
+"border-bottom : 1px solid #181823;\n"
+"}")
+        self.verticalLayout_33 = QVBoxLayout(self.style_sheet)
+        self.verticalLayout_33.setSpacing(0)
+        self.verticalLayout_33.setObjectName(u"verticalLayout_33")
+        self.verticalLayout_33.setContentsMargins(0, 0, 0, 0)
+        self.header_bar = QWidget(self.style_sheet)
+        self.header_bar.setObjectName(u"header_bar")
+        self.header_bar.setMinimumSize(QSize(0, 25))
+        self.header_bar.setMaximumSize(QSize(16777215, 25))
+        self.header_bar.setStyleSheet(u"* {\n"
+"font-family : \"Comfortaa\";\n"
+"font-weight : Bold;\n"
+"color : #90b6e7;\n"
+"}")
+        self.horizontalLayout_2 = QHBoxLayout(self.header_bar)
         self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.header_text_and_icon = QWidget(self.header_bar)
+        self.header_text_and_icon.setObjectName(u"header_text_and_icon")
+        self.header_text_and_icon.setStyleSheet(u"background : transparent;")
+        self.horizontalLayout_15 = QHBoxLayout(self.header_text_and_icon)
+        self.horizontalLayout_15.setSpacing(10)
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+        self.horizontalLayout_15.setContentsMargins(8, 4, 2, 2)
+        self.icon = QWidget(self.header_text_and_icon)
+        self.icon.setObjectName(u"icon")
+        self.icon.setMinimumSize(QSize(18, 18))
+        self.icon.setMaximumSize(QSize(18, 18))
+        self.icon.setStyleSheet(u"background-image: url(:/png/png/ico_small.png);\n"
+"border-radius :5px;\n"
+"")
+
+        self.horizontalLayout_15.addWidget(self.icon)
+
+        self.title_text = QLabel(self.header_text_and_icon)
+        self.title_text.setObjectName(u"title_text")
+        font = QFont()
+        font.setFamilies([u"Comfortaa"])
+        font.setPointSize(8)
+        font.setBold(True)
+        self.title_text.setFont(font)
+        self.title_text.setStyleSheet(u"")
+
+        self.horizontalLayout_15.addWidget(self.title_text)
+
+
+        self.horizontalLayout_2.addWidget(self.header_text_and_icon)
+
+        self.header_right_btn_container = QWidget(self.header_bar)
+        self.header_right_btn_container.setObjectName(u"header_right_btn_container")
+        self.header_right_btn_container.setStyleSheet(u"* {\n"
+"background : transparent;\n"
+"}\n"
+"\n"
+"QPushButton {\n"
+"	background : #202023;\n"
+"	border-radius : 7px\n"
+"}\n"
+"\n"
+"QPushButton::hover {\n"
+"	background : #454545;\n"
+"}\n"
+"QPushButton::pressed {\n"
+"	background : #131317;\n"
+"}")
+        self.horizontalLayout_20 = QHBoxLayout(self.header_right_btn_container)
+        self.horizontalLayout_20.setSpacing(6)
+        self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
+        self.horizontalLayout_20.setContentsMargins(0, 2, 10, 0)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_20.addItem(self.horizontalSpacer_4)
+
+        self.minimize_btn = QPushButton(self.header_right_btn_container)
+        self.minimize_btn.setObjectName(u"minimize_btn")
+        self.minimize_btn.setMinimumSize(QSize(20, 18))
+        self.minimize_btn.setMaximumSize(QSize(20, 18))
+        self.minimize_btn.setStyleSheet(u"image: url(:/svg/svg/minimize.svg);")
+
+        self.horizontalLayout_20.addWidget(self.minimize_btn)
+
+        self.window_btn = QPushButton(self.header_right_btn_container)
+        self.window_btn.setObjectName(u"window_btn")
+        self.window_btn.setMinimumSize(QSize(20, 18))
+        self.window_btn.setMaximumSize(QSize(20, 18))
+        self.window_btn.setStyleSheet(u"image: url(:/svg/svg/big_window.svg);\n"
+"padding : 4px;\n"
+"image-position : center;")
+
+        self.horizontalLayout_20.addWidget(self.window_btn)
+
+        self.close_btn = QPushButton(self.header_right_btn_container)
+        self.close_btn.setObjectName(u"close_btn")
+        self.close_btn.setMinimumSize(QSize(20, 18))
+        self.close_btn.setMaximumSize(QSize(20, 18))
+        self.close_btn.setStyleSheet(u"image: url(:/svg/svg/false.svg);")
+
+        self.horizontalLayout_20.addWidget(self.close_btn)
+
+
+        self.horizontalLayout_2.addWidget(self.header_right_btn_container)
+
+
+        self.verticalLayout_33.addWidget(self.header_bar)
+
         self.self_sized_main_widget = QWidget(self.style_sheet)
         self.self_sized_main_widget.setObjectName(u"self_sized_main_widget")
+        self.self_sized_main_widget.setMaximumSize(QSize(16777215, 16777215))
         self.self_sized_main_widget.setStyleSheet(u"")
         self.horizontalLayout = QHBoxLayout(self.self_sized_main_widget)
         self.horizontalLayout.setSpacing(0)
@@ -338,10 +442,10 @@ class Ui_MainWindow(object):
         self.tab_window = QTabWidget(self.page_one_container)
         self.tab_window.setObjectName(u"tab_window")
         self.tab_window.setEnabled(True)
-        font = QFont()
-        font.setFamilies([u"Comfortaa"])
-        font.setBold(True)
-        self.tab_window.setFont(font)
+        font1 = QFont()
+        font1.setFamilies([u"Comfortaa"])
+        font1.setBold(True)
+        self.tab_window.setFont(font1)
         self.tab_window.setAcceptDrops(False)
         self.tab_window.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.tab_window.setAutoFillBackground(False)
@@ -413,11 +517,11 @@ class Ui_MainWindow(object):
         self.title_label = QLabel(self.text_container)
         self.title_label.setObjectName(u"title_label")
         self.title_label.setMaximumSize(QSize(16777215, 20))
-        font1 = QFont()
-        font1.setFamilies([u"Comfortaa"])
-        font1.setPointSize(14)
-        font1.setBold(True)
-        self.title_label.setFont(font1)
+        font2 = QFont()
+        font2.setFamilies([u"Comfortaa"])
+        font2.setPointSize(14)
+        font2.setBold(True)
+        self.title_label.setFont(font2)
         self.title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -426,11 +530,7 @@ class Ui_MainWindow(object):
         self.update_label = QLabel(self.text_container)
         self.update_label.setObjectName(u"update_label")
         self.update_label.setMaximumSize(QSize(16777215, 12))
-        font2 = QFont()
-        font2.setFamilies([u"Comfortaa"])
-        font2.setPointSize(8)
-        font2.setBold(True)
-        self.update_label.setFont(font2)
+        self.update_label.setFont(font)
         self.update_label.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
 
@@ -560,7 +660,7 @@ class Ui_MainWindow(object):
         self.table_title_label = QLabel(self.text_container_2)
         self.table_title_label.setObjectName(u"table_title_label")
         self.table_title_label.setMaximumSize(QSize(16777215, 20))
-        self.table_title_label.setFont(font1)
+        self.table_title_label.setFont(font2)
         self.table_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -569,7 +669,7 @@ class Ui_MainWindow(object):
         self.table_update_label = QLabel(self.text_container_2)
         self.table_update_label.setObjectName(u"table_update_label")
         self.table_update_label.setMaximumSize(QSize(16777215, 12))
-        self.table_update_label.setFont(font2)
+        self.table_update_label.setFont(font)
         self.table_update_label.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
 
@@ -666,7 +766,7 @@ class Ui_MainWindow(object):
         self.four_title_label = QLabel(self.four_text_container)
         self.four_title_label.setObjectName(u"four_title_label")
         self.four_title_label.setMaximumSize(QSize(16777215, 20))
-        self.four_title_label.setFont(font1)
+        self.four_title_label.setFont(font2)
         self.four_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -675,7 +775,7 @@ class Ui_MainWindow(object):
         self.four_update_label = QLabel(self.four_text_container)
         self.four_update_label.setObjectName(u"four_update_label")
         self.four_update_label.setMaximumSize(QSize(16777215, 12))
-        self.four_update_label.setFont(font2)
+        self.four_update_label.setFont(font)
         self.four_update_label.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
 
@@ -687,7 +787,7 @@ class Ui_MainWindow(object):
         self.connect_charts = QCheckBox(self.four_text_widget)
         self.connect_charts.setObjectName(u"connect_charts")
         self.connect_charts.setMaximumSize(QSize(150, 16777215))
-        self.connect_charts.setFont(font)
+        self.connect_charts.setFont(font1)
         self.connect_charts.setStyleSheet(u"color:white;")
 
         self.horizontalLayout_5.addWidget(self.connect_charts)
@@ -916,7 +1016,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 192, 780))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 92, 780))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -1126,7 +1226,7 @@ class Ui_MainWindow(object):
         self.note_title_label = QLabel(self.note_text_container)
         self.note_title_label.setObjectName(u"note_title_label")
         self.note_title_label.setMaximumSize(QSize(16777215, 20))
-        self.note_title_label.setFont(font1)
+        self.note_title_label.setFont(font2)
         self.note_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -1135,7 +1235,7 @@ class Ui_MainWindow(object):
         self.note_update_label = QLabel(self.note_text_container)
         self.note_update_label.setObjectName(u"note_update_label")
         self.note_update_label.setMaximumSize(QSize(16777215, 12))
-        self.note_update_label.setFont(font2)
+        self.note_update_label.setFont(font)
         self.note_update_label.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
 
@@ -1259,7 +1359,7 @@ class Ui_MainWindow(object):
         self.note_title_label_2 = QLabel(self.note_text_container_2)
         self.note_title_label_2.setObjectName(u"note_title_label_2")
         self.note_title_label_2.setMaximumSize(QSize(16777215, 20))
-        self.note_title_label_2.setFont(font1)
+        self.note_title_label_2.setFont(font2)
         self.note_title_label_2.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 1px; ")
 
@@ -1268,7 +1368,7 @@ class Ui_MainWindow(object):
         self.note_update_label_2 = QLabel(self.note_text_container_2)
         self.note_update_label_2.setObjectName(u"note_update_label_2")
         self.note_update_label_2.setMaximumSize(QSize(16777215, 12))
-        self.note_update_label_2.setFont(font2)
+        self.note_update_label_2.setFont(font)
         self.note_update_label_2.setStyleSheet(u"margin-left : 1px; \n"
 "color : #90b6e7;")
 
@@ -1961,7 +2061,8 @@ class Ui_MainWindow(object):
 
         self.author_name = QLabel(self.frame)
         self.author_name.setObjectName(u"author_name")
-        self.author_name.setFont(font)
+        self.author_name.setMaximumSize(QSize(16777215, 16777215))
+        self.author_name.setFont(font1)
         self.author_name.setStyleSheet(u"color:#90b6e7;\n"
 "font-family:\"Comfortaa\";\n"
 "padding:3px;\n"
@@ -1975,13 +2076,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.frame)
 
 
-        self.horizontalLayout_2.addWidget(self.self_sized_main_widget)
+        self.verticalLayout_33.addWidget(self.self_sized_main_widget)
 
         MainWindow.setCentralWidget(self.style_sheet)
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(4)
+        self.stackedWidget.setCurrentIndex(0)
         self.tab_window.setCurrentIndex(0)
 
 
@@ -1990,6 +2091,10 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Macro Data Dashboard", None))
+        self.title_text.setText(QCoreApplication.translate("MainWindow", u"Macro Data Dashboard", None))
+        self.minimize_btn.setText("")
+        self.window_btn.setText("")
+        self.close_btn.setText("")
 #if QT_CONFIG(tooltip)
         self.one_page_btn.setToolTip(QCoreApplication.translate("MainWindow", u"One Chart Interface", None))
 #endif // QT_CONFIG(tooltip)
