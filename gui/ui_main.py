@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
