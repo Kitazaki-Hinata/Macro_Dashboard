@@ -1,3 +1,8 @@
+# pyright: reportMissingTypeStubs=false
+# pyright: reportUnknownMemberType=false
+# pyright: reportUnknownVariableType=false
+# pyright: reportUnknownArgumentType=false
+
 import os
 import json
 import re
@@ -14,8 +19,10 @@ import yfinance as yf
 from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 from abc import ABC, abstractmethod
+from typing import Any, Optional, Dict, List, Tuple
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from selenium import webdriver
 from dateutil.relativedelta import relativedelta
 from selenium.webdriver.chrome.options import Options
@@ -24,7 +31,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-class DatabaseConverter():
+class DatabaseConverter:
     _MONTH_MAP = {
         "jan": 1, "feb": 2, "mar": 3, "apr": 4,
         "may": 5, "jun": 6, "jul": 7, "aug": 8,
@@ -32,22 +39,22 @@ class DatabaseConverter():
     }
     end_date: date = date.today()
 
-    def __init__(self, db_file: str = 'data.db'):
-        self.db_file = db_file
-        self.conn = sqlite3.connect(db_file)   # 参数是数据库的本地地址，后续可以只用一次cursor
-        self.cursor = self.conn.cursor()
+    def __init__(self, db_file: str = 'data.db') -> None:
+        self.db_file: str = db_file
+        self.conn: sqlite3.Connection = sqlite3.connect(db_file)
+        self.cursor: sqlite3.Cursor = self.conn.cursor()
 
     @staticmethod
-    def _convert_month_str_to_num(month_str):
-        return DatabaseConverter._MONTH_MAP.get(month_str.casefold(), None)
+    def _convert_month_str_to_num(month_str: str) -> Optional[int]:
+        return DatabaseConverter._MONTH_MAP.get(str(month_str).casefold(), None)
 
     @staticmethod
-    def _rename_bea_date_col(df: pd.DataFrame)-> pd.DataFrame:
+    def _rename_bea_date_col(df: pd.DataFrame) -> pd.DataFrame:
         '''modify time index, unify all time index in different dataframe(time series dataframe'''
         try:
             # df.drop("TimePeriod", axis=1, inplace=True)  # remove original date index
-            date_col = df.pop("date")  # get date col
-            df.insert(0, "date", date_col)  # insert "date col" into first col
+            date_col = df.pop("date")  # type: ignore
+            df.insert(0, "date", date_col)  # type: ignore
             return df
         except Exception as e:
             logging.error(f"{e}, FAILED to write into database")
@@ -55,12 +62,12 @@ class DatabaseConverter():
             return df
 
     @staticmethod
-    def _format_converter(df: pd.DataFrame, data_name: str, is_pct_data: bool) -> pd.DataFrame:
+    def _format_converter(df: Optional[pd.DataFrame], data_name: str, is_pct_data: bool) -> pd.DataFrame:
         """将不同来源的数据统一为两列: date(YYYY-MM-DD) + value 列名为 data_name。
         足够健壮地应对 None/Timestamp/int 等类型，并容忍短表、重复、缺失。
         """
         if df is None or df.empty:
-            return df
+            return pd.DataFrame()
         df = df.copy()
 
         def finalize_with_date_first(df_in: pd.DataFrame) -> pd.DataFrame:
@@ -145,10 +152,11 @@ class DatabaseConverter():
             cols = list(df.columns)
             if cols == ["year", "period", "value"] or cols == ["year", "period", "MoM_growth"]:
                 period = df["period"].astype(str)
+                # 统一生成 month 为 Series[str]
                 if period.str.startswith("M").any():
-                    month = period.str[1:].astype(int)
-                    month = month.where(month != 12, 0) + 1
-                    month = month.astype(str).str.zfill(2)
+                    month_series = period.str[1:].astype(int)
+                    month_series = month_series.where(month_series != 12, 0) + 1
+                    month_series = month_series.astype(str).str.zfill(2)
                 elif period.str.startswith("Q").any():
                     def q_to_month(s: str) -> int:
                         try:
@@ -156,13 +164,13 @@ class DatabaseConverter():
                             return {1: 4, 2: 7, 3: 10, 4: 1}.get(q, 1)
                         except Exception:
                             return 1
-                    month = period.apply(q_to_month).astype(str).str.zfill(2)
+                    month_series = period.apply(q_to_month).astype(str).str.zfill(2)
                 else:
-                    month = "01"
+                    month_series = pd.Series(["01"] * len(df), index=df.index)
 
                 year = pd.to_numeric(df["year"], errors="coerce")
-                year = year.where(month != "01", year + 1)
-                df["date"] = year.astype("Int64").astype(str) + "-" + month + "-01"
+                year = year.where(month_series != "01", year + 1)
+                df["date"] = year.astype("Int64").astype(str) + "-" + month_series + "-" + "01"
                 # 选择数值列
                 val_col = "value" if "value" in df.columns else "MoM_growth"
                 out = df[["date", val_col]].copy().rename(columns={val_col: data_name})
@@ -203,7 +211,7 @@ class DatabaseConverter():
             logging.warning(f"fallback in _format_converter failed: {e}")
             return df
 
-    def _create_ts_sheet(self, start_date : str):
+    def _create_ts_sheet(self, start_date : str) -> sqlite3.Cursor:
         """If time_series_table does not exist, then create new db
         如果sheet不存在，创建sheet"""
         cursor = self.cursor
@@ -239,13 +247,13 @@ class DatabaseConverter():
                 # 计算需要添加的日期
                 current_date = datetime.now().date()
                 if current_date > max_date:
-                    dates_to_add = []
+                    dates_to_add: List[date] = []
                     while current_date > max_date:
                         dates_to_add.append(current_date)
                         current_date -= timedelta(days=1)
                     # 插入数据
-                    for date in dates_to_add:
-                        cursor.execute("INSERT INTO Time_Series (date) VALUES (?)", (date.strftime('%Y-%m-%d'),))
+                    for d in dates_to_add:
+                        cursor.execute("INSERT INTO Time_Series (date) VALUES (?)", (d.strftime('%Y-%m-%d'),))
                     self.conn.commit()
                 return cursor
 
@@ -275,7 +283,7 @@ class DatabaseConverter():
             else:
                 if is_time_series:  # check whether Time_Series table exists
                     df_after_modify_time: pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
-                    if df_after_modify_time is None or df_after_modify_time.empty or 'date' not in df_after_modify_time.columns:
+                    if df_after_modify_time.empty or 'date' not in df_after_modify_time.columns:
                         logging.error(f"{data_name} reformat produced empty/invalid dataframe, skip writing")
                         return
                     # 标准化和去重
@@ -328,12 +336,15 @@ class DatabaseConverter():
 
 class DataDownloader(ABC):
     @abstractmethod
-    def to_db(self, return_df = False):
-        pass
+    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+        """Download data and either write to DB or return DataFrames per table.
+        If return_df=True, return a dict mapping table_name -> DataFrame; otherwise None.
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def to_csv(self) -> None:
-        pass
+        raise NotImplementedError
 
 
 class BEADownloader(DataDownloader):
@@ -341,15 +352,15 @@ class BEADownloader(DataDownloader):
     download_py_file_path : str = os.path.dirname(os.path.abspath(__file__))
     csv_data_folder : str = os.path.join(download_py_file_path, "csv")
 
-    def __init__(self, json_dict: dict, api_key: str, request_year : int):
-        self.json_dict : dict = json_dict
-        self.api_key : str = api_key
-        self.request_year : int = request_year
+    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year : int):
+        self.json_dict: Dict[str, Dict[str, Any]] = json_dict
+        self.api_key: str = api_key
+        self.request_year: int = request_year
         self.time_range : str= ",".join(map(str, range(request_year, BEADownloader.current_year + 1)))
         self.time_range_lag : str = self.time_range[:-5]  # 去除最后5个字符，即去除最后一年
 
-    def to_db(self, return_df = False):
-        df_dict : dict = {}    # create list for future df storage and output  (return df_list)
+    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+        df_dict: Dict[str, pd.DataFrame] = {}
         total_items = len(self.json_dict)
         for idx, (table_name, table_config) in enumerate(self.json_dict.items(), 1):
             try:
@@ -386,17 +397,20 @@ class BEADownloader(DataDownloader):
                     pick = ""
                 df_filtered: pd.DataFrame = df[df["LineDescription"].isin([pick, ""])].copy()
                 # 处理重复 TimePeriod 时使用最后一个值
+                # 使用具名聚合函数，便于类型检查
+                def _last_or_none(s: pd.Series) -> Any:
+                    return s.iloc[-1] if len(s) else None
                 df_modified: pd.DataFrame = pd.pivot_table(
                     df_filtered,
                     index="TimePeriod",
                     columns="LineDescription",
                     values="DataValue",
-                    aggfunc="last"
+                    aggfunc=_last_or_none
                 )
                 df_modified.columns = [f"{table_config['name']}"]
                 df_modified.index.name = "TimePeriod"
                 logging.info(f"BEA_{table_name} Successfully extracted!")
-                if return_df is True and isinstance(df_modified, pd.DataFrame):  # used for to_csv method
+                if return_df is True:  # used for to_csv method
                     df_dict[table_name] = df_modified
                     if idx == total_items:
                         break
@@ -424,7 +438,7 @@ class BEADownloader(DataDownloader):
 
     def to_csv(self) -> None:
         try:
-            df_dict : dict = self.to_db(return_df=True)
+            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
         except:
             logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
             return None
@@ -442,24 +456,26 @@ class BEADownloader(DataDownloader):
 
 
 class YFDownloader(DataDownloader):
-    def __init__(self, json_dict: dict, api_key, request_year : int):
-        self.json_dict : dict = json_dict
+    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: Optional[str], request_year : int):
+        self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.start_date : str  = str(request_year)+"-01-01"
         self.end_date : str = str(date.today())
 
-    def to_db(self, return_df = False):
+    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
         '''NOTE : data is pd.dataframe'''
-        df_dict : dict = {}  # create list for future df storage and output  (return df_list)
+        df_dict: Dict[str, pd.DataFrame] = {}
         for table_name, table_config in self.json_dict.items():
             try:
                 index = table_config["code"]
-                data: pd.DataFrame = yf.download(index, start=self.start_date, end=self.end_date, interval="1d")
+                data = pd.DataFrame(
+                    yf.download(index, start=self.start_date, end=self.end_date, interval="1d")
+                )
                 # 针对单层列名的容错
                 try:
                     data.columns = data.columns.droplevel(1)
                 except Exception:
                     pass
-                if return_df is True and isinstance(data, pd.DataFrame):  # used for to_csv method
+                if return_df is True:  # used for to_csv method
                     df_dict[table_name] = data
                     continue
                 elif return_df is False:
@@ -482,7 +498,7 @@ class YFDownloader(DataDownloader):
 
     def to_csv(self) -> None:
         try:
-            df_dict : dict = self.to_db(return_df=True)
+            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
         except:
             logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
             return None
@@ -502,14 +518,14 @@ class YFDownloader(DataDownloader):
 class FREDDownloader(DataDownloader):
     url : str = r"https://api.stlouisfed.org/fred/series/observations"
 
-    def __init__(self, json_dict: dict, api_key, request_year : int):
-        self.json_dict : dict = json_dict
-        self.api_key : str = api_key
+    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year : int):
+        self.json_dict: Dict[str, Dict[str, Any]] = json_dict
+        self.api_key: str = api_key
         self.start_date : str  = str(request_year)+"-01-01"
         self.end_date : str = str(date.today())
 
-    def to_db(self, return_df = False):
-        df_dict : dict = {}
+    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+        df_dict: Dict[str, pd.DataFrame] = {}
         for table_name, table_config in self.json_dict.items():
             try:
                 params = {
@@ -540,7 +556,7 @@ class FREDDownloader(DataDownloader):
                         df["value"] = df["value"].ffill()
                     df = df[["date", "value"]]
 
-                if return_df is True and isinstance(df, pd.DataFrame):
+                if return_df is True:
                     df_dict[table_name] = df
                     logging.info(f"{table_name} Successfully extracted!")
                     continue
@@ -564,9 +580,9 @@ class FREDDownloader(DataDownloader):
         else:
             return None
 
-    def to_csv(self):
+    def to_csv(self) -> None:
         try:
-            df_dict: dict = self.to_db(return_df=True)
+            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
         except:
             logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
             return None
@@ -585,16 +601,16 @@ class FREDDownloader(DataDownloader):
 
 class BLSDownloader(DataDownloader):
     url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/"
-    headers: tuple = ('Content-type', 'application/json')
+    headers: Tuple[str, str] = ('Content-type', 'application/json')
 
-    def __init__(self, json_dict: dict, api_key : str, request_year : int):
-        self.json_dict : dict = json_dict
-        self.api_key : str = api_key
-        self.start_year : int  = request_year
+    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key : str, request_year : int):
+        self.json_dict: Dict[str, Dict[str, Any]] = json_dict
+        self.api_key: str = api_key
+        self.start_year: int  = request_year
         self.start_date : str  = str(request_year)+"-01-01"
 
-    def to_db(self, return_df : bool = False, debug : bool = False):
-        df_dict : dict = {}
+    def to_db(self, return_df : bool = False, debug : bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+        df_dict: Dict[str, pd.DataFrame] = {}
         if debug is True:
             # debug --- mock df
             converter = DatabaseConverter()
@@ -649,7 +665,7 @@ class BLSDownloader(DataDownloader):
                         logging.error(f"{table_name} FAILED REFORMAT PERCENTAGE, probably due to df error, {e}")
                         continue
 
-                if return_df is True and isinstance(df, pd.DataFrame):
+                if return_df is True:
                     df_dict[table_name] = df
                     logging.info(f"{table_name} Successfully extracted!")
                     continue
@@ -672,7 +688,7 @@ class BLSDownloader(DataDownloader):
 
     def to_csv(self) -> None:
         try:
-            df_dict: dict = self.to_db(return_df=True)
+            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
         except:
             logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
             return None
@@ -694,26 +710,25 @@ class TEDownloader(DataDownloader):
     time_pause : float = random.uniform(1, 1.3)  # wait, prevent be identified as a bot
     time_wait : int = 10  # wait for a response
 
-    def __init__(self, json_dict: dict, api_key : str, request_year : int):
-        self.json_dict : dict = json_dict
-        self.start_year : int  = request_year
+    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key : str, request_year : int):
+        self.json_dict: Dict[str, Dict[str, Any]] = json_dict
+        self.start_year: int  = request_year
         self.start_date: str = str(request_year) + "-01-01"
         options = Options()
         # options.add_argument("--headless")
         options.add_argument("--disable-blink-features=AutomationControlled")
         self.driver = webdriver.Chrome(options=options)
 
-    def _calc_function(self, x1: float, x2:float, y1:float, y2:float):
+    def _calc_function(self, x1: float, x2: float, y1: float, y2: float) -> Tuple[float, float]:
         """解二元一次方程，用于计算数据 used for data calculation"""
         gradient = np.round((y1 - y2)/(x1-x2), 3)
         intercept = np.round((y1 - gradient*x1), 3)
         return gradient, intercept
 
-    def _get_data_from_trading_economics_month(self, data_name: str):
+    def _get_data_from_trading_economics_month(self, data_name: str) -> Optional[pd.DataFrame]:
         """提取月度数据的代码，季度数据需要单独写
         主要流程：访问页面，点击5y按钮，点击bar按钮，提取table数字，提取bar长度，反向计算数据"""
 
-        data_name: str = data_name
         url = self.url + data_name.replace("_", "-")
         self.driver.get(url)
         time.sleep(TEDownloader.time_pause)
@@ -766,7 +781,7 @@ class TEDownloader(DataDownloader):
             original_html = self.driver.page_source
             soup = BeautifulSoup(original_html, "lxml")
             row = soup.find("tr", class_="datatable-row")
-            if row:
+            if isinstance(row, Tag):
                 tds = row.find_all("td")
                 if len(tds) >= 2:
                     current_num = float(tds[1].text.strip())    # list num，列表中的current数字
@@ -780,7 +795,15 @@ class TEDownloader(DataDownloader):
             # extract bar height value for actual data
             rects = soup.find_all("rect", class_="highcharts-point")
             # extract bar height value for actual data
-            heights = [float(rect.get("height")) for rect in rects if rect.get("height") is not None]  # value of height
+            heights: List[float] = []
+            for rect in rects:
+                if isinstance(rect, Tag):
+                    h = rect.get("height")
+                    if h is not None:
+                        try:
+                            heights.append(float(str(h)))
+                        except Exception:
+                            continue
 
             # 利用两个数据计算数据与bar高度的线性关系，y是结果，x是高度
             gradient, intercept = self._calc_function(heights[-1], heights[-2], current_num, previous_num,)
@@ -795,10 +818,10 @@ class TEDownloader(DataDownloader):
                 "May": 5, "Jun": 6, "Jul": 7, "Aug": 8,
                 "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
             }
-            month_abbr, year = current_data_date.split("_")
-            month : int = month_map[month_abbr]
-            year : int = int(year)
-            end_date = datetime(year, month, 1)
+            month_abbr, year_str = current_data_date.split("_")
+            month_int: int = month_map[month_abbr]
+            year_int: int = int(year_str)
+            end_date = datetime(year_int, month_int, 1)
             months_list = [
                 (end_date - relativedelta(months=i)).strftime("%b_%Y")
                 for i in reversed(range(61))  # 包含Mar_2020 ~ Mar_2025
@@ -809,15 +832,15 @@ class TEDownloader(DataDownloader):
             logging.error(f"{data_name} FAILED TO EXTRACT data from html, but successfully get data from website, {e}")
             return None
 
-    def to_db(self, return_df = False):
-        df_dict: dict = {}
+    def to_db(self, return_df: bool = False) -> Optional[Dict[str, pd.DataFrame]]:
+        df_dict: Dict[str, pd.DataFrame] = {}
         for table_name, table_config in self.json_dict.items():
             data_name = table_config["name"]
             df = self._get_data_from_trading_economics_month(data_name = data_name)
             if df is None:
                 logging.error(f"FAILED TO EXTRACT {table_name}, check PREVIOUS loggings")
                 continue
-            if return_df is True and isinstance(df, pd.DataFrame):
+            if return_df is True:
                 df_dict[table_name] = df
                 logging.info(f"{data_name} SUCCESSFULLY EXTRACT data from website TE")
                 continue
@@ -839,7 +862,7 @@ class TEDownloader(DataDownloader):
 
     def to_csv(self) -> None:
         try:
-            df_dict: dict = self.to_db(return_df=True)
+            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
         except:
             logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
             return None
@@ -859,7 +882,7 @@ class TEDownloader(DataDownloader):
 class DownloaderFactory:
     '''API/Interface, factory that direct to different data-instance classes'''
     @classmethod
-    def _get_api_key(cls, source: str) -> str or None:
+    def _get_api_key(cls, source: str) -> Optional[str]:
         load_dotenv()
         api = os.environ.get(source)
         if not api:
@@ -869,11 +892,11 @@ class DownloaderFactory:
 
     @classmethod
     def create_downloader(
-            cls,
-            source: str,
-            json_data: dict,   # full json data, not just one item in the dict
-            request_year : int,
-    ) -> 'DataDownloader' or None:
+        cls,
+        source: str,
+        json_data: Dict[str, Any],   # full json data, not just one item in the dict
+        request_year : int,
+    ) -> Optional['DataDownloader']:
 
         api_key = cls._get_api_key(source)
         json_dict_data_index_info = json_data.get(source, None)
