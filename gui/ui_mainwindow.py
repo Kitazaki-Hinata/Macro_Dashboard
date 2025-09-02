@@ -67,16 +67,30 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         btn = self.sender()
         btn_name = btn.objectName()
 
+        # 所有按钮列表
+        btns = [
+            self.one_page_btn,
+            self.four_page_btn,
+            self.table_btn,
+            self.note_btn,
+            self.settings_btn,
+        ]
+        # 先全部取消选中
+        for b in btns:
+            b.setChecked(False)
+        # 当前按钮选中
+        btn.setChecked(True)
+
         # show stack pages
         if btn_name == "one_page_btn":
             self.stackedWidget.setCurrentWidget(self.page_one_container)
-        if btn_name == "four_page_btn":
+        elif btn_name == "four_page_btn":
             self.stackedWidget.setCurrentWidget(self.page_four_container)
-        if btn_name == "table_btn":
+        elif btn_name == "table_btn":
             self.stackedWidget.setCurrentWidget(self.page_table_container)
-        if btn_name == "note_btn":
+        elif btn_name == "note_btn":
             self.stackedWidget.setCurrentWidget(self.page_note_container)
-        if btn_name == "settings_btn":
+        elif btn_name == "settings_btn":
             self.stackedWidget.setCurrentWidget(self.page_settings_container)
             # 进入设置页时刷新 .env 到输入框
             try:

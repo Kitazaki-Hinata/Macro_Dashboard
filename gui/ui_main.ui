@@ -427,6 +427,7 @@ image-position : center;</string>
 
 
 /*每个按钮的样式在这里*/
+/*不是checked，已经删除过 验证了*/
 QPushButton {
     background-position: center;
     background-repeat: no-repeat;
@@ -438,11 +439,9 @@ QPushButton:hover{
 	margin :0;
 	border :0;
 }
-
 QPushButton:pressed{
 	background-color : #90b6e7;
 	border-radius : 0;
-	border-left:2px solid white;
 	margin :0;
 	border :0;
 }
@@ -458,7 +457,6 @@ QPushButton#one_page_btn:pressed {
     icon-size: 20px 20px;
 }
 
-
 QPushButton#four_page_btn {
     icon: url(:/png/png/four.png);
     icon-size: 20px 20px;
@@ -467,7 +465,6 @@ QPushButton#four_page_btn:pressed {
     icon: url(:/png_press/png/four_press.png);
     icon-size: 20px 20px;
 }
-
 
 QPushButton#table_btn {
     icon: url(:/png/png/table.png);
@@ -478,7 +475,6 @@ QPushButton#table_btn:pressed {
     icon-size: 20px 20px;
 }
 
-
 QPushButton#note_btn {
     icon: url(:/png/png/note_btn.png);
     icon-size: 20px 20px;
@@ -488,7 +484,6 @@ QPushButton#note_btn:pressed {
     icon-size: 20px 20px;
 }
 
-
 QPushButton#settings_btn {
     icon: url(:/png/png/settings.png);
     icon-size: 20px 20px;
@@ -497,7 +492,6 @@ QPushButton#settings_btn:pressed {
     icon: url(:/png_press/png/settings_press.png);
     icon-size: 20px 20px;
 }
-
 
 
 

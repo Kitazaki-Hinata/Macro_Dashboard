@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -271,6 +272,7 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "/*\u6bcf\u4e2a\u6309\u94ae\u7684\u6837\u5f0f\u5728\u8fd9\u91cc*/\n"
+"/*\u4e0d\u662fchecked\uff0c\u5df2\u7ecf\u5220\u9664\u8fc7 \u9a8c\u8bc1\u4e86*/\n"
 "QPushButton {\n"
 "    background-position: center;\n"
 "    background-repeat: no-repeat;\n"
@@ -282,11 +284,9 @@ class Ui_MainWindow(object):
 "	margin :0;\n"
 "	border :0;\n"
 "}\n"
-"\n"
 "QPushButton:pressed{\n"
 "	background-color : #90b6e7;\n"
 "	border-radius : 0;\n"
-"	border-left:2px solid white;\n"
 "	margin :0;\n"
 "	border :0;\n"
 "}\n"
@@ -302,17 +302,15 @@ class Ui_MainWindow(object):
 "    icon-size: 20px 20px;\n"
 "}\n"
 "\n"
-"\n"
 "QPushButton#four_page_btn {\n"
 "    icon: url(:/png/png/four.png);\n"
 "    icon-size: 20px 20px;\n"
 "}\n"
 "QPushButton#four_page_btn:pressed {\n"
-"    icon: url(:/png_press/png/four_press.p"
-                        "ng);\n"
+"   "
+                        " icon: url(:/png_press/png/four_press.png);\n"
 "    icon-size: 20px 20px;\n"
 "}\n"
-"\n"
 "\n"
 "QPushButton#table_btn {\n"
 "    icon: url(:/png/png/table.png);\n"
@@ -323,7 +321,6 @@ class Ui_MainWindow(object):
 "    icon-size: 20px 20px;\n"
 "}\n"
 "\n"
-"\n"
 "QPushButton#note_btn {\n"
 "    icon: url(:/png/png/note_btn.png);\n"
 "    icon-size: 20px 20px;\n"
@@ -333,7 +330,6 @@ class Ui_MainWindow(object):
 "    icon-size: 20px 20px;\n"
 "}\n"
 "\n"
-"\n"
 "QPushButton#settings_btn {\n"
 "    icon: url(:/png/png/settings.png);\n"
 "    icon-size: 20px 20px;\n"
@@ -342,7 +338,6 @@ class Ui_MainWindow(object):
 "    icon: url(:/png_press/png/settings_press.png);\n"
 "    icon-size: 20px 20px;\n"
 "}\n"
-"\n"
 "\n"
 "\n"
 "\n"
