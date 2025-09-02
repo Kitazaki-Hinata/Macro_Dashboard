@@ -16,6 +16,9 @@ class mainWindow(QMainWindow, Ui_MainWindow):
     _dragging: bool
     _drag_offset: QPoint
 
+    # 新增：记录窗口原始位置和大小
+    _normal_geometry: QRect = None
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)  # type: ignore
@@ -36,12 +39,21 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_btn.clicked.connect(self.left_bar_button_slot)
         self.settings_btn.clicked.connect(self.left_bar_button_slot)
 
+        # 修改：为 header_right_btn_container 添加鼠标事件
+        self.header_right_btn_container.installEventFilter(self)
+        self.header_text_and_icon.installEventFilter(self)
+
         # 边缘
         self.left_grip = CustomGrip(self, Qt.Edge.LeftEdge, True)
         self.right_grip = CustomGrip(self, Qt.Edge.RightEdge, True)
         self.top_grip = CustomGrip(self, Qt.Edge.TopEdge, True)
         self.bottom_grip = CustomGrip(self, Qt.Edge.BottomEdge, True)
 
+        # 四角 grip（用 Qt.Corner 枚举）
+        self.topleft_grip = CustomGrip(self, Qt.TopLeftCorner, True)
+        self.topright_grip = CustomGrip(self, Qt.TopRightCorner, True)
+        self.bottomleft_grip = CustomGrip(self, Qt.BottomLeftCorner, True)
+        self.bottomright_grip = CustomGrip(self, Qt.BottomRightCorner, True)
 
         # 点击api确认按钮，保存输入的API
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
@@ -72,10 +84,28 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             except Exception:
                 pass
 
+    # 修改：事件过滤器用于拖动窗口
+    def eventFilter(self, obj, event):
+        if obj == self.header_right_btn_container or obj == self.header_text_and_icon:
+            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+                self._dragging = True
+                self._drag_offset = event.globalPos() - self.frameGeometry().topLeft()
+                return True
+            elif event.type() == QEvent.MouseMove and getattr(self, '_dragging', False):
+                self.move(event.globalPos() - self._drag_offset)
+                return True
+            elif event.type() == QEvent.MouseButtonRelease:
+                self._dragging = False
+                return True
+        return super().eventFilter(obj, event)
+
     def _toggle_max_restore(self):
         global GLOBAL_STATE
         if GLOBAL_STATE == True:
             GLOBAL_STATE = False
+            # 恢复窗口位置和大小
+            if self._normal_geometry:
+                self.setGeometry(self._normal_geometry)
             self.showNormal()
             self.window_btn.setStyleSheet(
                 '''
@@ -87,6 +117,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             self.resize(self.width()+1, self.height()+1)
         else:
             GLOBAL_STATE = True
+            # 记住窗口位置和大小
+            self._normal_geometry = self.geometry()
             self.showMaximized()
             self.window_btn.setStyleSheet(
                 '''
@@ -103,3 +135,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.right_grip.update_geometry()
         self.top_grip.update_geometry()
         self.bottom_grip.update_geometry()
+        # 四角 grip 跟随调整
+        self.topleft_grip.update_geometry()
+        self.topright_grip.update_geometry()
+        self.bottomleft_grip.update_geometry()
+        self.bottomright_grip.update_geometry()

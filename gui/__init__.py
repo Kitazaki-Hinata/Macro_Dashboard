@@ -30,6 +30,8 @@ __all__ = [
     "QThread",
     "QThreadPool",
     "QTimer",
+    "QRect",
+    "QEvent",
 
     "resources_rc",
     "Ui_MainWindow",

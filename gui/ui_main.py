@@ -2023,6 +2023,7 @@ class Ui_MainWindow(object):
 "font-family : \"Comfortaa\"; \n"
 "font-weight : bold;\n"
 "margin-left: 1px;")
+        self.console_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_30.addWidget(self.console_text)
 

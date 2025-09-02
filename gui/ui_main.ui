@@ -3796,6 +3796,9 @@ margin-left: 1px;</string>
                             <property name="text">
                              <string>Console &amp; Logging Information</string>
                             </property>
+                            <property name="alignment">
+                             <set>Qt::AlignmentFlag::AlignCenter</set>
+                            </property>
                            </widget>
                           </item>
                           <item>
