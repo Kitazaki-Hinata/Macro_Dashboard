@@ -30,6 +30,13 @@ class _MainWindowProto(Protocol):
     fred: Any
     bls: Any
     te: Any
+    # cme : Any
+    # dallas : Any
+    # emini : Any
+    # fxswap : Any
+    # infla : Any
+    # ism : Any
+    # nyf : Any
     # parallel controls
     parallel_download_check: Any
     max_threads_spin: Any
@@ -66,7 +73,20 @@ class _DownloadWorker(QObject):
                 _backend_available = False
                 self.progress.emit(f"Backend not available: {e}. Running mock download...")
 
-            sources = ["bea", "yf", "fred", "bls", "te"] if self._download_all else list(self._selected_sources)
+            sources = [
+                "bea",
+                "yf",
+                "fred",
+                "bls",
+                "te",
+                # "cme",
+                # "dallas",
+                # "emini",
+                # "fxswap",
+                # "infla",
+                # "ism",
+                # "nyf"
+                ] if self._download_all else list(self._selected_sources)
             if not sources:
                 self.progress.emit("No sources selected. Nothing to do.")
                 self.finished.emit()
@@ -103,6 +123,13 @@ class _DownloadWorker(QObject):
                 try:
                     downloader.to_db()  # type: ignore[reportUnknownMemberType]
                     self.progress.emit(f"{src} done.")
+                    
+                    # check 是否需要导出csv
+                    if hasattr(self, "main_window") and hasattr(self.main_window, "download_csv_check"):
+                        if getattr(self.main_window.download_csv_check, "isChecked", lambda: False)():
+                            self.progress.emit(f"Exporting {src} data to CSV...")
+                            downloader.to_csv()  # type: ignore[reportUnknownMemberType]
+                            self.progress.emit(f"{src} CSV export done.")
                 except Exception as e:
                     self.progress.emit(f"{src} failed: {e}")
                     continue

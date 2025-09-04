@@ -68,30 +68,71 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         btn_name = btn.objectName()
 
         # 所有按钮列表
-        btns = [
-            self.one_page_btn,
-            self.four_page_btn,
-            self.table_btn,
-            self.note_btn,
-            self.settings_btn,
-        ]
-        # 先全部取消选中
-        for b in btns:
-            b.setChecked(False)
-        # 当前按钮选中
-        btn.setChecked(True)
+        btn_dict = {
+            "one_page_btn" : self.one_page_btn,
+            "four_page_btn" : self.four_page_btn,
+            "table_btn" : self.table_btn,
+            "note_btn" : self.note_btn,
+            "settings_btn" : self.settings_btn,
+        }
+
+        # clear effect 清除自带的效果保留qss效果
+        for name, button in btn_dict.items():
+            if button != btn:  # 比较按钮对象而不是名称
+                button.setChecked(False)
+                button.setStyleSheet("")
 
         # show stack pages
         if btn_name == "one_page_btn":
             self.stackedWidget.setCurrentWidget(self.page_one_container)
+            self.one_page_btn.setStyleSheet(
+                '''
+                background : #90b6e7;
+                icon: url(:/png_check/png/one_check.png);
+                icon-size: 20px 20px;
+                border-left : 2px solid white;
+                '''
+            )
         elif btn_name == "four_page_btn":
             self.stackedWidget.setCurrentWidget(self.page_four_container)
+            self.four_page_btn.setStyleSheet(
+                '''
+                background : #90b6e7;
+                icon: url(:/png_check/png/four_check.png);
+                icon-size: 20px 20px;
+                border-left : 2px solid white;
+                '''
+            )
         elif btn_name == "table_btn":
             self.stackedWidget.setCurrentWidget(self.page_table_container)
+            self.table_btn.setStyleSheet(
+                '''
+                background : #90b6e7;
+                icon: url(:/png_check/png/table_check.png);
+                icon-size: 20px 20px;
+                border-left : 2px solid white;
+                '''
+            )
         elif btn_name == "note_btn":
             self.stackedWidget.setCurrentWidget(self.page_note_container)
+            self.note_btn.setStyleSheet(
+                '''
+                background : #90b6e7;
+                icon: url(:/png_check/png/note_btn_check.png);
+                icon-size: 20px 20px;
+                border-left : 2px solid white;
+                '''
+            )
         elif btn_name == "settings_btn":
             self.stackedWidget.setCurrentWidget(self.page_settings_container)
+            self.settings_btn.setStyleSheet(
+                '''
+                background : #90b6e7;
+                icon: url(:/png_check/png/settings_check.png);
+                icon-size: 20px 20px;
+                border-left : 2px solid white;
+                '''
+            )
             # 进入设置页时刷新 .env 到输入框
             try:
                 self.ui_functions.settings_api_load()
