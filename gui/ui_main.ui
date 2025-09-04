@@ -547,7 +547,7 @@ QPushButton#settings_btn:pressed {
                </size>
               </property>
               <property name="toolTip">
-               <string>One Chart Interface</string>
+               <string/>
               </property>
               <property name="styleSheet">
                <string notr="true"/>
@@ -575,7 +575,7 @@ QPushButton#settings_btn:pressed {
                <enum>Qt::ContextMenuPolicy::PreventContextMenu</enum>
               </property>
               <property name="toolTip">
-               <string>Four Charts Interface</string>
+               <string/>
               </property>
               <property name="styleSheet">
                <string notr="true"/>
@@ -600,7 +600,7 @@ QPushButton#settings_btn:pressed {
                </size>
               </property>
               <property name="toolTip">
-               <string>Non Time Series Tables</string>
+               <string/>
               </property>
               <property name="styleSheet">
                <string notr="true"/>
@@ -625,7 +625,7 @@ QPushButton#settings_btn:pressed {
                </size>
               </property>
               <property name="toolTip">
-               <string>Notes</string>
+               <string/>
               </property>
               <property name="styleSheet">
                <string notr="true"/>
@@ -663,7 +663,7 @@ QPushButton#settings_btn:pressed {
                </size>
               </property>
               <property name="toolTip">
-               <string>Settings</string>
+               <string/>
               </property>
               <property name="styleSheet">
                <string notr="true"/>
@@ -772,7 +772,7 @@ QPushButton#settings_btn:pressed {
                  <bool>false</bool>
                 </property>
                 <property name="toolTip">
-                 <string>Tab pages</string>
+                 <string/>
                 </property>
                 <property name="layoutDirection">
                  <enum>Qt::LayoutDirection::LeftToRight</enum>
@@ -1595,13 +1595,13 @@ color : #90b6e7;</string>
                <widget class="QWidget" name="note_list" native="true">
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>230</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>200</width>
+                  <width>230</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -1676,84 +1676,17 @@ margin :0;
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QFrame" name="expand_btn_container">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
+                  <widget class="QWidget" name="note_list_text_container" native="true">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>50</height>
+                     <height>70</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>50</height>
-                    </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton {
-
-	background-color : #3e4146;
-	border : 0;
-}
-
-QPushButton:hover {
-	background-color : #515660;
-}
-
-QPushButton:pressed {
-	background-color : #2b2e32;
-}
-</string>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::Shape::NoFrame</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Shadow::Plain</enum>
-                   </property>
-                   <property name="lineWidth">
-                    <number>0</number>
-                   </property>
-                   <widget class="QPushButton" name="expand_fold">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>200</width>
-                      <height>50</height>
-                     </rect>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string/>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true"> image: url(:/svg/svg/fold.svg);
- padding : 15px;</string>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="note_list_text_container" native="true">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>50</height>
+                     <height>70</height>
                     </size>
                    </property>
                    <property name="toolTip">
@@ -1783,10 +1716,16 @@ QPushButton:pressed {
                     </property>
                     <item>
                      <widget class="QWidget" name="note_text_container_3" native="true">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>70</height>
+                       </size>
+                      </property>
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>40</height>
+                        <height>70</height>
                        </size>
                       </property>
                       <property name="layoutDirection">
@@ -1794,7 +1733,7 @@ QPushButton:pressed {
                       </property>
                       <layout class="QVBoxLayout" name="verticalLayout_16">
                        <property name="spacing">
-                        <number>0</number>
+                        <number>5</number>
                        </property>
                        <property name="leftMargin">
                         <number>0</number>
@@ -1808,6 +1747,22 @@ QPushButton:pressed {
                        <property name="bottomMargin">
                         <number>0</number>
                        </property>
+                       <item>
+                        <spacer name="verticalSpacer_7">
+                         <property name="orientation">
+                          <enum>Qt::Orientation::Vertical</enum>
+                         </property>
+                         <property name="sizeType">
+                          <enum>QSizePolicy::Policy::Fixed</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>20</width>
+                           <height>18</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
                        <item>
                         <widget class="QLabel" name="four_title_label_3">
                          <property name="maximumSize">
@@ -1834,7 +1789,7 @@ QPushButton:pressed {
 margin-left : 7px; </string>
                          </property>
                          <property name="text">
-                          <string>New Created Note</string>
+                          <string>Feel Free to Write Notes</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -1861,12 +1816,28 @@ margin-left : 7px; </string>
 color : #90b6e7;</string>
                          </property>
                          <property name="text">
-                          <string>Recent Update Time : 2025-08-01</string>
+                          <string>a place where store thoughts, or feelings</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignmentFlag::AlignCenter</set>
                          </property>
                         </widget>
+                       </item>
+                       <item>
+                        <spacer name="verticalSpacer_6">
+                         <property name="orientation">
+                          <enum>Qt::Orientation::Vertical</enum>
+                         </property>
+                         <property name="sizeType">
+                          <enum>QSizePolicy::Policy::Expanding</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>20</width>
+                           <height>10</height>
+                          </size>
+                         </property>
+                        </spacer>
                        </item>
                       </layout>
                      </widget>
@@ -1893,8 +1864,8 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>92</width>
-                      <height>780</height>
+                      <width>230</width>
+                      <height>637</height>
                      </rect>
                     </property>
                     <property name="styleSheet">
@@ -1933,109 +1904,24 @@ QPushButton:pressed {
                       <number>1</number>
                      </property>
                      <item>
-                      <widget class="QPushButton" name="text_1">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="text_2">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
                       <widget class="QPushButton" name="pushButton_9">
                        <property name="text">
-                        <string>PushButton</string>
+                        <string>Default Note</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="pushButton">
-                       <property name="text">
-                        <string>PushButton</string>
+                      <spacer name="verticalSpacer_8">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Vertical</enum>
                        </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_3">
-                       <property name="text">
-                        <string>PushButton</string>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
                        </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_15">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_2">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_5">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_11">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_14">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_4">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_7">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_12">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_6">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_13">
-                       <property name="text">
-                        <string>PushButton</string>
-                       </property>
-                      </widget>
+                      </spacer>
                      </item>
                     </layout>
                    </widget>
@@ -2132,6 +2018,12 @@ QPushButton#note_delete_btn:pressed {
               </item>
               <item>
                <widget class="QWidget" name="content_area" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_11">
                  <item>
                   <widget class="QWidget" name="text_enter_container" native="true">
@@ -2174,6 +2066,9 @@ QPushButton#save_text:pressed {
 </string>
                    </property>
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
+                    <property name="bottomMargin">
+                     <number>9</number>
+                    </property>
                     <item>
                      <widget class="QWidget" name="note_text_container" native="true">
                       <property name="maximumSize">
@@ -2218,7 +2113,7 @@ QPushButton#save_text:pressed {
 margin-left : 7px; </string>
                          </property>
                          <property name="text">
-                          <string>New Created Note</string>
+                          <string>Notes Editor</string>
                          </property>
                         </widget>
                        </item>
@@ -2282,6 +2177,22 @@ color : #90b6e7;</string>
                      </spacer>
                     </item>
                    </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="note_label_notes">
+                   <property name="font">
+                    <font>
+                     <family>Comfortaa</family>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color : white; margin-left : 20px</string>
+                   </property>
+                   <property name="text">
+                    <string>Note: The title name should be written in the first line start with &quot;##&quot;</string>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -2500,7 +2411,7 @@ margin-left : 1px; </string>
 color : #90b6e7;</string>
                       </property>
                       <property name="text">
-                       <string>Set API // Download Data // Other Options</string>
+                       <string>Set API // Download Data // About &amp; Terms</string>
                       </property>
                      </widget>
                     </item>
@@ -2883,7 +2794,7 @@ QWidget{
 font-weight : Bold;</string>
                       </property>
                       <property name="text">
-                       <string>About &amp; Options</string>
+                       <string>About &amp; Terms</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -3073,7 +2984,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:700;&quot;&gt;This software is designed for educational and reference purposes only; commercial use, redistribution for profit and claiming as own product are prohibited. &lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt;The software provides a dashboard for macroeconomic data learning and analysis.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt;The source code is open and available under the MIT-Non Commercial (MIT-NC) License terms.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt;Some UI elements (SVG and PNG icons, components) are sourced from [FAWZIUIUX]：fawziuiux.com/#Home.  All rights belong to the original author.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt;Some UI elements (SVG and PNG icons, components) are sourced from [FAWZIUIUX]：fawziuiux.com/#Home.  All rights belong to the original author.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei UI'; font-size:9pt;&quot;&gt;Special thanks to : SeaStar&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="acceptRichText">
                        <bool>false</bool>
@@ -3374,7 +3286,7 @@ color : #777785;
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QCheckBox" name="cme">
+                                 <widget class="QCheckBox" name="fw">
                                   <property name="enabled">
                                    <bool>false</bool>
                                   </property>
@@ -3387,7 +3299,7 @@ color : #777785;
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QCheckBox" name="dallas">
+                                 <widget class="QCheckBox" name="dfm">
                                   <property name="enabled">
                                    <bool>false</bool>
                                   </property>
@@ -3413,7 +3325,7 @@ color : #777785;
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QCheckBox" name="infla">
+                                 <widget class="QCheckBox" name="cin">
                                   <property name="enabled">
                                    <bool>false</bool>
                                   </property>
@@ -3426,7 +3338,7 @@ color : #777785;
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QCheckBox" name="emini">
+                                 <widget class="QCheckBox" name="em">
                                   <property name="enabled">
                                    <bool>false</bool>
                                   </property>
@@ -3442,7 +3354,7 @@ color : #777785;
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QCheckBox" name="fxswap">
+                                 <widget class="QCheckBox" name="fs">
                                   <property name="enabled">
                                    <bool>false</bool>
                                   </property>
@@ -3843,7 +3755,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="author_name">
+           <widget class="QLabel" name="author_name_and_time">
             <property name="maximumSize">
              <size>
               <width>16777215</width>

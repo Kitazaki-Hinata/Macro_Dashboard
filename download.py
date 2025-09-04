@@ -354,10 +354,6 @@ class DataDownloader(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def to_csv(self) -> None:
-        raise NotImplementedError
-
 
 class BEADownloader(DataDownloader):
     current_year : int = date.today().year

@@ -22,7 +22,6 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -853,8 +852,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
         self.note_list = QWidget(self.page_note_container)
         self.note_list.setObjectName(u"note_list")
-        self.note_list.setMinimumSize(QSize(0, 0))
-        self.note_list.setMaximumSize(QSize(200, 16777215))
+        self.note_list.setMinimumSize(QSize(230, 0))
+        self.note_list.setMaximumSize(QSize(230, 16777215))
         self.note_list.setStyleSheet(u"* {\n"
 "background-color: #3e4146;\n"
 "border : 0;\n"
@@ -912,44 +911,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_15.setSpacing(0)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
         self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
-        self.expand_btn_container = QFrame(self.note_list)
-        self.expand_btn_container.setObjectName(u"expand_btn_container")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.expand_btn_container.sizePolicy().hasHeightForWidth())
-        self.expand_btn_container.setSizePolicy(sizePolicy1)
-        self.expand_btn_container.setMinimumSize(QSize(0, 50))
-        self.expand_btn_container.setMaximumSize(QSize(16777215, 50))
-        self.expand_btn_container.setStyleSheet(u"QPushButton {\n"
-"\n"
-"	background-color : #3e4146;\n"
-"	border : 0;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"	background-color : #515660;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"	background-color : #2b2e32;\n"
-"}\n"
-"")
-        self.expand_btn_container.setFrameShape(QFrame.Shape.NoFrame)
-        self.expand_btn_container.setFrameShadow(QFrame.Shadow.Plain)
-        self.expand_btn_container.setLineWidth(0)
-        self.expand_fold = QPushButton(self.expand_btn_container)
-        self.expand_fold.setObjectName(u"expand_fold")
-        self.expand_fold.setGeometry(QRect(0, 0, 200, 50))
-        self.expand_fold.setMinimumSize(QSize(0, 50))
-        self.expand_fold.setStyleSheet(u" image: url(:/svg/svg/fold.svg);\n"
-" padding : 15px;")
-
-        self.verticalLayout_15.addWidget(self.expand_btn_container)
-
         self.note_list_text_container = QWidget(self.note_list)
         self.note_list_text_container.setObjectName(u"note_list_text_container")
-        self.note_list_text_container.setMinimumSize(QSize(0, 50))
+        self.note_list_text_container.setMinimumSize(QSize(0, 70))
+        self.note_list_text_container.setMaximumSize(QSize(16777215, 70))
         self.note_list_text_container.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.note_list_text_container.setStyleSheet(u"background : #3a3b43;")
         self.verticalLayout_17 = QVBoxLayout(self.note_list_text_container)
@@ -958,12 +923,17 @@ class Ui_MainWindow(object):
         self.verticalLayout_17.setContentsMargins(0, 0, 0, 0)
         self.note_text_container_3 = QWidget(self.note_list_text_container)
         self.note_text_container_3.setObjectName(u"note_text_container_3")
-        self.note_text_container_3.setMaximumSize(QSize(16777215, 40))
+        self.note_text_container_3.setMinimumSize(QSize(0, 70))
+        self.note_text_container_3.setMaximumSize(QSize(16777215, 70))
         self.note_text_container_3.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.verticalLayout_16 = QVBoxLayout(self.note_text_container_3)
-        self.verticalLayout_16.setSpacing(0)
+        self.verticalLayout_16.setSpacing(5)
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
         self.verticalLayout_16.setContentsMargins(0, 0, 0, 0)
+        self.verticalSpacer_7 = QSpacerItem(20, 18, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+
+        self.verticalLayout_16.addItem(self.verticalSpacer_7)
+
         self.four_title_label_3 = QLabel(self.note_text_container_3)
         self.four_title_label_3.setObjectName(u"four_title_label_3")
         self.four_title_label_3.setMaximumSize(QSize(16777215, 18))
@@ -993,6 +963,10 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_16.addWidget(self.four_update_label_3)
 
+        self.verticalSpacer_6 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_16.addItem(self.verticalSpacer_6)
+
 
         self.verticalLayout_17.addWidget(self.note_text_container_3)
 
@@ -1011,7 +985,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 92, 780))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 230, 637))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -1033,80 +1007,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_18.setSpacing(2)
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
         self.verticalLayout_18.setContentsMargins(0, 1, 0, 1)
-        self.text_1 = QPushButton(self.scrollAreaWidgetContents)
-        self.text_1.setObjectName(u"text_1")
-
-        self.verticalLayout_18.addWidget(self.text_1)
-
-        self.text_2 = QPushButton(self.scrollAreaWidgetContents)
-        self.text_2.setObjectName(u"text_2")
-
-        self.verticalLayout_18.addWidget(self.text_2)
-
         self.pushButton_9 = QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_9.setObjectName(u"pushButton_9")
 
         self.verticalLayout_18.addWidget(self.pushButton_9)
 
-        self.pushButton = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton.setObjectName(u"pushButton")
+        self.verticalSpacer_8 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.verticalLayout_18.addWidget(self.pushButton)
-
-        self.pushButton_3 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_3.setObjectName(u"pushButton_3")
-
-        self.verticalLayout_18.addWidget(self.pushButton_3)
-
-        self.pushButton_15 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_15.setObjectName(u"pushButton_15")
-
-        self.verticalLayout_18.addWidget(self.pushButton_15)
-
-        self.pushButton_2 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-
-        self.verticalLayout_18.addWidget(self.pushButton_2)
-
-        self.pushButton_5 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_5.setObjectName(u"pushButton_5")
-
-        self.verticalLayout_18.addWidget(self.pushButton_5)
-
-        self.pushButton_11 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_11.setObjectName(u"pushButton_11")
-
-        self.verticalLayout_18.addWidget(self.pushButton_11)
-
-        self.pushButton_14 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_14.setObjectName(u"pushButton_14")
-
-        self.verticalLayout_18.addWidget(self.pushButton_14)
-
-        self.pushButton_4 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_4.setObjectName(u"pushButton_4")
-
-        self.verticalLayout_18.addWidget(self.pushButton_4)
-
-        self.pushButton_7 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_7.setObjectName(u"pushButton_7")
-
-        self.verticalLayout_18.addWidget(self.pushButton_7)
-
-        self.pushButton_12 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_12.setObjectName(u"pushButton_12")
-
-        self.verticalLayout_18.addWidget(self.pushButton_12)
-
-        self.pushButton_6 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_6.setObjectName(u"pushButton_6")
-
-        self.verticalLayout_18.addWidget(self.pushButton_6)
-
-        self.pushButton_13 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_13.setObjectName(u"pushButton_13")
-
-        self.verticalLayout_18.addWidget(self.pushButton_13)
+        self.verticalLayout_18.addItem(self.verticalSpacer_8)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -1179,6 +1087,7 @@ class Ui_MainWindow(object):
 
         self.content_area = QWidget(self.page_note_container)
         self.content_area.setObjectName(u"content_area")
+        self.content_area.setMinimumSize(QSize(0, 0))
         self.verticalLayout_11 = QVBoxLayout(self.content_area)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
         self.text_enter_container = QWidget(self.content_area)
@@ -1211,6 +1120,7 @@ class Ui_MainWindow(object):
 "")
         self.horizontalLayout_8 = QHBoxLayout(self.text_enter_container)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.horizontalLayout_8.setContentsMargins(-1, -1, -1, 9)
         self.note_text_container = QWidget(self.text_enter_container)
         self.note_text_container.setObjectName(u"note_text_container")
         self.note_text_container.setMaximumSize(QSize(16777215, 40))
@@ -1251,6 +1161,13 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_11.addWidget(self.text_enter_container)
+
+        self.note_label_notes = QLabel(self.content_area)
+        self.note_label_notes.setObjectName(u"note_label_notes")
+        self.note_label_notes.setFont(font1)
+        self.note_label_notes.setStyleSheet(u"color : white; margin-left : 20px")
+
+        self.verticalLayout_11.addWidget(self.note_label_notes)
 
         self.note_title_container = QWidget(self.content_area)
         self.note_title_container.setObjectName(u"note_title_container")
@@ -1791,19 +1708,19 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_31.addWidget(self.ism)
 
-        self.cme = QCheckBox(self.cs_data)
-        self.cme.setObjectName(u"cme")
-        self.cme.setEnabled(False)
-        self.cme.setCheckable(True)
+        self.fw = QCheckBox(self.cs_data)
+        self.fw.setObjectName(u"fw")
+        self.fw.setEnabled(False)
+        self.fw.setCheckable(True)
 
-        self.verticalLayout_31.addWidget(self.cme)
+        self.verticalLayout_31.addWidget(self.fw)
 
-        self.dallas = QCheckBox(self.cs_data)
-        self.dallas.setObjectName(u"dallas")
-        self.dallas.setEnabled(False)
-        self.dallas.setCheckable(True)
+        self.dfm = QCheckBox(self.cs_data)
+        self.dfm.setObjectName(u"dfm")
+        self.dfm.setEnabled(False)
+        self.dfm.setCheckable(True)
 
-        self.verticalLayout_31.addWidget(self.dallas)
+        self.verticalLayout_31.addWidget(self.dfm)
 
         self.nyf = QCheckBox(self.cs_data)
         self.nyf.setObjectName(u"nyf")
@@ -1812,27 +1729,27 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_31.addWidget(self.nyf)
 
-        self.infla = QCheckBox(self.cs_data)
-        self.infla.setObjectName(u"infla")
-        self.infla.setEnabled(False)
-        self.infla.setCheckable(True)
+        self.cin = QCheckBox(self.cs_data)
+        self.cin.setObjectName(u"cin")
+        self.cin.setEnabled(False)
+        self.cin.setCheckable(True)
 
-        self.verticalLayout_31.addWidget(self.infla)
+        self.verticalLayout_31.addWidget(self.cin)
 
-        self.emini = QCheckBox(self.cs_data)
-        self.emini.setObjectName(u"emini")
-        self.emini.setEnabled(False)
-        self.emini.setCheckable(True)
-        self.emini.setChecked(False)
+        self.em = QCheckBox(self.cs_data)
+        self.em.setObjectName(u"em")
+        self.em.setEnabled(False)
+        self.em.setCheckable(True)
+        self.em.setChecked(False)
 
-        self.verticalLayout_31.addWidget(self.emini)
+        self.verticalLayout_31.addWidget(self.em)
 
-        self.fxswap = QCheckBox(self.cs_data)
-        self.fxswap.setObjectName(u"fxswap")
-        self.fxswap.setEnabled(False)
-        self.fxswap.setCheckable(True)
+        self.fs = QCheckBox(self.cs_data)
+        self.fs.setObjectName(u"fs")
+        self.fs.setEnabled(False)
+        self.fs.setCheckable(True)
 
-        self.verticalLayout_31.addWidget(self.fxswap)
+        self.verticalLayout_31.addWidget(self.fs)
 
 
         self.horizontalLayout_19.addWidget(self.cs_data)
@@ -2024,11 +1941,11 @@ class Ui_MainWindow(object):
 
         self.console_area = QTextEdit(self.consolecontainer)
         self.console_area.setObjectName(u"console_area")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.console_area.sizePolicy().hasHeightForWidth())
-        self.console_area.setSizePolicy(sizePolicy2)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.console_area.sizePolicy().hasHeightForWidth())
+        self.console_area.setSizePolicy(sizePolicy1)
         self.console_area.setStyleSheet(u"color:white; \n"
 "font-famlily:\"Comfortaa\";\n"
 "border :0;\n"
@@ -2055,18 +1972,18 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.stackedWidget)
 
-        self.author_name = QLabel(self.frame)
-        self.author_name.setObjectName(u"author_name")
-        self.author_name.setMaximumSize(QSize(16777215, 16777215))
-        self.author_name.setFont(font1)
-        self.author_name.setStyleSheet(u"color:#90b6e7;\n"
+        self.author_name_and_time = QLabel(self.frame)
+        self.author_name_and_time.setObjectName(u"author_name_and_time")
+        self.author_name_and_time.setMaximumSize(QSize(16777215, 16777215))
+        self.author_name_and_time.setFont(font1)
+        self.author_name_and_time.setStyleSheet(u"color:#90b6e7;\n"
 "font-family:\"Comfortaa\";\n"
 "padding:3px;\n"
 "border: 0;\n"
 "font-size:10px;")
-        self.author_name.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.author_name_and_time.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
-        self.verticalLayout_2.addWidget(self.author_name)
+        self.verticalLayout_2.addWidget(self.author_name_and_time)
 
 
         self.horizontalLayout.addWidget(self.frame)
@@ -2092,27 +2009,27 @@ class Ui_MainWindow(object):
         self.window_btn.setText("")
         self.close_btn.setText("")
 #if QT_CONFIG(tooltip)
-        self.one_page_btn.setToolTip(QCoreApplication.translate("MainWindow", u"One Chart Interface", None))
+        self.one_page_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.one_page_btn.setText("")
 #if QT_CONFIG(tooltip)
-        self.four_page_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Four Charts Interface", None))
+        self.four_page_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.four_page_btn.setText("")
 #if QT_CONFIG(tooltip)
-        self.table_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Non Time Series Tables", None))
+        self.table_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.table_btn.setText("")
 #if QT_CONFIG(tooltip)
-        self.note_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Notes", None))
+        self.note_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.note_btn.setText("")
 #if QT_CONFIG(tooltip)
-        self.settings_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.settings_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.settings_btn.setText("")
 #if QT_CONFIG(tooltip)
-        self.tab_window.setToolTip(QCoreApplication.translate("MainWindow", u"Tab pages", None))
+        self.tab_window.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.title_label.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
         self.update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
@@ -2127,42 +2044,25 @@ class Ui_MainWindow(object):
         self.connect_charts.setText(QCoreApplication.translate("MainWindow", u" Connect Charts", None))
         self.four_settings_button.setText("")
 #if QT_CONFIG(tooltip)
-        self.expand_fold.setToolTip("")
-#endif // QT_CONFIG(tooltip)
-        self.expand_fold.setText("")
-#if QT_CONFIG(tooltip)
         self.note_list_text_container.setToolTip(QCoreApplication.translate("MainWindow", u"Feel free to write notes here ~", None))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         self.four_title_label_3.setToolTip("")
 #endif // QT_CONFIG(tooltip)
-        self.four_title_label_3.setText(QCoreApplication.translate("MainWindow", u"New Created Note", None))
-        self.four_update_label_3.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
-        self.text_1.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.text_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_9.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_15.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_5.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_11.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_14.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_7.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_12.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_6.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton_13.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.four_title_label_3.setText(QCoreApplication.translate("MainWindow", u"Feel Free to Write Notes", None))
+        self.four_update_label_3.setText(QCoreApplication.translate("MainWindow", u"a place where store thoughts, or feelings", None))
+        self.pushButton_9.setText(QCoreApplication.translate("MainWindow", u"Default Note", None))
         self.note_add_btn.setText("")
         self.note_delete_btn.setText("")
-        self.note_title_label.setText(QCoreApplication.translate("MainWindow", u"New Created Note", None))
+        self.note_title_label.setText(QCoreApplication.translate("MainWindow", u"Notes Editor", None))
         self.note_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
 #if QT_CONFIG(tooltip)
         self.save_text.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.save_text.setText("")
+        self.note_label_notes.setText(QCoreApplication.translate("MainWindow", u"Note: The title name should be written in the first line start with \"##\"", None))
         self.note_title_label_2.setText(QCoreApplication.translate("MainWindow", u"Settings Panel", None))
-        self.note_update_label_2.setText(QCoreApplication.translate("MainWindow", u"Set API // Download Data // Other Options", None))
+        self.note_update_label_2.setText(QCoreApplication.translate("MainWindow", u"Set API // Download Data // About & Terms", None))
         self.api_group_box.setTitle("")
         self.setting_page_notify_text.setText(QCoreApplication.translate("MainWindow", u"Enter API key here and click \"Save\" button to save API key", None))
         self.bea_label.setText(QCoreApplication.translate("MainWindow", u"BEA API key : ", None))
@@ -2171,7 +2071,7 @@ class Ui_MainWindow(object):
         self.api_save_btn.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.status_label.setText(QCoreApplication.translate("MainWindow", u"Status will be displayed here", None))
         self.other_group_box.setTitle("")
-        self.other_option_text.setText(QCoreApplication.translate("MainWindow", u"About & Options", None))
+        self.other_option_text.setText(QCoreApplication.translate("MainWindow", u"About & Terms", None))
         self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Data Dashboard </p><p>Version: 1.0.0</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
         self.image_label.setText("")
         self.textEdit.setDocumentTitle("")
@@ -2186,7 +2086,9 @@ class Ui_MainWindow(object):
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span"
                         " style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">The software provides a dashboard for macroeconomic data learning and analysis.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">The source code is open and available under the MIT-Non Commercial (MIT-NC) License terms.</span></p>\n"
-"<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">Some UI elements (SVG and PNG icons, components) are sourced from [FAWZIUIUX]\uff1afawziuiux.com/#Home.  All rights belong to the original author.</span></p></body></html>", None))
+"<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">Some UI elements (SVG and PNG icons, components) are sourced from [FAWZIUIUX]\uff1afawziuiux.com/#Home.  All rights belong to the original author.</span></p>\n"
+"<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI"
+                        "'; font-size:9pt;\">Special thanks to : SeaStar</span></p></body></html>", None))
         self.read_and_agree_check.setText(QCoreApplication.translate("MainWindow", u"I have read and agree to the Terms and Conditions.", None))
         self.download_data_box.setTitle("")
         self.download_text.setText(QCoreApplication.translate("MainWindow", u"Select data resources and download data", None))
@@ -2196,12 +2098,12 @@ class Ui_MainWindow(object):
         self.bls.setText(QCoreApplication.translate("MainWindow", u"BLS data API", None))
         self.te.setText(QCoreApplication.translate("MainWindow", u"TE data", None))
         self.ism.setText(QCoreApplication.translate("MainWindow", u"ISM", None))
-        self.cme.setText(QCoreApplication.translate("MainWindow", u"CME FedWatch", None))
-        self.dallas.setText(QCoreApplication.translate("MainWindow", u"Dallas Fed Manu.", None))
+        self.fw.setText(QCoreApplication.translate("MainWindow", u"CME FedWatch", None))
+        self.dfm.setText(QCoreApplication.translate("MainWindow", u"Dallas Fed Manu.", None))
         self.nyf.setText(QCoreApplication.translate("MainWindow", u"NewYork Fed", None))
-        self.infla.setText(QCoreApplication.translate("MainWindow", u"Infla. Nowcasting", None))
-        self.emini.setText(QCoreApplication.translate("MainWindow", u"CME EminiFuture", None))
-        self.fxswap.setText(QCoreApplication.translate("MainWindow", u"Forex Swap", None))
+        self.cin.setText(QCoreApplication.translate("MainWindow", u"Infla. Nowcasting", None))
+        self.em.setText(QCoreApplication.translate("MainWindow", u"CME EminiFuture", None))
+        self.fs.setText(QCoreApplication.translate("MainWindow", u"Forex Swap", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Data Start Year", None))
         self.download_csv_check.setText(QCoreApplication.translate("MainWindow", u"Download csv", None))
         self.download_for_all_check.setText(QCoreApplication.translate("MainWindow", u"Download ALL data", None))
@@ -2219,6 +2121,6 @@ class Ui_MainWindow(object):
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Comfortaa'; font-size:9pt; font-weight:700; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
-        self.author_name.setText(QCoreApplication.translate("MainWindow", u"Love from : Kitazaki Hinata", None))
+        self.author_name_and_time.setText(QCoreApplication.translate("MainWindow", u"Love from : Kitazaki Hinata", None))
     # retranslateUi
 

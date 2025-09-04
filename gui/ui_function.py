@@ -30,11 +30,11 @@ class _MainWindowProto(Protocol):
     fred: Any
     bls: Any
     te: Any
-    # cme : Any
-    # dallas : Any
-    # emini : Any
-    # fxswap : Any
-    # infla : Any
+    # fw : Any
+    # dfm : Any
+    # em : Any
+    # fs : Any
+    # cin : Any
     # ism : Any
     # nyf : Any
     # parallel controls
@@ -51,13 +51,14 @@ class _DownloadWorker(QObject):
     finished = Signal()
     failed = Signal(str)
 
-    def __init__(self, json_data: Dict[str, Any], start_year: int, download_all: bool, selected_sources: Optional[list[str]] | None = None):
+    def __init__(self, json_data: Dict[str, Any], start_year: int, download_all: bool, selected_sources: Optional[list[str]] | None = None, main_window = None):
         super().__init__()
         self._json_data = json_data
         self._start_year = start_year
         self._download_all = download_all
         self._is_cancelled = False
         self._selected_sources = selected_sources or []
+        self.main_window = main_window
 
     def cancel(self):
         self._is_cancelled = True
@@ -79,11 +80,11 @@ class _DownloadWorker(QObject):
                 "fred",
                 "bls",
                 "te",
-                # "cme",
-                # "dallas",
-                # "emini",
-                # "fxswap",
-                # "infla",
+                # "fw",
+                # "dfm",
+                # "em",
+                # "fs",
+                # "cin",
                 # "ism",
                 # "nyf"
                 ] if self._download_all else list(self._selected_sources)
@@ -125,8 +126,8 @@ class _DownloadWorker(QObject):
                     self.progress.emit(f"{src} done.")
                     
                     # check 是否需要导出csv
-                    if hasattr(self, "main_window") and hasattr(self.main_window, "download_csv_check"):
-                        if getattr(self.main_window.download_csv_check, "isChecked", lambda: False)():
+                    if self.main_window and hasattr(self.main_window, "download_csv_check"):
+                        if self.main_window.download_csv_check.isChecked():
                             self.progress.emit(f"Exporting {src} data to CSV...")
                             downloader.to_csv()  # type: ignore[reportUnknownMemberType]
                             self.progress.emit(f"{src} CSV export done.")
@@ -138,6 +139,7 @@ class _DownloadWorker(QObject):
             return
         finally:
             self.finished.emit()
+
 
 
 class UiFunctions():  # 删除:mainWindow
@@ -160,8 +162,6 @@ class UiFunctions():  # 删除:mainWindow
             self.settings_api_load()
         except Exception:
             pass
-
-
 
     def _env_file_path(self) -> str:
         base = os.path.abspath(os.path.dirname(__file__))
@@ -223,6 +223,7 @@ class UiFunctions():  # 删除:mainWindow
         with open(path, 'w'):
             pass
         self._append_console("Log file cleared successfully")
+
 
     # ============ Download wiring ============
     def _append_console(self, text: str):
@@ -295,6 +296,7 @@ class UiFunctions():  # 删除:mainWindow
                 start_year=start_year,
                 download_all=True if sources and len(sources) == 5 else False,
                 selected_sources=sources,
+                main_window = self.main_window
             )
             self._dl_thread = QThread()
             self._worker.moveToThread(self._dl_thread)

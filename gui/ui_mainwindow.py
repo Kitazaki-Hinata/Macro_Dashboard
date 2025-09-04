@@ -27,6 +27,16 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 去除系统标题栏（使用 Qt6 命名空间的枚举）
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
 
+        # 初始化按钮样式
+        self.one_page_btn.setStyleSheet(
+            '''
+            background : #90b6e7;
+            icon: url(:/png_check/png/one_check.png);
+            icon-size: 20px 20px;
+            border-left : 2px solid white;
+            '''
+        )
+
         # 上边栏 信号连接
         self.minimize_btn.clicked.connect(self.showMinimized)
         self.window_btn.clicked.connect(self._toggle_max_restore)
@@ -141,6 +151,9 @@ class mainWindow(QMainWindow, Ui_MainWindow):
 
     # 修改：事件过滤器用于拖动窗口
     def eventFilter(self, obj, event):
+        # 禁止最大化或全屏时拖动窗口
+        if self.isMaximized() or self.isFullScreen():
+            return super().eventFilter(obj, event)
         if obj == self.header_right_btn_container or obj == self.header_text_and_icon:
             if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
                 self._dragging = True
@@ -169,7 +182,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 image-position : center;
                 '''
             )
-            self.resize(self.width()+1, self.height()+1)
+            self.resize(self.width()+0, self.height()+0)
         else:
             GLOBAL_STATE = True
             # 记住窗口位置和大小

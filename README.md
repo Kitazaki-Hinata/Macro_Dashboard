@@ -1,11 +1,18 @@
-# Macro Data Dashboard 开源的宏观经济数据工作台
+# Macro Data Dashboard 轻量级宏观经济数据工作台
 
-> Version: v0.6.00.alpha
-> Author: Kitazaki Hinata, SeaAndStars
+**debug waitlist :**
+1. log经过面板console输出后无法写入.log文件
+2. 最大化与缩小窗口按钮需要点击两次
+3. all选项框与数据单选框没有设置不能同时选中
+4. 无法使用to_csv方法 （将to_csv嵌入to_db）
+
+> Version: v1.0.0
+
+> Author: Kitazaki Hinata, SeaStar
 >
 > Recent Updates:
 >
-> 1. 重新架构数据下载与数据库
+> 1. 解决一些bug
 
 **本程序仅用于学习和学术研究，请遵守目标网站使用条款。**
 
@@ -20,10 +27,10 @@
 ## 一、项目说明
 
 创建这个项目的目的是方便汇集不同宏观数据方便进行比较（频繁的打开各种不同网页抓取数据太过于麻烦）。
-此项目使用 Python 脚本获取宏观经济数据，并将数据下载至本地数据库（data.db）文件当中，然后生成集成式的图表。
+此项目使用脚本获取宏观经济数据，并将数据下载至本地数据库（data.db）文件当中，然后生成集成式的图表。
 可下载的数据会陆续更新。
 
-注意：强烈建议使用代理 IP 下载数据！弹出的浏览器窗口需保持打开状态，不要对其进行任何操作！禁止快速重复下载数据（会触发 API 上限，或触发 IP 封禁）。
+注意：强烈建议使用代理 IP 下载数据！弹出的浏览器窗口需保持打开状态，不要对其进行任何操作！不要快速重复下载数据，会触发 API 上限，或触发 IP 封禁。
 
 ***
 
@@ -42,14 +49,14 @@ uv sync
 ```
 
 ### 3. 获取 API key
-
+请访问以下地址获取免费API key：
 - BEA: <https://apps.bea.gov/api/signup/>
 - FRED St. Louis: <https://fredaccount.stlouisfed.org/apikeys>
 - BLS: <https://data.bls.gov/registrationEngine/>
 
 ### 4. 使用方法
 
-- 在项目根目录新建文件「.env」，按以下方式写入 API key：
+- 打开软件，点击“设置”按钮，在API KEY栏中依次填写，或者在项目根目录新建文件「.env」，按以下方式写入 API key：
 
 ```ini
 bea = "XXXXXX-YOUR-API-KEY"
@@ -58,9 +65,8 @@ bls = "YOUR-API-KEY-000000"
 ```
 
 - 保存「.env」后打开入口文件
-- 设置排列方式与数据
 - 如果没有下载数据，选择开始年份（最早 2020），并下载数据
-- 等待下载完成后，点击绘制并展示
+- 等待下载完成后，设置图表样式和想要展示的数据
 
 ***
 
@@ -143,9 +149,9 @@ bls = "YOUR-API-KEY-000000"
 
 ## 四、开源许可、程序架构与接口说明、其他信息
 
-开源许可：MIT license（参见根目录 LICENSE 文件）
+开源许可：MIT-Non-Commercial license（参见根目录 LICENSE 文件）
 
-程序架构与接口说明：[点击访问 md 文件](doc/structure.md)
+数据处理程序架构与接口说明：[点击访问 md 文件](doc/structure.md)
 
 BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 

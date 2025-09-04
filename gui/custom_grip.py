@@ -30,8 +30,8 @@ class CustomGrip(QWidget):
         if not parent:
             return
         w, h = parent.width(), parent.height()
-        grip_size = 8  # 四角略大
-        # 边缘
+        grip_size = 8
+        # edge 边缘
         if self.edge_or_corner == Qt.Edge.LeftEdge:
             self.setGeometry(0, 0, grip_size, h)
         elif self.edge_or_corner == Qt.Edge.RightEdge:
@@ -40,7 +40,7 @@ class CustomGrip(QWidget):
             self.setGeometry(0, 0, w, grip_size)
         elif self.edge_or_corner == Qt.Edge.BottomEdge:
             self.setGeometry(0, h - grip_size, w, grip_size)
-        # 四角
+        # angles 四角
         elif self.edge_or_corner == Qt.TopLeftCorner:
             self.setGeometry(0, 0, grip_size, grip_size)
         elif self.edge_or_corner == Qt.TopRightCorner:
@@ -61,73 +61,78 @@ class CustomGrip(QWidget):
             return
         delta = event.globalPosition().toPoint() - self._start_pos
         geom = QRect(self._start_geom)
-        min_width, min_height = 400, 300  # 可根据需要调整
+        # 从主窗口获取最小宽度和高度
+        min_width = self.parentWidget().minimumWidth()
+        min_height = self.parentWidget().minimumHeight()
 
-        # 记录原始值
-        orig_left, orig_right = geom.left(), geom.right()
-        orig_top, orig_bottom = geom.top(), geom.bottom()
-
-        # 边缘
         if self.edge_or_corner == Qt.Edge.LeftEdge:
-            new_left = min(geom.right() - min_width, geom.left() + delta.x())
-            # 限制最小宽度，不移动窗口
-            if geom.right() - new_left < min_width:
-                new_left = geom.right() - min_width
+            new_left = geom.left() + delta.x()
+            max_left = geom.right() - min_width
+            if new_left > max_left:
+                new_left = max_left
             geom.setLeft(new_left)
         elif self.edge_or_corner == Qt.Edge.RightEdge:
-            new_right = max(geom.left() + min_width, geom.right() + delta.x())
-            if new_right - geom.left() < min_width:
+            new_right = geom.right() + delta.x()
+            if new_right < geom.left() + min_width:
                 new_right = geom.left() + min_width
             geom.setRight(new_right)
         elif self.edge_or_corner == Qt.Edge.TopEdge:
-            new_top = min(geom.bottom() - min_height, geom.top() + delta.y())
-            if geom.bottom() - new_top < min_height:
-                new_top = geom.bottom() - min_height
+            new_top = geom.top() + delta.y()
+            max_top = geom.bottom() - min_height
+            if new_top > max_top:
+                new_top = max_top
             geom.setTop(new_top)
         elif self.edge_or_corner == Qt.Edge.BottomEdge:
-            new_bottom = max(geom.top() + min_height, geom.bottom() + delta.y())
-            if new_bottom - geom.top() < min_height:
+            new_bottom = geom.bottom() + delta.y()
+            if new_bottom < geom.top() + min_height:
                 new_bottom = geom.top() + min_height
             geom.setBottom(new_bottom)
-        # 四角
         elif self.edge_or_corner == Qt.TopLeftCorner:
-            new_left = min(geom.right() - min_width, geom.left() + delta.x())
-            new_top = min(geom.bottom() - min_height, geom.top() + delta.y())
-            if geom.right() - new_left < min_width:
-                new_left = geom.right() - min_width
-            if geom.bottom() - new_top < min_height:
-                new_top = geom.bottom() - min_height
+            # 左上角同时处理
+            new_left = geom.left() + delta.x()
+            max_left = geom.right() - min_width
+            if new_left > max_left:
+                new_left = max_left
             geom.setLeft(new_left)
+            
+            new_top = geom.top() + delta.y()
+            max_top = geom.bottom() - min_height
+            if new_top > max_top:
+                new_top = max_top
             geom.setTop(new_top)
         elif self.edge_or_corner == Qt.TopRightCorner:
-            new_right = max(geom.left() + min_width, geom.right() + delta.x())
-            new_top = min(geom.bottom() - min_height, geom.top() + delta.y())
-            if new_right - geom.left() < min_width:
+            new_right = geom.right() + delta.x()
+            if new_right < geom.left() + min_width:
                 new_right = geom.left() + min_width
-            if geom.bottom() - new_top < min_height:
-                new_top = geom.bottom() - min_height
             geom.setRight(new_right)
+            
+            new_top = geom.top() + delta.y()
+            max_top = geom.bottom() - min_height
+            if new_top > max_top:
+                new_top = max_top
             geom.setTop(new_top)
         elif self.edge_or_corner == Qt.BottomLeftCorner:
-            new_left = min(geom.right() - min_width, geom.left() + delta.x())
-            new_bottom = max(geom.top() + min_height, geom.bottom() + delta.y())
-            if geom.right() - new_left < min_width:
-                new_left = geom.right() - min_width
-            if new_bottom - geom.top() < min_height:
-                new_bottom = geom.top() + min_height
+            new_left = geom.left() + delta.x()
+            max_left = geom.right() - min_width
+            if new_left > max_left:
+                new_left = max_left
             geom.setLeft(new_left)
+            
+            new_bottom = geom.bottom() + delta.y()
+            if new_bottom < geom.top() + min_height:
+                new_bottom = geom.top() + min_height
             geom.setBottom(new_bottom)
         elif self.edge_or_corner == Qt.BottomRightCorner:
-            new_right = max(geom.left() + min_width, geom.right() + delta.x())
-            new_bottom = max(geom.top() + min_height, geom.bottom() + delta.y())
-            if new_right - geom.left() < min_width:
+            new_right = geom.right() + delta.x()
+            if new_right < geom.left() + min_width:
                 new_right = geom.left() + min_width
-            if new_bottom - geom.top() < min_height:
-                new_bottom = geom.top() + min_height
             geom.setRight(new_right)
+            
+            new_bottom = geom.bottom() + delta.y()
+            if new_bottom < geom.top() + min_height:
+                new_bottom = geom.top() + min_height
             geom.setBottom(new_bottom)
 
-        # 只改变大小，不移动窗口位置
         self.parentWidget().setGeometry(geom)
 
     def mouseReleaseEvent(self, event):
