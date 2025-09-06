@@ -906,11 +906,27 @@ class Ui_MainWindow(object):
 " QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
 "     background: none;\n"
 " }\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"/*\u8f93\u5165\u6761*/\n"
+"QLineEdit {\n"
+"        background-color: #33363a;\n"
+"        border-radius : 2px;\n"
+"	    max-height : 9px;\n"
+"        border-bottom: 1px solid #90b6e7;\n"
+"        padding: 5px;\n"
+"    }\n"
+"QLineEdit:focus {\n"
+"		background-color: #454555;\n"
+"        border-bottom: 1px solid #ffffff;\n"
+"    }\n"
 "")
         self.verticalLayout_15 = QVBoxLayout(self.note_list)
-        self.verticalLayout_15.setSpacing(0)
+        self.verticalLayout_15.setSpacing(5)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
-        self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_15.setContentsMargins(3, 0, 3, 0)
         self.note_list_text_container = QWidget(self.note_list)
         self.note_list_text_container.setObjectName(u"note_list_text_container")
         self.note_list_text_container.setMinimumSize(QSize(0, 70))
@@ -985,7 +1001,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 230, 637))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 224, 554))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -1007,10 +1023,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_18.setSpacing(2)
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
         self.verticalLayout_18.setContentsMargins(0, 1, 0, 1)
-        self.pushButton_9 = QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_9.setObjectName(u"pushButton_9")
+        self.note_instructions_btn = QPushButton(self.scrollAreaWidgetContents)
+        self.note_instructions_btn.setObjectName(u"note_instructions_btn")
 
-        self.verticalLayout_18.addWidget(self.pushButton_9)
+        self.verticalLayout_18.addWidget(self.note_instructions_btn)
 
         self.verticalSpacer_8 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -1020,9 +1036,25 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_15.addWidget(self.scrollArea)
 
+        self.note_status_bar = QLabel(self.note_list)
+        self.note_status_bar.setObjectName(u"note_status_bar")
+        self.note_status_bar.setFont(font)
+        self.note_status_bar.setStyleSheet(u"color : #90b6e7; padding-top : 4px;")
+        self.note_status_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_15.addWidget(self.note_status_bar)
+
+        self.note_enter_passage_name = QLineEdit(self.note_list)
+        self.note_enter_passage_name.setObjectName(u"note_enter_passage_name")
+        self.note_enter_passage_name.setMinimumSize(QSize(0, 26))
+        self.note_enter_passage_name.setFont(font)
+        self.note_enter_passage_name.setStyleSheet(u"color : white; ")
+
+        self.verticalLayout_15.addWidget(self.note_enter_passage_name)
+
         self.note_add_del_container = QWidget(self.note_list)
         self.note_add_del_container.setObjectName(u"note_add_del_container")
-        self.note_add_del_container.setMinimumSize(QSize(0, 40))
+        self.note_add_del_container.setMinimumSize(QSize(0, 60))
         self.note_add_del_container.setStyleSheet(u"* {\n"
 "background : #3a3b43;\n"
 "}\n"
@@ -1061,6 +1093,15 @@ class Ui_MainWindow(object):
 "    icon: url(:/png_press/png/delete_press.png);\n"
 "    icon-size: 17px 17px;\n"
 "}\n"
+"QPushButton#note_rename_btn {\n"
+"    icon: url(:/png/png/rename.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#note_rename_btn:pr"
+                        "essed {\n"
+"    icon: url(:/png_press/png/rename_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
 "\n"
 "")
         self.horizontalLayout_9 = QHBoxLayout(self.note_add_del_container)
@@ -1071,6 +1112,12 @@ class Ui_MainWindow(object):
         self.note_add_btn.setStyleSheet(u"")
 
         self.horizontalLayout_9.addWidget(self.note_add_btn)
+
+        self.note_rename_btn = QPushButton(self.note_add_del_container)
+        self.note_rename_btn.setObjectName(u"note_rename_btn")
+        self.note_rename_btn.setMaximumSize(QSize(25, 25))
+
+        self.horizontalLayout_9.addWidget(self.note_rename_btn)
 
         self.note_delete_btn = QPushButton(self.note_add_del_container)
         self.note_delete_btn.setObjectName(u"note_delete_btn")
@@ -1165,7 +1212,7 @@ class Ui_MainWindow(object):
         self.note_label_notes = QLabel(self.content_area)
         self.note_label_notes.setObjectName(u"note_label_notes")
         self.note_label_notes.setFont(font1)
-        self.note_label_notes.setStyleSheet(u"color : white; margin-left : 20px")
+        self.note_label_notes.setStyleSheet(u"color : #EE5C88; margin-left : 20px")
 
         self.verticalLayout_11.addWidget(self.note_label_notes)
 
@@ -1995,7 +2042,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(3)
         self.tab_window.setCurrentIndex(0)
 
 
@@ -2003,8 +2050,8 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Macro Data Dashboard", None))
-        self.title_text.setText(QCoreApplication.translate("MainWindow", u"Macro Data Dashboard", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Macro Dashboard", None))
+        self.title_text.setText(QCoreApplication.translate("MainWindow", u"Macro Dashboard", None))
         self.minimize_btn.setText("")
         self.window_btn.setText("")
         self.close_btn.setText("")
@@ -2051,8 +2098,10 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.four_title_label_3.setText(QCoreApplication.translate("MainWindow", u"Feel Free to Write Notes", None))
         self.four_update_label_3.setText(QCoreApplication.translate("MainWindow", u"a place where store thoughts, or feelings", None))
-        self.pushButton_9.setText(QCoreApplication.translate("MainWindow", u"Default Note", None))
+        self.note_instructions_btn.setText(QCoreApplication.translate("MainWindow", u"Users Instructions", None))
+        self.note_status_bar.setText(QCoreApplication.translate("MainWindow", u"Enter file name then click button", None))
         self.note_add_btn.setText("")
+        self.note_rename_btn.setText("")
         self.note_delete_btn.setText("")
         self.note_title_label.setText(QCoreApplication.translate("MainWindow", u"Notes Editor", None))
         self.note_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
@@ -2060,7 +2109,7 @@ class Ui_MainWindow(object):
         self.save_text.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.save_text.setText("")
-        self.note_label_notes.setText(QCoreApplication.translate("MainWindow", u"Note: The title name should be written in the first line start with \"##\"", None))
+        self.note_label_notes.setText(QCoreApplication.translate("MainWindow", u"Reminder : Remember to click \"SAVE\" button on the right hand side after you finish writing your notes.", None))
         self.note_title_label_2.setText(QCoreApplication.translate("MainWindow", u"Settings Panel", None))
         self.note_update_label_2.setText(QCoreApplication.translate("MainWindow", u"Set API // Download Data // About & Terms", None))
         self.api_group_box.setTitle("")
@@ -2072,7 +2121,7 @@ class Ui_MainWindow(object):
         self.status_label.setText(QCoreApplication.translate("MainWindow", u"Status will be displayed here", None))
         self.other_group_box.setTitle("")
         self.other_option_text.setText(QCoreApplication.translate("MainWindow", u"About & Terms", None))
-        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Data Dashboard </p><p>Version: 1.0.0</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
+        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 1.0.0</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
         self.image_label.setText("")
         self.textEdit.setDocumentTitle("")
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"

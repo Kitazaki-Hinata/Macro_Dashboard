@@ -139,7 +139,6 @@ class _DownloadWorker(QObject):
             self.finished.emit()
 
 
-
 class UiFunctions():  # 删除:mainWindow
     def __init__(self, main_window: _MainWindowProto):
         self.main_window: _MainWindowProto = main_window
@@ -161,6 +160,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
+    '''SETTINGS PAGE SLOTS METHODS'''
     def _env_file_path(self) -> str:
         base = os.path.abspath(os.path.dirname(__file__))
         return os.path.abspath(os.path.join(base, "..", ".env"))
@@ -221,6 +221,116 @@ class UiFunctions():  # 删除:mainWindow
         with open(path, 'w'):
             pass
         self._append_console("Log file cleared successfully")
+
+    '''NOTE PAGE SLOTS METHODS'''
+    def note_add_extra_page(self):
+        '''点击后新建一个文档和对应的按钮，包括对命名格式的判断'''
+        # get btn name from lineedit
+        note_name= self.main_window.note_enter_passage_name.text()
+
+        # illegal judgement
+        if note_name == "":
+            self.main_window.note_status_bar.setText("Please enter a note name")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            return
+
+        illegal_chars = '\\/:*?"<>| 123456789'
+        for char in illegal_chars:
+            if char in note_name:
+                self.main_window.note_status_bar.setText(
+                    "\\ / : * ? \" < > |, space, nums are invalid"
+                )
+                self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                return
+        if note_name == "note_instructions_btn":
+            self.main_window.note_status_bar.setText("Name Conflict, change a name")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            return
+
+        # check whether has duplication 防止命名重复
+        layout = self.main_window.scrollAreaWidgetContents.layout()
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            if item and item.widget():
+                widget = item.widget()
+                if isinstance(widget, QPushButton) and widget.text() == note_name:
+                    self.main_window.note_status_bar.setText("Name Conflict, change a name")
+                    self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                    return
+
+        button_name = self.main_window.note_enter_passage_name.text()
+        new_button = QPushButton(button_name)
+        layout.insertWidget(0, new_button)          # 插入到第一个位置
+        self.main_window.note_status_bar.setText("Create note successful")
+        self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
+
+    def note_delete_page(self):
+        '''点击后删除文章对应的按钮'''
+        note_name = self.main_window.note_enter_passage_name.text()
+        layout = self.main_window.scrollAreaWidgetContents.layout()
+
+        if not note_name:
+            self.main_window.note_status_bar.setText("Please enter a note name")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            return
+
+        # 遍历布局中的所有控件来找到匹配的按钮
+        found = False
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            if item and item.widget():
+                widget = item.widget()
+                if isinstance(widget, QPushButton) and widget.text() == note_name:
+                    layout.removeWidget(widget)
+                    widget.deleteLater()
+                    found = True
+                    break
+
+        if found:
+            self.main_window.note_status_bar.setText("Delete note successful")
+            self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
+        else:
+            self.main_window.note_status_bar.setText("Note does not exist")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+
+    def note_rename_page(self):
+        '''重命名文章  rename the file'''
+        note_name = self.main_window.note_enter_passage_name.text()
+
+        # illegal judgement
+        if note_name == "":
+            self.main_window.note_status_bar.setText("Please enter a note name")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            return
+
+        illegal_chars = '\\/:*?"<>| 123456789'
+        for char in illegal_chars:
+            if char in note_name:
+                self.main_window.note_status_bar.setText(
+                    "\\ / : * ? \" < > |, space, nums are invalid"
+                )
+                self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                return
+        if note_name == "note_instructions_btn":
+            self.main_window.note_status_bar.setText("Name Conflict, change a name")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            return
+
+        # 防止命名重复
+        layout = self.main_window.scrollAreaWidgetContents.layout()
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            if item and item.widget():
+                widget = item.widget()
+                if isinstance(widget, QPushButton) and widget.text() == note_name:
+                    self.main_window.note_status_bar.setText("Name Conflict, change a name")
+                    self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                    return
+
+        button_name = self.main_window.note_enter_passage_name.text()
+
+        # 这里需要输入两次text值，第一个是想要改名的，第二个是改完名字的text
+        ########################################
 
 
     # ============ Download wiring ============
@@ -488,4 +598,6 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
+
+
 

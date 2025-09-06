@@ -1,9 +1,9 @@
-# Macro Data Dashboard 轻量级宏观经济数据工作台
+# Macro Dashboard 轻量级宏观经济工作台
 
 **debug waitlist :**
 1. log经过面板console输出后无法写入.log文件
-2. 最大化与缩小窗口按钮需要点击两次
-3. all选项框与数据单选框没有设置不能同时选中
+2. all选项框与数据单选框没有设置不能同时选中
+3. note页面改名按钮的改名逻辑
 
 > Version: v1.0.0
 

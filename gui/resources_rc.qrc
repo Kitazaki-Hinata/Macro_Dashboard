@@ -2,6 +2,7 @@
   <qresource prefix="png">
     <file>png/ico_small.png</file>
     <file>png/big_window.png</file>
+    <file>png/rename.png</file>
     <file>png/save_2.png</file>
     <file>png/small_window.png</file>
     <file>png/add_page.png</file>
@@ -35,6 +36,7 @@
   </qresource>
   <qresource prefix="png_press">
     <file>png/save_2_press.png</file>
+    <file>png/rename_press.png</file>
     <file>png/delete_press.png</file>
     <file>png/add_page_press.png</file>
     <file>png/expand_press.png</file>

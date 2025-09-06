@@ -65,11 +65,17 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.bottomleft_grip = CustomGrip(self, Qt.BottomLeftCorner, True)
         self.bottomright_grip = CustomGrip(self, Qt.BottomRightCorner, True)
 
+        '''Settings page btn signal connection'''
         # 点击api确认按钮，保存输入的API
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
-
         # 重置日志文件按钮
         self.clear_lag_btn.clicked.connect(self.ui_functions.clear_logs)
+
+        '''Notes Editor page btn '''
+        self.note_add_btn.clicked.connect(self.ui_functions.note_add_extra_page)
+        self.note_delete_btn.clicked.connect(self.ui_functions.note_delete_page)
+        self.note_rename_btn.clicked.connect(self.ui_functions.note_rename_page)
+
 
 
     def left_bar_button_slot(self):
@@ -149,7 +155,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             except Exception:
                 pass
 
-    # 修改：事件过滤器用于拖动窗口
+    # 事件过滤器用于拖动窗口
     def eventFilter(self, obj, event):
         # 禁止最大化或全屏时拖动窗口
         if self.isMaximized() or self.isFullScreen():
@@ -186,7 +192,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         else:
             GLOBAL_STATE = True
             # 记住窗口位置和大小
-            self._normal_geometry = self.geometry()
             self.showMaximized()
             self.window_btn.setStyleSheet(
                 '''

@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Macro Data Dashboard</string>
+   <string>Macro Dashboard</string>
   </property>
   <property name="styleSheet">
    <string notr="true">* {
@@ -248,7 +248,7 @@ border-radius :5px;
              <string notr="true"/>
             </property>
             <property name="text">
-             <string>Macro Data Dashboard</string>
+             <string>Macro Dashboard</string>
             </property>
            </widget>
           </item>
@@ -729,7 +729,7 @@ QPushButton#settings_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -1657,20 +1657,36 @@ margin :0;
  QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
      background: none;
  }
+
+
+
+
+/*输入条*/
+QLineEdit {
+        background-color: #33363a;
+        border-radius : 2px;
+	    max-height : 9px;
+        border-bottom: 1px solid #90b6e7;
+        padding: 5px;
+    }
+QLineEdit:focus {
+		background-color: #454555;
+        border-bottom: 1px solid #ffffff;
+    }
 </string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_15">
                  <property name="spacing">
-                  <number>0</number>
+                  <number>5</number>
                  </property>
                  <property name="leftMargin">
-                  <number>0</number>
+                  <number>3</number>
                  </property>
                  <property name="topMargin">
                   <number>0</number>
                  </property>
                  <property name="rightMargin">
-                  <number>0</number>
+                  <number>3</number>
                  </property>
                  <property name="bottomMargin">
                   <number>0</number>
@@ -1864,8 +1880,8 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>230</width>
-                      <height>637</height>
+                      <width>224</width>
+                      <height>554</height>
                      </rect>
                     </property>
                     <property name="styleSheet">
@@ -1904,9 +1920,9 @@ QPushButton:pressed {
                       <number>1</number>
                      </property>
                      <item>
-                      <widget class="QPushButton" name="pushButton_9">
+                      <widget class="QPushButton" name="note_instructions_btn">
                        <property name="text">
-                        <string>Default Note</string>
+                        <string>Users Instructions</string>
                        </property>
                       </widget>
                      </item>
@@ -1928,11 +1944,51 @@ QPushButton:pressed {
                   </widget>
                  </item>
                  <item>
+                  <widget class="QLabel" name="note_status_bar">
+                   <property name="font">
+                    <font>
+                     <family>Comfortaa</family>
+                     <pointsize>8</pointsize>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color : #90b6e7; padding-top : 4px;</string>
+                   </property>
+                   <property name="text">
+                    <string>Enter file name then click button</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="note_enter_passage_name">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Comfortaa</family>
+                     <pointsize>8</pointsize>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color : white; </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QWidget" name="note_add_del_container" native="true">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>40</height>
+                     <height>60</height>
                     </size>
                    </property>
                    <property name="styleSheet">
@@ -1974,6 +2030,14 @@ QPushButton#note_delete_btn:pressed {
     icon: url(:/png_press/png/delete_press.png);
     icon-size: 17px 17px;
 }
+QPushButton#note_rename_btn {
+    icon: url(:/png/png/rename.png);
+    icon-size: 17px 17px;
+}
+QPushButton#note_rename_btn:pressed {
+    icon: url(:/png_press/png/rename_press.png);
+    icon-size: 17px 17px;
+}
 
 </string>
                    </property>
@@ -1988,6 +2052,19 @@ QPushButton#note_delete_btn:pressed {
                       </property>
                       <property name="styleSheet">
                        <string notr="true"/>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="note_rename_btn">
+                      <property name="maximumSize">
+                       <size>
+                        <width>25</width>
+                        <height>25</height>
+                       </size>
                       </property>
                       <property name="text">
                        <string/>
@@ -2188,10 +2265,10 @@ color : #90b6e7;</string>
                     </font>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">color : white; margin-left : 20px</string>
+                    <string notr="true">color : #EE5C88; margin-left : 20px</string>
                    </property>
                    <property name="text">
-                    <string>Note: The title name should be written in the first line start with &quot;##&quot;</string>
+                    <string>Reminder : Remember to click &quot;SAVE&quot; button on the right hand side after you finish writing your notes.</string>
                    </property>
                   </widget>
                  </item>
@@ -2889,7 +2966,7 @@ margin-right:20px;
 }</string>
                             </property>
                             <property name="text">
-                             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Macro Data Dashboard &lt;/p&gt;&lt;p&gt;Version: 1.0.0&lt;/p&gt;&lt;p&gt;Copyright (c) 2025 Kitazaki-Hinata&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Macro Dashboard &lt;/p&gt;&lt;p&gt;Version: 1.0.0&lt;/p&gt;&lt;p&gt;Copyright (c) 2025 Kitazaki-Hinata&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                             </property>
                             <property name="wordWrap">
                              <bool>false</bool>
