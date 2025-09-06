@@ -4,6 +4,7 @@ import json
 import logging
 from PySide6.QtWidgets import QApplication
 from gui.ui_mainwindow import mainWindow
+from download import DownloaderFactory
 
 
 def setup_logging():
@@ -33,10 +34,20 @@ if __name__ == "__main__":
     setup_logging()  # 初始化日志系统
     json_data: dict = read_json()
 
-    app = QApplication([])
-    window = mainWindow()
-    window.show()
-    app.exec()
+    # app = QApplication([])
+    # window = mainWindow()
+    # window.show()
+    # app.exec()
+
+
+    # testing
+    request_year: int = 2020
+    bea_downloader = DownloaderFactory.create_downloader(
+        source='bea',
+        json_data = json_data,
+        request_year = request_year
+    )
+    bea_downloader.to_db(return_csv = True)
 
 
 

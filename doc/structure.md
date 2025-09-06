@@ -79,23 +79,16 @@ needs_cleaning: bool，是否需要数据清洗（处理残缺数据）
 ## DataSource 抽象类：定义下载与存储方法
 
 所有继承 DataSource 的实例类必须实现以下方法：
-
-1. `to_db`
+`to_db`
    - 功能：将数据写入 `data.db`
-   - 返回值：None / Dict(name, dataframe)
-     - 直接调用则写库返回 None；若下载 CSV，`to_csv` 会将内部参数 `return_df` 设为 True，使其返回包含 DataFrame 的字典
-
-2. `to_csv`
-   - 功能：下载 CSV 到 `csv` 目录（后续可能改为直接对接 database）
+   - `return_csv` 参数：bool值，输入后在下载完数据后会先下载csv到csv文件夹，然后转录到db
    - 返回值：None
+
 
 ```python
 class DataSource(ABC):
     @abstractmethod
-    def to_db(self, return_df: bool = False):
-        pass
-
-    def to_csv(self) -> None:
+    def to_db(self, return_csv: bool = False):
         pass
 ```
 
@@ -125,9 +118,8 @@ class DataSource(ABC):
 3. `request_year`：请求起始年份
 
 实例类的方法：
+`to_db`：写入数据库（`return_csv` 为内部参数）
 
-1. `to_db`：写入数据库（`return_df` 为内部参数，下载 CSV 时让其返回 DataFrame 字典）
-2. `to_csv`：下载 CSV（后续可能改为直连 database）
 
 ***
 

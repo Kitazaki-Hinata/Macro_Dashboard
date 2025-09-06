@@ -347,7 +347,7 @@ class DatabaseConverter:
 
 class DataDownloader(ABC):
     @abstractmethod
-    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         """Download data and either write to DB or return DataFrames per table.
         If return_df=True, return a dict mapping table_name -> DataFrame; otherwise None.
         max_workers: Optional[int] for concurrent downloads (None => sensible default).
@@ -367,11 +367,11 @@ class BEADownloader(DataDownloader):
         self.time_range : str= ",".join(map(str, range(request_year, BEADownloader.current_year + 1)))
         self.time_range_lag : str = self.time_range[:-5]  # 去除最后5个字符，即去除最后一年
 
-    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
-            return df_dict if return_df else None
+            return None
 
         def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
@@ -410,56 +410,45 @@ class BEADownloader(DataDownloader):
                 df_modified.columns = [f"{table_config['name']}"]
                 df_modified.index.name = "TimePeriod"
                 logging.info(f"BEA_{table_name} Successfully extracted!")
-                if return_df:
-                    return table_name, df_modified
-                else:
-                    if df_modified.empty:
-                        logging.error(f"{table_name} is empty, FAILED INSERT, locate in to_db")
-                        return table_name, None
-                    converter = DatabaseConverter()
-                    converter.write_into_db(
-                        df = df_modified,
-                        data_name=table_config["name"],
-                        start_date  = str(date(self.request_year, 1, 1)),
-                        is_time_series=True,
-                        is_pct_data=table_config["needs_pct"]
-                    )
+
+                if df_modified.empty:
+                    logging.error(f"{table_name} is empty, FAILED INSERT, locate in to_db")
                     return table_name, None
+                converter = DatabaseConverter()
+                converter.write_into_db(
+                    df = df_modified,
+                    data_name=table_config["name"],
+                    start_date  = str(date(self.request_year, 1, 1)),
+                    is_time_series=True,
+                    is_pct_data=table_config["needs_pct"]
+                )
+                return table_name, df_modified
             except Exception as e:
                 logging.error(f"{table_name} FAILED DOWNLOAD/REFORMAT in BEA worker: {e}")
                 return table_name, None
 
-        workers = max_workers or min(8, (os.cpu_count() or 4) * 2)
-        with ThreadPoolExecutor(max_workers=workers) as ex:
-            future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
-            for fut in as_completed(future_map):
+        workers  = max_workers or min(8, (os.cpu_count() or 4) * 2)    # workers是int，确认进程数量
+        with ThreadPoolExecutor(max_workers=workers) as ex:   # 创建一个线程池
+            future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}   # 往线程池里面添加submit，每个submit添加worker函数用于下载，tn数据名称，cfg是json的参数
+            for fut in as_completed(future_map):    # 获取线程池中的结果
                 tn = future_map[fut]
                 try:
                     name, df = fut.result()
-                    if return_df and df is not None:
+                    if df is not None:
                         df_dict[name] = df
+                    if return_csv:
+                        for name, df in df_dict.items():
+                            try:
+                                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                                os.makedirs(data_folder_path, exist_ok=True)
+                                csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                                df.to_csv(csv_path, index=True)
+                                logging.info(f"{name} saved to {csv_path} Successfully!")
+                            except Exception as e:
+                                logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
+                                continue
                 except Exception as e:
                     logging.error(f"BEA future for {tn} raised: {e}")
-
-        return df_dict if return_df else None
-
-    def to_csv(self) -> None:
-        try:
-            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
-        except:
-            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
-            return None
-
-        for name, df in df_dict.items():
-            try:
-                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
-                os.makedirs(data_folder_path, exist_ok= True)
-                csv_path = os.path.join(data_folder_path, f"{name}.csv")
-                df.to_csv(csv_path, index=True)
-                logging.info(f"{name} saved to {csv_path} Successfully!")
-            except Exception as e:
-                logging.error(f"{ name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
-                continue
 
 
 class YFDownloader(DataDownloader):
@@ -926,6 +915,7 @@ class DownloaderFactory:
     '''API/Interface, factory that direct to different data-instance classes'''
     @classmethod
     def _get_api_key(cls, source: str) -> Optional[str]:
+        '''获取api key，从env文件获得'''
         load_dotenv()
         api = os.environ.get(source)
         if not api:
