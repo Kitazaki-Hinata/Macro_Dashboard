@@ -366,18 +366,6 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
-    "long_term_unemployment": {
-      "name": "Long_Term_Unemployment",
-      "code": "LNS13025703",
-      "needs_pct": false,
-      "needs_cleaning": false
-    },
-    "youth_unemployment": {
-      "name": "Youth_Unemployment",
-      "code": "LNS14000060",
-      "needs_pct": false,
-      "needs_cleaning": false
-    },
     "part_time_job_population": {
       "name": "Part_Time_Job_Population",
       "code": "LNS12032194",
@@ -460,6 +448,18 @@
       "name": "CPI_Shelter",
       "code": "CUUR0000SAH1",
       "needs_pct": true,
+      "needs_cleaning": false
+    },
+    "long_term_unemployment": {
+      "name": "Long_Term_Unemployment",
+      "code": "LNS13025703",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "youth_unemployment": {
+      "name": "Youth_Unemployment",
+      "code": "LNS14000060",
+      "needs_pct": false,
       "needs_cleaning": false
     }
   },

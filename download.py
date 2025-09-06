@@ -141,7 +141,7 @@ class DatabaseConverter:
 
         # 3) FRED（包含 'date' 列 + 一个数值列）
         try:
-            if "date" in df.columns:
+            if "date" in df.columns and str(df["date"][1])[4] == "-":
                 # 找到第一个非 date 的数据列
                 value_cols = [c for c in df.columns if c != "date"]
                 if value_cols:
@@ -277,7 +277,7 @@ class DatabaseConverter:
             start_date : str,
             is_time_series: bool = False,
             is_pct_data: bool = False
-    ) -> None:
+    ):
         '''params df: df that used to write into db
         params data_name: used in db columns and errors
         params start_date, start date of  all data, used when create db sheet
@@ -327,7 +327,10 @@ class DatabaseConverter:
                         )
 
                         self.conn.commit()
-                        return
+
+                        # 找到date列的索引位置，选择date列及后面的一列
+                        df_after_modify_time = df_after_modify_time.iloc[:, -2:]
+                        return df_after_modify_time
                     else:
                         # 其他数据则直接生成新sheet存入database当中
                         df.to_sql(
@@ -338,7 +341,7 @@ class DatabaseConverter:
                         )
                         self.conn.commit()
                         self.conn.close()
-                        return
+                        return df
 
             except Exception as e:
                 logging.error(f"FAILED to write into database, in method write_into_db, since {e}")
@@ -415,14 +418,14 @@ class BEADownloader(DataDownloader):
                     logging.error(f"{table_name} is empty, FAILED INSERT, locate in to_db")
                     return table_name, None
                 converter = DatabaseConverter()
-                converter.write_into_db(
+                final_result_df = converter.write_into_db(
                     df = df_modified,
                     data_name=table_config["name"],
                     start_date  = str(date(self.request_year, 1, 1)),
                     is_time_series=True,
                     is_pct_data=table_config["needs_pct"]
                 )
-                return table_name, df_modified
+                return table_name, final_result_df
             except Exception as e:
                 logging.error(f"{table_name} FAILED DOWNLOAD/REFORMAT in BEA worker: {e}")
                 return table_name, None
@@ -457,11 +460,11 @@ class YFDownloader(DataDownloader):
         self.start_date : str  = str(request_year)+"-01-01"
         self.end_date : str = str(date.today())
 
-    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
-            return df_dict if return_df else None
+            return df_dict if return_csv else None
 
         def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
@@ -473,18 +476,15 @@ class YFDownloader(DataDownloader):
                     data.columns = data.columns.droplevel(1)
                 except Exception:
                     pass
-                if return_df:
-                    return table_name, data
-                else:
-                    converter = DatabaseConverter()
-                    converter.write_into_db(
-                        df=data,
-                        data_name=table_config["name"],
-                        start_date=self.start_date,
-                        is_time_series=True,
-                        is_pct_data=table_config["needs_pct"]
-                    )
-                    return table_name, None
+                converter = DatabaseConverter()
+                final_result_df = converter.write_into_db(
+                    df=data,
+                    data_name=table_config["name"],
+                    start_date=self.start_date,
+                    is_time_series=True,
+                    is_pct_data=table_config["needs_pct"]
+                )
+                return table_name, final_result_df
             except Exception as e:
                 logging.error(f"to_db, {table_name} FAILED EXTRACT DATA from Yfinance, {e}")
                 return table_name, None
@@ -496,30 +496,21 @@ class YFDownloader(DataDownloader):
                 tn = future_map[fut]
                 try:
                     name, df = fut.result()
-                    if return_df and df is not None:
+                    if df is not None:
                         df_dict[name] = df
+                    if return_csv:
+                        for name, df in df_dict.items():
+                            try:
+                                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                                os.makedirs(data_folder_path, exist_ok=True)
+                                csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                                df.to_csv(csv_path, index=True)
+                                logging.info(f"{name} saved to {csv_path} Successfully!")
+                            except Exception as e:
+                                logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_db', since {e}")
+                                continue
                 except Exception as e:
                     logging.error(f"YF future for {tn} raised: {e}")
-
-        return df_dict if return_df else None
-
-    def to_csv(self) -> None:
-        try:
-            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
-        except:
-            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
-            return None
-
-        for name, df in df_dict.items():
-            try:
-                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)  # 因为csv文件夹地址一样所以统一使用BEA类里面定义好的地址
-                os.makedirs(data_folder_path, exist_ok= True)
-                csv_path = os.path.join(data_folder_path, f"{name}.csv")
-                df.to_csv(csv_path, index=True)
-                logging.info(f"{name} saved to {csv_path} Successfully!")
-            except Exception as e:
-                logging.error(f"{ name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
-                continue
 
 
 class FREDDownloader(DataDownloader):
@@ -531,11 +522,11 @@ class FREDDownloader(DataDownloader):
         self.start_date : str  = str(request_year)+"-01-01"
         self.end_date : str = str(date.today())
 
-    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
-            return df_dict if return_df else None
+            return df_dict if return_csv else None
 
         def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
@@ -565,20 +556,16 @@ class FREDDownloader(DataDownloader):
                         df["value"] = df["value"].ffill()
                     df = df[["date", "value"]]
 
-                if return_df:
-                    logging.info(f"{table_name} Successfully extracted!")
-                    return table_name, df
-                else:
-                    converter = DatabaseConverter()
-                    converter.write_into_db(
-                        df=df,
-                        data_name=table_config["name"],
-                        start_date=self.start_date,
-                        is_time_series=True,
-                        is_pct_data=table_config["needs_pct"]
-                    )
-                    logging.info(f"{table_name} Successfully extracted!")
-                    return table_name, None
+                converter = DatabaseConverter()
+                final_result_df = converter.write_into_db(
+                    df=df,
+                    data_name=table_config["name"],
+                    start_date=self.start_date,
+                    is_time_series=True,
+                    is_pct_data=table_config["needs_pct"]
+                )
+                logging.info(f"{table_name} Successfully extracted!")
+                return table_name, final_result_df
             except Exception as e:
                 logging.error(f"{table_name} FAILED EXTRACT DATA from FRED: {e}")
                 return table_name, None
@@ -590,30 +577,21 @@ class FREDDownloader(DataDownloader):
                 tn = future_map[fut]
                 try:
                     name, df = fut.result()
-                    if return_df and df is not None:
+                    if  df is not None:
                         df_dict[name] = df
+                    if return_csv:
+                        for name, df in df_dict.items():
+                            try:
+                                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                                os.makedirs(data_folder_path, exist_ok=True)
+                                csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                                df.to_csv(csv_path, index=True)
+                                logging.info(f"{name} saved to {csv_path} Successfully!")
+                            except Exception as e:
+                                logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_db', since {e}")
+                                continue
                 except Exception as e:
                     logging.error(f"FRED future for {tn} raised: {e}")
-
-        return df_dict if return_df else None
-
-    def to_csv(self) -> None:
-        try:
-            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
-        except:
-            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
-            return None
-
-        for name, df in df_dict.items():
-            try:
-                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)  # 因为csv文件夹地址一样所以统一使用BEA类里面定义好的地址
-                os.makedirs(data_folder_path, exist_ok= True)
-                csv_path = os.path.join(data_folder_path, f"{name}.csv")
-                df.to_csv(csv_path, index=True)
-                logging.info(f"{name} saved to {csv_path} Successfully!")
-            except Exception as e:
-                logging.error(f"{ name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
-                continue
 
 
 class BLSDownloader(DataDownloader):
@@ -626,7 +604,7 @@ class BLSDownloader(DataDownloader):
         self.start_year: int  = request_year
         self.start_date : str  = str(request_year)+"-01-01"
 
-    def to_db(self, return_df : bool = False, debug : bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_csv : bool = False, debug : bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         if debug is True:
             converter = DatabaseConverter()
@@ -640,7 +618,7 @@ class BLSDownloader(DataDownloader):
         else:
             items = list(self.json_dict.items())
             if not items:
-                return df_dict if return_df else None
+                return df_dict if return_csv else None
 
             def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
                 try:
@@ -683,20 +661,16 @@ class BLSDownloader(DataDownloader):
                         logging.error(f"{table_name} FAILED REFORMAT PERCENTAGE, probably due to df error, {e}")
                         return table_name, None
 
-                if return_df:
-                    logging.info(f"{table_name} Successfully extracted!")
-                    return table_name, df
-                else:
-                    converter = DatabaseConverter()
-                    converter.write_into_db(
-                        df=df,
-                        data_name=table_config["name"],
-                        start_date=self.start_date,
-                        is_time_series=True,
-                        is_pct_data=table_config["needs_pct"]
-                    )
-                    logging.info(f"{table_name} Successfully extracted!")
-                    return table_name, None
+                converter = DatabaseConverter()
+                final_result_df = converter.write_into_db(
+                    df=df,
+                    data_name=table_config["name"],
+                    start_date=self.start_date,
+                    is_time_series=True,
+                    is_pct_data=table_config["needs_pct"]
+                )
+                logging.info(f"{table_name} Successfully extracted!")
+                return table_name, final_result_df
 
             workers = max_workers or min(8, (os.cpu_count() or 4) * 2)
             with ThreadPoolExecutor(max_workers=workers) as ex:
@@ -705,33 +679,21 @@ class BLSDownloader(DataDownloader):
                     tn = future_map[fut]
                     try:
                         name, df = fut.result()
-                        if return_df and df is not None:
+                        if df is not None:
                             df_dict[name] = df
+                        if return_csv:
+                            for name, df in df_dict.items():
+                                try:
+                                    data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                                    os.makedirs(data_folder_path, exist_ok=True)
+                                    csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                                    df.to_csv(csv_path, index=True)
+                                    logging.info(f"{name} saved to {csv_path} Successfully!")
+                                except Exception as e:
+                                    logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_db', since {e}")
+                                    continue
                     except Exception as e:
                         logging.error(f"BLS future for {tn} raised: {e}")
-
-        if return_df is True:
-            return df_dict
-        else:
-            return None
-
-    def to_csv(self) -> None:
-        try:
-            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
-        except:
-            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
-            return None
-
-        for name, df in df_dict.items():
-            try:
-                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)  # 因为csv文件夹地址一样所以统一使用BEA类里面定义好的地址
-                os.makedirs(data_folder_path, exist_ok=True)
-                csv_path = os.path.join(data_folder_path, f"{name}.csv")
-                df.to_csv(csv_path, index=True)
-                logging.info(f"{name} saved to {csv_path} Successfully!")
-            except Exception as e:
-                logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
-                continue
 
 
 class TEDownloader(DataDownloader):
@@ -747,6 +709,7 @@ class TEDownloader(DataDownloader):
         # options.add_argument("--headless")
         options.add_argument("--disable-blink-features=AutomationControlled")
         self.driver = webdriver.Chrome(options=options)
+        self.driver.maximize_window()
 
     def _calc_function(self, x1: float, x2: float, y1: float, y2: float) -> Tuple[float, float]:
         """解二元一次方程，用于计算数据 used for data calculation"""
@@ -764,16 +727,16 @@ class TEDownloader(DataDownloader):
         time.sleep(TEDownloader.time_pause)
 
         # consent button click
-        try:
-            cookie_consent_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                EC.element_to_be_clickable((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div[2]/div[2]/button[1]/p'))
-            )
-            cookie_consent_button.click()
-            # self.driver.execute_script("arguments[0].click();", cookie_consent_button)
-            time.sleep(TEDownloader.time_pause)
-        except:
-            logging.warning(f"{data_name} FAILED TO CLICK consent button, continue")
-            pass
+        # try:
+        #     cookie_consent_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
+        #         EC.element_to_be_clickable((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div[2]/div[2]/button[1]/p'))
+        #     )
+        #     cookie_consent_button.click()
+        #     # self.driver.execute_script("arguments[0].click();", cookie_consent_button)
+        #     time.sleep(TEDownloader.time_pause)
+        # except:
+        #     logging.warning(f"{data_name} FAILED TO CLICK consent button, continue")
+        #     pass
 
         # click "5y" button
         try:
@@ -862,7 +825,7 @@ class TEDownloader(DataDownloader):
             logging.error(f"{data_name} FAILED TO EXTRACT data from html, but successfully get data from website, {e}")
             return None
 
-    def to_db(self, return_df: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
         # 说明: 由于 Selenium WebDriver 复用同一 self.driver，不适合多线程并行。
         # 如需并行，需要为每个任务创建独立 driver，成本较高，这里保持顺序执行。
         df_dict: Dict[str, pd.DataFrame] = {}
@@ -872,43 +835,29 @@ class TEDownloader(DataDownloader):
             if df is None:
                 logging.error(f"FAILED TO EXTRACT {table_name}, check PREVIOUS loggings")
                 continue
-            if return_df is True:
-                df_dict[table_name] = df
-                logging.info(f"{data_name} SUCCESSFULLY EXTRACT data from website TE")
-                continue
-            elif return_df is False:
-                converter = DatabaseConverter()
-                converter.write_into_db(
-                    df=df,
-                    data_name=table_config["name"],
-                    start_date=self.start_date,
-                    is_time_series=True,
-                    is_pct_data=table_config["needs_pct"]
-                )
-                continue
+            converter = DatabaseConverter()
+            converter.write_into_db(
+                df=df,
+                data_name=table_config["name"],
+                start_date=self.start_date,
+                is_time_series=True,
+                is_pct_data=table_config["needs_pct"]
+            )
+            df_dict[table_name] = df
+            continue
 
-        if return_df is True:
-            return df_dict
-        else:
-            return None
-
-    def to_csv(self) -> None:
-        try:
-            df_dict: Dict[str, pd.DataFrame] = self.to_db(return_df=True) or {}
-        except:
-            logging.error("to_csv, DF_DICT requires DICT but get NONE, probably failed to download data in to_db format")
-            return None
-
-        for name, df in df_dict.items():
-            try:
-                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)  # 因为csv文件夹地址一样所以统一使用BEA类里面定义好的地址
-                os.makedirs(data_folder_path, exist_ok=True)
-                csv_path = os.path.join(data_folder_path, f"{name}.csv")
-                df.to_csv(csv_path, index=True)
-                logging.info(f"{name} saved to {csv_path} Successfully!")
-            except Exception as e:
-                logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_csv', since {e}")
-                continue
+        if return_csv:
+            for name, df in df_dict.items():
+                try:
+                    data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                    os.makedirs(data_folder_path, exist_ok=True)
+                    csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                    df.to_csv(csv_path, index=True)
+                    logging.info(f"{name} saved to {csv_path} Successfully!")
+                except Exception as e:
+                    logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_db', since {e}")
+                    continue
+        return None
 
 
 class DownloaderFactory:
@@ -962,4 +911,3 @@ class DownloaderFactory:
             api_key=api_key,
             request_year=request_year
         )
-

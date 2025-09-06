@@ -1,6 +1,6 @@
 """
 独立进程执行单个数据源的下载，便于父进程实现强制取消。
-用法: python worker_run_source.py <request_json_path> <start_year:int> <source:str>
+用法: python worker_run_source.py <request_json_path> <start_year:int> <source:str> [--csv]
 """
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import json
 
 def main() -> int:
     if len(sys.argv) < 4:
-        print("Usage: worker_run_source.py <request_json_path> <start_year:int> <source>")
+        print("Usage: worker_run_source.py <request_json_path> <start_year:int> <source> [--csv]")
         return 2
     req_path = sys.argv[1]
     try:
@@ -19,6 +19,10 @@ def main() -> int:
         print("Invalid start_year")
         return 2
     source = sys.argv[3]
+    # 新增: 检查是否有 --csv 参数
+    return_csv = False
+    if len(sys.argv) > 4 and sys.argv[4] == "--csv":
+        return_csv = True
 
     # 读取请求配置
     try:
@@ -44,7 +48,8 @@ def main() -> int:
         if downloader is None:
             print(f"No downloader for {source}")
             return 5
-        downloader.to_db()  # type: ignore[reportUnknownMemberType]
+        # 修改: 传递 return_csv 参数
+        downloader.to_db(return_csv=return_csv)  # type: ignore[reportUnknownMemberType]
         return 0
     except Exception as e:
         print(f"{source} failed: {e}")

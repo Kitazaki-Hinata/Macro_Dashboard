@@ -34,20 +34,26 @@ if __name__ == "__main__":
     setup_logging()  # 初始化日志系统
     json_data: dict = read_json()
 
-    # app = QApplication([])
-    # window = mainWindow()
-    # window.show()
-    # app.exec()
+    app = QApplication([])
+    window = mainWindow()
+    window.show()
+    app.exec()
 
+    '''Testing download file'''
+    # request_year: int = 2020
+    # fred_downloader = DownloaderFactory.create_downloader(
+    #     source = "fred",
+    #     json_data = json_data,
+    #     request_year = request_year
+    # )
+    # fred_downloader.to_db(return_csv = True)
+    # te_downloader = DownloaderFactory.create_downloader(
+    #     source = "te",
+    #     json_data = json_data,
+    #     request_year = request_year
+    # )
+    # te_downloader.to_db(return_csv = True)
 
-    # testing
-    request_year: int = 2020
-    bea_downloader = DownloaderFactory.create_downloader(
-        source='bea',
-        json_data = json_data,
-        request_year = request_year
-    )
-    bea_downloader.to_db(return_csv = True)
 
 
 

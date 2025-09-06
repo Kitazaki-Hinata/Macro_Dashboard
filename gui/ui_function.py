@@ -122,15 +122,13 @@ class _DownloadWorker(QObject):
                     continue
                 self.progress.emit(f"Downloading {src} data to database...")
                 try:
-                    downloader.to_db()  # type: ignore[reportUnknownMemberType]
+                    # 优先判断 download_csv_check 是否被选中
+                    if self.main_window and hasattr(self.main_window, "download_csv_check") and self.main_window.download_csv_check.isChecked():
+                        self.progress.emit(f"Exporting {src} data to CSV...")
+                        downloader.to_db(return_csv=True)
+                    else:
+                        downloader.to_db(return_csv=False)
                     self.progress.emit(f"{src} done.")
-                    
-                    # check 是否需要导出csv
-                    if self.main_window and hasattr(self.main_window, "download_csv_check"):
-                        if self.main_window.download_csv_check.isChecked():
-                            self.progress.emit(f"Exporting {src} data to CSV...")
-                            downloader.to_csv()  # type: ignore[reportUnknownMemberType]
-                            self.progress.emit(f"{src} CSV export done.")
                 except Exception as e:
                     self.progress.emit(f"{src} failed: {e}")
                     continue
@@ -282,7 +280,7 @@ class UiFunctions():  # 删除:mainWindow
         if parallel:
             # parallel executor
             self._append_console(f"Start parallel download ({len(sources)} sources, threads={max_threads}) from year {start_year}...")
-            execu = _ParallelExecutor(json_data=json_data, start_year=start_year, sources=sources, max_threads=max_threads)
+            execu = _ParallelExecutor(json_data=json_data, start_year=start_year, sources=sources, max_threads=max_threads, main_window=self.main_window)
             self._parallel_exec = execu
             execu.progress.connect(self._append_console)
             execu.failed.connect(self._on_worker_failed)
@@ -322,7 +320,7 @@ class UiFunctions():  # 删除:mainWindow
             self._worker = None
             self.main_window.download_btn.setEnabled(True)
             self.main_window.cancel_btn.setEnabled(False)
-            self._append_console("All tasks completed.")
+            self._append_console("ALL TASKS COMPLETE !!! (∠・ω< )⌒★")
 
     def cancel_download(self):
         did = False
@@ -359,7 +357,7 @@ class _ParallelExecutor(QObject):
     _completed: int
     _procs: Dict[str, Any]
 
-    def __init__(self, json_data: Dict[str, Any], start_year: int, sources: list[str], max_threads: int = 4):
+    def __init__(self, json_data: Dict[str, Any], start_year: int, sources: list[str], max_threads: int = 4, main_window=None):
         super().__init__()
         self._json_data = json_data
         self._start_year = start_year
@@ -371,6 +369,7 @@ class _ParallelExecutor(QObject):
         self._timer = None
         self._procs = {}
         self._completed = 0
+        self.main_window = main_window  # 新增: 保存 main_window 引用
         try:
             QThreadPool.globalInstance().setMaxThreadCount(self._max_threads)
         except Exception:
@@ -467,6 +466,12 @@ class _ParallelExecutor(QObject):
                 self.progress.emit("worker_run_source.py not found")
                 return
             args = [py, worker, req_path, str(self._start_year), src]
+            # 新增: 判断是否需要导出 CSV
+            export_csv = False
+            if self.main_window and hasattr(self.main_window, "download_csv_check"):
+                export_csv = self.main_window.download_csv_check.isChecked()
+            if export_csv:
+                args.append("--csv")
             # 启动子进程
             p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             self._procs[src] = p  # Save the process reference for management
@@ -483,12 +488,4 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
-
-
-
-
-
-
-
-
 
