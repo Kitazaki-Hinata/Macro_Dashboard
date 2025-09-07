@@ -1892,6 +1892,7 @@ background:#3a3d43;
 QPushButton {
 	background-color : #3e4146;
 	border : 0;
+	max-width : 230px;
 }
 
 QPushButton:hover {

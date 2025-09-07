@@ -107,6 +107,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 icon: url(:/png_check/png/one_check.png);
                 icon-size: 20px 20px;
                 border-left : 2px solid white;
+                padding-right : 2px;
                 '''
             )
         elif btn_name == "four_page_btn":
@@ -117,6 +118,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 icon: url(:/png_check/png/four_check.png);
                 icon-size: 20px 20px;
                 border-left : 2px solid white;
+                padding-right : 2px;
                 '''
             )
         elif btn_name == "table_btn":
@@ -127,6 +129,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 icon: url(:/png_check/png/table_check.png);
                 icon-size: 20px 20px;
                 border-left : 2px solid white;
+                padding-right : 2px;
                 '''
             )
         elif btn_name == "note_btn":
@@ -137,6 +140,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 icon: url(:/png_check/png/note_btn_check.png);
                 icon-size: 20px 20px;
                 border-left : 2px solid white;
+                padding-right : 2px;
                 '''
             )
         elif btn_name == "settings_btn":
@@ -147,6 +151,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 icon: url(:/png_check/png/settings_check.png);
                 icon-size: 20px 20px;
                 border-left : 2px solid white;
+                padding-right : 2px;
                 '''
             )
             # 进入设置页时刷新 .env 到输入框

@@ -14,6 +14,7 @@ __all__ = [
     "QWidget",
     "QMainWindow",
     "QPushButton",
+    "QLineEdit",
 
     "Qt",
     "QColor",

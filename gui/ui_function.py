@@ -4,6 +4,7 @@
 '''
 
 import os
+import sys
 import logging
 import json
 from typing import Optional, Dict, Any, Protocol
@@ -11,7 +12,6 @@ from typing import Optional, Dict, Any, Protocol
 from gui import *
 from concurrent.futures import ThreadPoolExecutor, Future
 import subprocess
-import sys
 
 from dotenv import dotenv_values
 
@@ -234,11 +234,11 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
 
-        illegal_chars = '\\/:*?"<>| 123456789'
+        illegal_chars = '\\/:*?"<>| '
         for char in illegal_chars:
             if char in note_name:
                 self.main_window.note_status_bar.setText(
-                    "\\ / : * ? \" < > |, space, nums are invalid"
+                    "\\ / : * ? \" < > |, space are invalid"
                 )
                 self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
                 return
@@ -261,6 +261,17 @@ class UiFunctions():  # 删除:mainWindow
         button_name = self.main_window.note_enter_passage_name.text()
         new_button = QPushButton(button_name)
         layout.insertWidget(0, new_button)          # 插入到第一个位置
+
+        # create txt file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        note_dir = os.path.join(parent_dir, "note")
+        if not os.path.exists(note_dir):   # create folder if not exist
+            os.makedirs(note_dir)
+        txt_file_path = os.path.join(note_dir, f"{button_name}.txt")
+        with open(txt_file_path, "w") as file:
+            file.write("")  # 写入空内容
+
         self.main_window.note_status_bar.setText("Create note successful")
         self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
 
@@ -283,6 +294,15 @@ class UiFunctions():  # 删除:mainWindow
                 if isinstance(widget, QPushButton) and widget.text() == note_name:
                     layout.removeWidget(widget)
                     widget.deleteLater()
+
+                    # delete text file
+                    current_dir = os.path.dirname(os.path.abspath(__file__))
+                    parent_dir = os.path.dirname(current_dir)
+                    note_dir = os.path.join(parent_dir, "note")   # folder path
+                    txt_file_path = os.path.join(note_dir, f"{note_name}.txt")
+                    if os.path.exists(txt_file_path):
+                        os.remove(txt_file_path)
+
                     found = True
                     break
 
@@ -296,41 +316,114 @@ class UiFunctions():  # 删除:mainWindow
     def note_rename_page(self):
         '''重命名文章  rename the file'''
         note_name = self.main_window.note_enter_passage_name.text()
+        layout = self.main_window.scrollAreaWidgetContents.layout()
 
-        # illegal judgement
-        if note_name == "":
+        if not note_name:
             self.main_window.note_status_bar.setText("Please enter a note name")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
 
-        illegal_chars = '\\/:*?"<>| 123456789'
-        for char in illegal_chars:
-            if char in note_name:
-                self.main_window.note_status_bar.setText(
-                    "\\ / : * ? \" < > |, space, nums are invalid"
-                )
-                self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
-                return
-        if note_name == "note_instructions_btn":
-            self.main_window.note_status_bar.setText("Name Conflict, change a name")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
-            return
-
-        # 防止命名重复
-        layout = self.main_window.scrollAreaWidgetContents.layout()
+        # 遍历布局中的所有控件来找到匹配的按钮
+        found = False
         for i in range(layout.count()):
             item = layout.itemAt(i)
             if item and item.widget():
                 widget = item.widget()
                 if isinstance(widget, QPushButton) and widget.text() == note_name:
-                    self.main_window.note_status_bar.setText("Name Conflict, change a name")
-                    self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
-                    return
+                    widget.setText("Enter and press any to finish")  # 将按钮名称修改为提示词
+                    widget.setStyleSheet(
+                        '''
+                        color : #90b6e7;
+                        font-family : "Comfortaa";
+                        font-weight : Bold;
+                        '''
+                    )
+                    
+                    # 创建LineEdit，输入新名称
+                    line_edit = QLineEdit()
+                    line_edit.setStyleSheet(
+                        '''
+                        color : white;
+                        font-weight : Bold;
+                        font-family : "Comfortaa";
+                        font-size : 8px;
+                        min-height : 15px;
+                        max-height : 15px;
+                        '''
+                    )
+                    line_edit.setPlaceholderText("Enter new name here")
+                    line_edit.setObjectName(f"rename_edit_{note_name}")
+                    layout.insertWidget(i+1, line_edit)   # 放在按钮下面
+                    
 
-        button_name = self.main_window.note_enter_passage_name.text()
+                    def finish_rename(le=line_edit, btn=widget, idx=i):
+                        # 若是点击别的地方自动完成重命名
+                        new_name = le.text().strip()
+                        if new_name:
+                            # 检查新名称是否合法 check validity
+                            illegal_chars = '\\/:*?"<>| '
+                            is_valid = True
+                            for char in illegal_chars:
+                                if char in new_name:
+                                    is_valid = False
+                                    break
+                            
+                            if is_valid and new_name != "note_instructions_btn":
+                                # 检查是否有重名
+                                duplicate = False
+                                for j in range(layout.count()):
+                                    item_check = layout.itemAt(j)
+                                    if item_check and item_check.widget():
+                                        check_widget = item_check.widget()
+                                        if isinstance(check_widget, QPushButton) and check_widget.text() == new_name:
+                                            duplicate = True
+                                            break
+                                
+                                if not duplicate:
+                                    btn.setText(new_name)
+                                    btn.setStyleSheet("color : white")
 
-        # 这里需要输入两次text值，第一个是想要改名的，第二个是改完名字的text
-        ########################################
+                                    # rename text file
+                                    current_dir = os.path.dirname(os.path.abspath(__file__))
+                                    parent_dir = os.path.dirname(current_dir)
+                                    note_dir = os.path.join(parent_dir, "note")  # folder path
+                                    origin_txt_file_path = os.path.join(note_dir, f"{note_name}.txt")
+                                    changed_txt_file_path = os.path.join(note_dir, f"{new_name}.txt")
+                                    if os.path.exists(origin_txt_file_path):
+                                        os.rename(origin_txt_file_path, changed_txt_file_path)
+
+                                    self.main_window.note_status_bar.setText("Rename successful")
+                                    self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
+                                    # 只有在名称合法时才移除LineEdit
+                                    layout.removeWidget(le)
+                                    le.deleteLater()
+                                else:
+                                    self.main_window.note_status_bar.setText("Name Conflict, change a name")
+                                    self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                                    # 保持LineEdit不删除，让用户重新输入
+                                    le.setFocus()
+                            else:
+                                self.main_window.note_status_bar.setText("\\ / : * ? \" < > |, space, nums are invalid")
+                                self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                                # 保持LineEdit不删除，让用户重新输入
+                                le.setFocus()
+                        else:
+                            self.main_window.note_status_bar.setText("Please enter a valid note name")
+                            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                            # 保持LineEdit不删除，让用户重新输入
+                            le.setFocus()
+                    
+                    # 连接LineEdit的编辑完成信号
+                    line_edit.editingFinished.connect(lambda le=line_edit, btn=widget, idx=i: finish_rename(le, btn, idx))
+                    
+                    # 设置焦点到LineEdit
+                    line_edit.setFocus()
+                    
+                    found = True
+
+        if not found:
+            self.main_window.note_status_bar.setText("Note does not exist")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
 
 
     # ============ Download wiring ============
@@ -598,6 +691,10 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
+
+
+
+
 
 
 
