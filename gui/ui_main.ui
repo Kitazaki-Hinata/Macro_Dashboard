@@ -18,8 +18,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>1000000</width>
-    <height>1000000</height>
+    <width>2304</width>
+    <height>1440</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -729,7 +729,7 @@ QPushButton#settings_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>3</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -1629,7 +1629,7 @@ margin :0;
  }
 
 
-/*设置上下按钮*/
+/*设置上下滑条按钮*/
  QScrollBar::add-line:vertical {
      border: none;
     background: #252526;
@@ -1657,6 +1657,53 @@ margin :0;
  QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
      background: none;
  }
+
+
+
+
+
+
+
+
+/* scroll bar   horizontal 隐藏!!!!!*/
+ QScrollBar:horizontal {
+	border: none;
+    background: transparent;
+    width: 0;
+ }
+ QScrollBar::handle:horizontal {	
+	border: none;
+    background: transparent;
+    width: 0;
+ }
+
+
+ QScrollBar::add-line:horizontal {
+     border: none;
+    background: transparent;
+    width: 0;
+ }
+ QScrollBar::sub-line:horizontal {
+	border: none;
+    background: transparent;
+    width: 0;
+ }
+
+
+/*防止遮住滑条背景颜色*/
+ QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+     border: none;
+    background: transparent;
+    width: 0;
+ }
+ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+     border: none;
+    background: transparent;
+    width: 0;
+ }
+
+
+
 
 
 
@@ -2215,7 +2262,7 @@ margin-left : 7px; </string>
 color : #90b6e7;</string>
                          </property>
                          <property name="text">
-                          <string>Recent Update Time : 2025-08-01</string>
+                          <string>Current file name : </string>
                          </property>
                         </widget>
                        </item>

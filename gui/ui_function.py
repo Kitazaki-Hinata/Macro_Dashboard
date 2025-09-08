@@ -285,6 +285,11 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
 
+        if note_name == "note_instructions_btn" or note_name == "User_instructions":
+            self.main_window.note_status_bar.setText("This file cannot be deleted")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            return
+
         # 遍历布局中的所有控件来找到匹配的按钮
         found = False
         for i in range(layout.count()):
@@ -323,7 +328,11 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
 
-        # 遍历布局中的所有控件来找到匹配的按钮
+        if note_name == "note_instructions_btn" or note_name == "User_instructions":
+            self.main_window.note_status_bar.setText("Name Conflict, change a name")
+            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            return
+
         found = False
         for i in range(layout.count()):
             item = layout.itemAt(i)
@@ -424,6 +433,42 @@ class UiFunctions():  # 删除:mainWindow
         if not found:
             self.main_window.note_status_bar.setText("Note does not exist")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+
+    def note_btn_open_file_slot(self, file_name):
+        # 传入打开的文件名称，所有新建的按钮均调用这个槽函数
+        self.main_window.plainTextEdit.setReadOnly(False)  # 先设置允许编写
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        selected_note_dir = os.path.join(parent_dir, "note", f"{file_name}.txt")
+        
+        # 读取文件内容并显示在plainTextEdit控件中
+        try:
+            with open(selected_note_dir, 'r', encoding='utf-8') as file:
+                content = file.read()
+                self.main_window.plainTextEdit.setPlainText(content)
+        except FileNotFoundError:
+            self.main_window.plainTextEdit.setPlainText("")
+            logging.error(f"File {selected_note_dir} not found")
+            return
+        except Exception as e:
+            self.main_window.plainTextEdit.setPlainText("")
+            logging.error(f"Error reading file {selected_note_dir}: {str(e)}")
+            return
+
+    def note_open_instruction(self):
+        # 打开instruction文件，仅用于一个按钮
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        selected_note_dir = os.path.join(parent_dir, "note", f"User_instructions.txt")
+        try:
+            with open(selected_note_dir, 'r', encoding='utf-8') as file:
+                content = file.read()
+                self.main_window.plainTextEdit.setPlainText(content)
+        except FileNotFoundError:
+            self.main_window.plainTextEdit.setPlainText("")
+            logging.error(f"File {selected_note_dir} not found")
+            return
+        self.main_window.plainTextEdit.setReadOnly(True)
 
 
     # ============ Download wiring ============
@@ -691,10 +736,6 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
-
-
-
-
 
 
 

@@ -3,7 +3,8 @@
 启动窗口请前往main.py文件
 '''
 
-
+import os
+import logging
 from gui import *
 from .ui_function import UiFunctions
 from gui.custom_grip import CustomGrip
@@ -75,8 +76,10 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_add_btn.clicked.connect(self.ui_functions.note_add_extra_page)
         self.note_delete_btn.clicked.connect(self.ui_functions.note_delete_page)
         self.note_rename_btn.clicked.connect(self.ui_functions.note_rename_page)
+        self.note_instructions_btn.clicked.connect(self.ui_functions.note_open_instruction)
 
-
+        # 初始化按钮
+        note_list = self.initialize_txt_note_btn()
 
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''
@@ -160,7 +163,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             except Exception:
                 pass
 
-    # 事件过滤器用于拖动窗口
+    # 事件过滤器，拖动窗口
     def eventFilter(self, obj, event):
         # 禁止最大化或全屏时拖动窗口
         if self.isMaximized() or self.isFullScreen():
@@ -218,3 +221,44 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.topright_grip.update_geometry()
         self.bottomleft_grip.update_geometry()
         self.bottomright_grip.update_geometry()
+
+    def initialize_txt_note_btn(self):
+        # initialize txt docs into note editor，每次打开软件时初始化note按钮
+        # txt文档路径 file path
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        note_dir = os.path.join(parent_dir, "note")
+        if not os.path.exists(note_dir):  # create folder if not exist
+            os.makedirs(note_dir)
+
+        # 获取当前目录下的文件
+        try:
+            all_items = os.listdir(note_dir)
+            txt_files = []
+            for item in all_items:
+                full_path = os.path.join(note_dir, item)
+                if os.path.isfile(full_path) and item.endswith('.txt'):
+                    txt_files.append(full_path)
+            # 使用列表推导式过滤User_instructions.txt
+            txt_files = [f for f in txt_files if not f.endswith("User_instructions.txt")]
+        except Exception as e:
+            logging.error("Failed to get txt file in note folder, continue")
+            return
+
+        # 遍历名称，创建按钮
+        layout = self.scrollAreaWidgetContents.layout()
+        note_btn_list = []
+        for note_path in txt_files:
+            note_name = os.path.basename(note_path)
+            note_name_no_ext = os.path.splitext(note_name)[0]
+            safe_var_name = note_name_no_ext.replace(' ', '_').replace('-', '_')    # 去除非法字符
+            new_button = QPushButton(note_name_no_ext)
+            new_button.setObjectName(note_name_no_ext)
+            layout.insertWidget(0, new_button)
+
+            # 设置为mainWindow的属性
+            setattr(self, safe_var_name, new_button)
+            # 连接槽函数，传递文件名参数
+            new_button.clicked.connect(lambda checked, fname=note_name_no_ext: self.ui_functions.note_btn_open_file_slot(fname))
+            note_btn_list.append(note_name_no_ext)
+        return note_btn_list

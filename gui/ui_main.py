@@ -22,13 +22,14 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTabWidget, QTableView,
     QTextEdit, QVBoxLayout, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1267, 792)
         MainWindow.setMinimumSize(QSize(1267, 792))
-        MainWindow.setMaximumSize(QSize(1000000, 1000000))
+        MainWindow.setMaximumSize(QSize(2304, 1440))
         MainWindow.setStyleSheet(u"* {\n"
 "	background-color: #33363a;\n"
 "}\n"
@@ -877,7 +878,7 @@ class Ui_MainWindow(object):
 " }\n"
 "\n"
 "\n"
-"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6309\u94ae*/\n"
+"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6ed1\u6761\u6309\u94ae*/\n"
 " QScrollBar::add-line:vertical {\n"
 "     border: none;\n"
 "    background: #252526;\n"
@@ -898,14 +899,62 @@ class Ui_MainWindow(object):
 " }\n"
 "\n"
 "\n"
-"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc"
-                        "\u666f\u989c\u8272*/\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1"
+                        "\u6761\u80cc\u666f\u989c\u8272*/\n"
 " QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
 "     background: none;\n"
 " }\n"
 " QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
 "     background: none;\n"
 " }\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"/* scroll bar   horizontal \u9690\u85cf!!!!!*/\n"
+" QScrollBar:horizontal {\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"    width: 0;\n"
+" }\n"
+" QScrollBar::handle:horizontal {	\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"    width: 0;\n"
+" }\n"
+"\n"
+"\n"
+" QScrollBar::add-line:horizontal {\n"
+"     border: none;\n"
+"    background: transparent;\n"
+"    width: 0;\n"
+" }\n"
+" QScrollBar::sub-line:horizontal {\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"    width: 0;\n"
+" }\n"
+"\n"
+"\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc\u666f\u989c\u8272*/\n"
+" QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {\n"
+"     border: none;\n"
+"    background: transparent;\n"
+"    width: 0;\n"
+""
+                        " }\n"
+" QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {\n"
+"     border: none;\n"
+"    background: transparent;\n"
+"    width: 0;\n"
+" }\n"
+"\n"
+"\n"
+"\n"
 "\n"
 "\n"
 "\n"
@@ -1009,6 +1058,7 @@ class Ui_MainWindow(object):
 "QPushButton {\n"
 "	background-color : #3e4146;\n"
 "	border : 0;\n"
+"	max-width : 230px;\n"
 "}\n"
 "\n"
 "QPushButton:hover {\n"
@@ -2042,7 +2092,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
         self.tab_window.setCurrentIndex(0)
 
 
@@ -2104,7 +2154,7 @@ class Ui_MainWindow(object):
         self.note_rename_btn.setText("")
         self.note_delete_btn.setText("")
         self.note_title_label.setText(QCoreApplication.translate("MainWindow", u"Notes Editor", None))
-        self.note_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.note_update_label.setText(QCoreApplication.translate("MainWindow", u"Current file name : ", None))
 #if QT_CONFIG(tooltip)
         self.save_text.setToolTip("")
 #endif // QT_CONFIG(tooltip)

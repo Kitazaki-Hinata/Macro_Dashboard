@@ -3,9 +3,8 @@
 **debug waitlist :**
 1. log经过面板console输出后无法写入.log文件
 2. all选项框与数据单选框没有设置不能同时选中
-3. note页面改名按钮的改名逻辑
+3. note页面保存功能
 4. Comfortaa字体使用
-5. 每次打开软件的时候在note里面自动识别已经创建的txt文件
 
 > Version: v1.0.0
 
