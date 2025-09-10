@@ -3,7 +3,6 @@
 **debug waitlist :**
 1. log经过面板console输出后无法写入.log文件
 2. all选项框与数据单选框没有设置不能同时选中
-3. note页面保存功能
 4. Comfortaa字体使用
 
 > Version: v1.0.0

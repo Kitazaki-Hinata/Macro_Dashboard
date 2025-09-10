@@ -79,7 +79,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_instructions_btn.clicked.connect(self.ui_functions.note_open_instruction)
 
         # 初始化按钮
-        note_list = self.initialize_txt_note_btn()
+        self.initialize_txt_note_btn()
+        self.save_text.clicked.connect(lambda: self.ui_functions.note_save_file(self._get_current_file_name()))
 
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''
@@ -239,7 +240,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 full_path = os.path.join(note_dir, item)
                 if os.path.isfile(full_path) and item.endswith('.txt'):
                     txt_files.append(full_path)
-            # 使用列表推导式过滤User_instructions.txt
+
+            # 过滤User_instructions.txt
             txt_files = [f for f in txt_files if not f.endswith("User_instructions.txt")]
         except Exception as e:
             logging.error("Failed to get txt file in note folder, continue")
@@ -247,7 +249,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
 
         # 遍历名称，创建按钮
         layout = self.scrollAreaWidgetContents.layout()
-        note_btn_list = []
         for note_path in txt_files:
             note_name = os.path.basename(note_path)
             note_name_no_ext = os.path.splitext(note_name)[0]
@@ -260,5 +261,18 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             setattr(self, safe_var_name, new_button)
             # 连接槽函数，传递文件名参数
             new_button.clicked.connect(lambda checked, fname=note_name_no_ext: self.ui_functions.note_btn_open_file_slot(fname))
-            note_btn_list.append(note_name_no_ext)
-        return note_btn_list
+        return
+
+    def _get_current_file_name(self):
+        """提取当前文件名，在save note功能里面使用"""
+        try:
+            text = self.note_update_label.text()
+            # 检查文本格式是否符合预期
+            if ":" in text:
+                return text.split(":")[1].strip()  # 使用strip()替代[1:]切片
+            else:
+                # 如果格式不符合预期，返回空字符串或其他默认值
+                return ""
+        except Exception:
+            # 发生异常时返回空字符串
+            return ""

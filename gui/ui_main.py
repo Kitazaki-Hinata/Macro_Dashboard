@@ -1286,6 +1286,7 @@ class Ui_MainWindow(object):
         self.plainTextEdit.setObjectName(u"plainTextEdit")
         self.plainTextEdit.setStyleSheet(u"color : white; \n"
 "font-family : \"Comfortaa\";")
+        self.plainTextEdit.setReadOnly(True)
 
         self.verticalLayout_14.addWidget(self.plainTextEdit)
 
@@ -2092,7 +2093,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(3)
         self.tab_window.setCurrentIndex(0)
 
 
@@ -2154,12 +2155,62 @@ class Ui_MainWindow(object):
         self.note_rename_btn.setText("")
         self.note_delete_btn.setText("")
         self.note_title_label.setText(QCoreApplication.translate("MainWindow", u"Notes Editor", None))
-        self.note_update_label.setText(QCoreApplication.translate("MainWindow", u"Current file name : ", None))
+        self.note_update_label.setText(QCoreApplication.translate("MainWindow", u"Current file name : [Read Only] Notes Editor Instructions", None))
 #if QT_CONFIG(tooltip)
         self.save_text.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.save_text.setText("")
-        self.note_label_notes.setText(QCoreApplication.translate("MainWindow", u"Reminder : Remember to click \"SAVE\" button on the right hand side after you finish writing your notes.", None))
+        self.note_label_notes.setText(QCoreApplication.translate("MainWindow", u"Reminder : Please read instructions carefully.", None))
+        self.plainTextEdit.setPlainText(QCoreApplication.translate("MainWindow", u"\u2605\u2605 \u8fd9\u662f\u4e00\u4e2aNotes Editor\u754c\u9762\u7684\u4f7f\u7528\u8bf4\u660e\uff0c\u8bf7\u4e0d\u8981\u5220\u9664\u6b64\u6587\u6863\u3002\u2605\u2605\n"
+"	\n"
+"        \u672c\u6587\u6863\u7f16\u8f91\u5668\u7684\u6587\u4ef6\u50a8\u5b58\u76ee\u5f55\u4e3a \u8f6f\u4ef6\u8def\u5f84/note\uff08\u5373\u4e3a\u8f6f\u4ef6\u76ee\u5f55\u5f53\u4e2d\u7684note\u6587\u4ef6\u5939\uff09\uff0c\u5982\u9700\u64cd\u4f5c\u8bf7\u81ea\u884c\u5230\u6587\u4ef6\u5939\u4e0b\u9762\u8fdb\u884c\u64cd\u4f5c\uff0c\u6ce8\u610f\u4e0d\u8981\u5728\u8f6f\u4ef6\u8fd0\u884c\u7684\u65f6\u5019\u64cd\u4f5c\u6587\u4ef6\u5939\u3002	\n"
+"\n"
+"        \u53f3\u4e0a\u89d2\u7684\u6309\u94ae\u662f\u4fdd\u5b58\u6309\u94ae\u3002\u8bf7\u52a1\u5fc5\u5728\u6bcf\u6b21\u5199\u5b8c\u6587\u7ae0\u540e\u70b9\u51fb\u4fdd\u5b58\u6309\u94ae\uff0c\u811a\u672c\u5c06\u4f1a\u8bc6\u522b\u4e2d\u95f4\u6587\u672c\u7f16\u8f91\u533a\u7684\u6587\u672c\u5e76\u4f20\u5165\u5bf9\u5e94\u7684txt\u6587\u4ef6\u5f53\u4e2d\u3002\uff08\u81ea\u52a8\u4fdd\u5b58\u529f\u80fd\u4f1a\u5728\u540e"
+                        "\u7eed\u66f4\u65b0\u4e2d\u52a0\u5165\uff09\n"
+"        \u5de6\u4e0b\u89d2\u6709\u4e09\u4e2a\u6309\u94ae\uff0c\u6309\u987a\u5e8f\u4f9d\u6b21\u662f\uff1a\n"
+"                \u65b0\u5efa\u7b14\u8bb0\uff0c\u7b14\u8bb0\u91cd\u547d\u540d\uff0c\u5220\u9664\u7b14\u8bb0\u3002\n"
+"\n"
+"        -- \u65b0\u5efa\u7b14\u8bb0\uff1a\n"
+"	1. \u5148\u5728\u6700\u4e0b\u65b9\u7684\u8f93\u5165\u6846\u5185\u8f93\u5165\u7b14\u8bb0\u7684\u540d\u79f0\uff0c\u6ce8\u610f\u8bf7\u4e0d\u8981\u5728\u540d\u79f0\u5185\u5305\u62ec\u7a7a\u683c\uff0c\u4ee5\u53ca \\ / : * ? \\\" < > | \u8fd9\u4e9b\u7cfb\u7edf\u9ed8\u8ba4\u4e0d\u5141\u8bb8\u4f5c\u4e3a\u6587\u4ef6\u540d\u79f0\u7684\u5b57\u7b26\u3002\n"
+"	2. \u70b9\u51fb\u5de6\u4e0b\u89d2\u7684 \u65b0\u5efa\u7b14\u8bb0 \u6309\u94ae\uff0c\u5373\u53ef\u5728\u5de6\u8fb9Notes Editor\u8fb9\u680f\u91cc\u770b\u5230\u5bf9\u5e94\u7684\u6309\u94ae\uff0c\u70b9\u51fb\u6309\u94ae\u5373\u53ef\u8fdb\u5165\u6587\u6863\u7f16\u8f91\u3002\n"
+"        -- \u7b14\u8bb0\u91cd\u547d\u540d\uff1a\n"
+"	1. \u5148\u5728\u6700\u4e0b"
+                        "\u65b9\u8f93\u5165\u60f3\u8981\u66f4\u6539\u7684\u7b14\u8bb0\u7684\u540d\u79f0\uff0c\u6ce8\u610f\u5927\u5c0f\u5199\uff0c\u811a\u672c\u4f1a\u5c1d\u8bd5\u5339\u914d\u5bf9\u5e94\u7684\u6309\u94ae\u3002\n"
+"	2. \u5f53\u5339\u914d\u6210\u529f\u540e\uff0c\u5bf9\u5e94\u7684\u6309\u94ae\u4e0b\u65b9\u5c06\u5f39\u51fa\u65b0\u7684\u8f93\u5165\u6846\uff0c\u8bf7\u5728\u65b0\u7684\u8f93\u5165\u6846\u5f53\u4e2d\u8f93\u5165\u65b0\u7684\u6587\u4ef6\u540d\uff0c\u6ce8\u610f\u4e0d\u8981\u4e0e\u5176\u4ed6\u6587\u4ef6\u91cd\u540d\u6216\u5c1d\u8bd5\u8f93\u5165\u975e\u6cd5\u5b57\u7b26\u3002\uff08\u6b64\u65f6\u6587\u4ef6\u5939\u4e0b\u9762\u7684txt\u6587\u6863\u6ca1\u6709\u6539\u540d\uff09\n"
+"	3. \u4fee\u6539\u5b8c\u6210\u540e\uff0c\u6309\u4efb\u610f\u952e\u6216\u8005\u70b9\u51fb\u754c\u9762\u5185\u7684\u4efb\u610f\u5730\u65b9\u5373\u53ef\u5b8c\u6210\u4fee\u6539\uff0c\u811a\u672c\u4f1a\u81ea\u52a8\u4fee\u6539\u6587\u4ef6\u5939\u76ee\u5f55\u4e0b\u9762\u7684txt\u6587\u6863\u3002\n"
+"        -- \u5220\u9664\u7b14\u8bb0\uff1a\n"
+"	1. \u5728"
+                        "\u6700\u4e0b\u65b9\u7684\u8f93\u5165\u6846\u5185\u8f93\u5165\u60f3\u8981\u5220\u9664\u7684\u7b14\u8bb0\u7684\u540d\u79f0\u3002\n"
+"	2. \u70b9\u51fb \u5220\u9664 \u6309\u94ae\u3002\uff08\u6ce8\u610f\u5220\u9664\u65f6\u4e0d\u4f1a\u5f39\u51fa\u518d\u6b21\u786e\u8ba4\u7a97\u53e3\u4e14\u6587\u4ef6\u65e0\u6cd5\u590d\u539f\uff0c\u8bf7\u8c28\u614e\u5220\u9664\uff09\n"
+"\n"
+"        \u7f16\u8f91\u6846\u76ee\u524d\u6682\u65f6\u4e0d\u652f\u6301\u63d2\u5165\u56fe\u7247\u548c\u7f16\u8f91\u5b57\u4f53\u6837\u5f0f\uff0c\u540e\u7eed\u4f1a\u9010\u6b65\u66f4\u65b0\u5185\u5bb9\u3002\n"
+"        \u795d\u4f7f\u7528\u6109\u5feb\uff01(\u2220\u30fb\u03c9< )\u2312\u2605  Love from Kitazaki Hinata\n"
+"\n"
+"------------------------------------------------------------------------------------------------------------------------------------------------------------------\n"
+"\n"
+"\u2605\u2605 This is the usage guide for the Notes Editor interface. Please do not delete this document. \u2605\u2605 \n"
+"\n"
+"        The file storage directory o"
+                        "f this document editor is \"software path/note\" (which is the \"note\" folder within the software directory). If you need to operate, please do it directly in the folder. Be careful not to operate the folder while the software is running. \n"
+"        The button on the upper right corner is the save button. Please make sure to click the save button after each time you finish writing the article. The script will recognize the text in the middle text editing area and transfer it to the corresponding txt file. (The automatic save function will be added in the subsequent updates.)\n"
+"        On the lower left corner, there are three buttons in sequence:\n"
+"                New note, Rename note, Delete note. \n"
+"        -- Create a new note:\n"
+"        1. First, enter the name of the note in the bottom input box. Please make sure not to include spaces, as well as characters such as \\ / : * ? \" < > | which are system-prohibited for use as file names.\n"
+"        2. Click the \"Create Note\" button at the bott"
+                        "om left corner, and you will see the corresponding button in the Notes Editor sidebar on the left. Click the button to enter the document editing mode.\n"
+"\n"
+"        -- Rename a note:\n"
+"        1. Enter the name of the note you want to change in the bottom input box. Pay attention to the case. The script will try to match the corresponding button.\n"
+"        2. Once the match is successful, a new input box will appear below the corresponding button. Please enter the new file name in the new input box. Be sure not to have the same name as other files or input illegal characters. (At this time, the txt document under the folder has not been renamed)\n"
+"        3. After the modification is completed, press any key or click anywhere on the interface to complete the modification. The script will automatically modify the txt document under the folder directory.\n"
+"        -- Delete a note:\n"
+"        1. Enter the name of the note you want to delete in the bottom input box.\n"
+"        2. Click the \"Delete\""
+                        " button. (Note that no confirmation window will pop up when deleting and the file cannot be restored. Please be cautious when deleting) \n"
+"\n"
+"        The edit box currently does not support inserting images or editing font styles. Updates will be gradually released in the future.\n"
+"        Enjoy your use! (\u2220\u00b7\u03c9< )\u2312\u2605 Love from Kitazaki Hinata", None))
         self.note_title_label_2.setText(QCoreApplication.translate("MainWindow", u"Settings Panel", None))
         self.note_update_label_2.setText(QCoreApplication.translate("MainWindow", u"Set API // Download Data // About & Terms", None))
         self.api_group_box.setTitle("")

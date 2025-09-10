@@ -19,3 +19,28 @@
 
         编辑框目前暂时不支持插入图片和编辑字体样式，后续会逐步更新内容。
         祝使用愉快！(∠・ω< )⌒★  Love from Kitazaki Hinata
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+★★ This is the usage guide for the Notes Editor interface. Please do not delete this document. ★★ 
+
+        The file storage directory of this document editor is "software path/note" (which is the "note" folder within the software directory). If you need to operate, please do it directly in the folder. Be careful not to operate the folder while the software is running. 
+        
+        The button on the upper right corner is the save button. Please make sure to click the save button after each time you finish writing the article. The script will recognize the text in the middle text editing area and transfer it to the corresponding txt file. (The automatic save function will be added in the subsequent updates.)
+        On the lower left corner, there are three buttons in sequence:
+                New note, Rename note, Delete note. 
+
+        -- Create a new note:
+        1. First, enter the name of the note in the bottom input box. Please make sure not to include spaces, as well as characters such as \ / : * ? " < > | which are system-prohibited for use as file names.
+        2. Click the "Create Note" button at the bottom left corner, and you will see the corresponding button in the Notes Editor sidebar on the left. Click the button to enter the document editing mode.
+
+        -- Rename a note:
+        1. Enter the name of the note you want to change in the bottom input box. Pay attention to the case. The script will try to match the corresponding button.
+        2. Once the match is successful, a new input box will appear below the corresponding button. Please enter the new file name in the new input box. Be sure not to have the same name as other files or input illegal characters. (At this time, the txt document under the folder has not been renamed)
+        3. After the modification is completed, press any key or click anywhere on the interface to complete the modification. The script will automatically modify the txt document under the folder directory.
+        -- Delete a note:
+        1. Enter the name of the note you want to delete in the bottom input box.
+        2. Click the "Delete" button. (Note that no confirmation window will pop up when deleting and the file cannot be restored. Please be cautious when deleting) 
+
+        The edit box currently does not support inserting images or editing font styles. Updates will be gradually released in the future.
+        Enjoy your use! (∠·ω< )⌒★ Love from Kitazaki Hinata

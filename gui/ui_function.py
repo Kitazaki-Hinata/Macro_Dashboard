@@ -272,6 +272,10 @@ class UiFunctions():  # 删除:mainWindow
         with open(txt_file_path, "w") as file:
             file.write("")  # 写入空内容
 
+        # update interface
+        new_button.clicked.connect(
+            lambda checked, fname=button_name: self.note_btn_open_file_slot(fname)
+        )
         self.main_window.note_status_bar.setText("Create note successful")
         self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
 
@@ -314,6 +318,10 @@ class UiFunctions():  # 删除:mainWindow
         if found:
             self.main_window.note_status_bar.setText("Delete note successful")
             self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
+            self.main_window.plainTextEdit.clear()
+            self.main_window.plainTextEdit.setReadOnly(True)
+            self.main_window.save_text.setDisabled(True)
+
         else:
             self.main_window.note_status_bar.setText("Note does not exist")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
@@ -339,46 +347,41 @@ class UiFunctions():  # 删除:mainWindow
             if item and item.widget():
                 widget = item.widget()
                 if isinstance(widget, QPushButton) and widget.text() == note_name:
-                    widget.setText("Enter and press any to finish")  # 将按钮名称修改为提示词
-                    widget.setStyleSheet(
-                        '''
+                    # 保存旧的objectName用于后续的信号重新连接
+                    old_object_name = widget.objectName()
+
+                    widget.setText("Enter and press any to finish")
+                    widget.setStyleSheet('''
                         color : #90b6e7;
                         font-family : "Comfortaa";
                         font-weight : Bold;
-                        '''
-                    )
-                    
+                    ''')
+
                     # 创建LineEdit，输入新名称
                     line_edit = QLineEdit()
-                    line_edit.setStyleSheet(
-                        '''
+                    line_edit.setStyleSheet('''
                         color : white;
                         font-weight : Bold;
                         font-family : "Comfortaa";
                         font-size : 8px;
                         min-height : 15px;
                         max-height : 15px;
-                        '''
-                    )
+                    ''')
                     line_edit.setPlaceholderText("Enter new name here")
                     line_edit.setObjectName(f"rename_edit_{note_name}")
-                    layout.insertWidget(i+1, line_edit)   # 放在按钮下面
-                    
+                    layout.insertWidget(i + 1, line_edit)
 
-                    def finish_rename(le=line_edit, btn=widget, idx=i):
-                        # 若是点击别的地方自动完成重命名
+                    def finish_rename(le=line_edit, btn=widget, old_name=old_object_name, idx=i):
                         new_name = le.text().strip()
                         if new_name:
-                            # 检查新名称是否合法 check validity
                             illegal_chars = '\\/:*?"<>| '
                             is_valid = True
                             for char in illegal_chars:
                                 if char in new_name:
                                     is_valid = False
                                     break
-                            
+
                             if is_valid and new_name != "note_instructions_btn":
-                                # 检查是否有重名
                                 duplicate = False
                                 for j in range(layout.count()):
                                     item_check = layout.itemAt(j)
@@ -387,55 +390,68 @@ class UiFunctions():  # 删除:mainWindow
                                         if isinstance(check_widget, QPushButton) and check_widget.text() == new_name:
                                             duplicate = True
                                             break
-                                
-                                if not duplicate:
-                                    btn.setText(new_name)
-                                    btn.setStyleSheet("color : white")
 
-                                    # rename text file
+                                if not duplicate:
+                                    # 重命名文件
                                     current_dir = os.path.dirname(os.path.abspath(__file__))
                                     parent_dir = os.path.dirname(current_dir)
-                                    note_dir = os.path.join(parent_dir, "note")  # folder path
-                                    origin_txt_file_path = os.path.join(note_dir, f"{note_name}.txt")
+                                    note_dir = os.path.join(parent_dir, "note")
+                                    origin_txt_file_path = os.path.join(note_dir, f"{old_name}.txt")
                                     changed_txt_file_path = os.path.join(note_dir, f"{new_name}.txt")
+
                                     if os.path.exists(origin_txt_file_path):
                                         os.rename(origin_txt_file_path, changed_txt_file_path)
 
+                                    # 更新按钮的文本和objectName
+                                    btn.setText(new_name)
+                                    btn.setObjectName(new_name)  # 关键：更新objectName
+                                    btn.setStyleSheet("color : white")
+
+                                    # 重新连接按钮的点击信号
+                                    try:
+                                        # 先断开旧的连接
+                                        btn.clicked.disconnect()
+                                    except:
+                                        pass  # 如果没有连接，忽略错误
+
+                                    # 重新连接新的信号
+                                    btn.clicked.connect(
+                                        lambda checked, name=new_name: self.note_btn_open_file_slot(name))
+
                                     self.main_window.note_status_bar.setText("Rename successful")
                                     self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
-                                    # 只有在名称合法时才移除LineEdit
+
                                     layout.removeWidget(le)
                                     le.deleteLater()
                                 else:
                                     self.main_window.note_status_bar.setText("Name Conflict, change a name")
                                     self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
-                                    # 保持LineEdit不删除，让用户重新输入
                                     le.setFocus()
                             else:
                                 self.main_window.note_status_bar.setText("\\ / : * ? \" < > |, space, nums are invalid")
                                 self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
-                                # 保持LineEdit不删除，让用户重新输入
                                 le.setFocus()
                         else:
                             self.main_window.note_status_bar.setText("Please enter a valid note name")
                             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
-                            # 保持LineEdit不删除，让用户重新输入
                             le.setFocus()
-                    
+
                     # 连接LineEdit的编辑完成信号
-                    line_edit.editingFinished.connect(lambda le=line_edit, btn=widget, idx=i: finish_rename(le, btn, idx))
-                    
-                    # 设置焦点到LineEdit
-                    line_edit.setFocus()
-                    
+                    line_edit.editingFinished.connect(finish_rename)
+
+                    # 可选：也可以连接回车键信号
+                    line_edit.returnPressed.connect(finish_rename)
+
                     found = True
+                    break
 
         if not found:
-            self.main_window.note_status_bar.setText("Note does not exist")
+            self.main_window.note_status_bar.setText("Note not found")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
 
     def note_btn_open_file_slot(self, file_name):
         # 传入打开的文件名称，所有新建的按钮均调用这个槽函数
+        self.main_window.save_text.setDisabled(False)
         self.main_window.plainTextEdit.setReadOnly(False)  # 先设置允许编写
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
@@ -446,6 +462,9 @@ class UiFunctions():  # 删除:mainWindow
             with open(selected_note_dir, 'r', encoding='utf-8') as file:
                 content = file.read()
                 self.main_window.plainTextEdit.setPlainText(content)
+                self.main_window.note_update_label.setText(f"Current file name : {file_name}")
+                self.main_window.note_label_notes.setText('Reminder : Remember to click "SAVE" button on the right hand side after you finish writing your notes.')
+                self.main_window.note_label_notes.setStyleSheet("color: #ee5c88; margin-left : 20px")
         except FileNotFoundError:
             self.main_window.plainTextEdit.setPlainText("")
             logging.error(f"File {selected_note_dir} not found")
@@ -468,7 +487,34 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.plainTextEdit.setPlainText("")
             logging.error(f"File {selected_note_dir} not found")
             return
+        self.main_window.note_update_label.setText(f"Current file name : [Read Only] Notes Editor Instructions")
         self.main_window.plainTextEdit.setReadOnly(True)
+        self.main_window.note_label_notes.setText(
+            f'Reminder : Please read instructions carefully.'
+        )
+        self.main_window.note_label_notes.setStyleSheet("color: #ee5c88; margin-left : 20px")
+        self.main_window.save_text.setDisabled(True)
+    def note_save_file(self, file_name):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        selected_note_dir = os.path.join(parent_dir, "note", f"{file_name}.txt")
+
+        try:
+            file_content = self.main_window.plainTextEdit.toPlainText()
+            with open(selected_note_dir, 'w', encoding='utf-8') as file:
+                file.write(file_content)
+            self.main_window.note_label_notes.setText(
+                f'Note successfully saved!'
+            )
+            self.main_window.note_label_notes.setStyleSheet("color: #90b6e7; margin-left : 20px")
+
+        except Exception as e:
+            logging.error(f"Error: notes editor cannot save writing file, error is {e}")
+            self.main_window.note_label_notes.setText(
+                f'WARNING : THIS NOTE FAILED TO SAVE, PLEASE CHECK LOG FILE "doc/error.log" FILE!!!'
+            )
+            self.main_window.note_label_notes.setStyleSheet("color: #ee5c88; margin-left : 20px")
+
 
 
     # ============ Download wiring ============
@@ -736,6 +782,8 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
+
+
 
 
 

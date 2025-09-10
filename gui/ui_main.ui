@@ -729,7 +729,7 @@ QPushButton#settings_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -2262,7 +2262,7 @@ margin-left : 7px; </string>
 color : #90b6e7;</string>
                          </property>
                          <property name="text">
-                          <string>Current file name : </string>
+                          <string>Current file name : [Read Only] Notes Editor Instructions</string>
                          </property>
                         </widget>
                        </item>
@@ -2316,7 +2316,7 @@ color : #90b6e7;</string>
                     <string notr="true">color : #EE5C88; margin-left : 20px</string>
                    </property>
                    <property name="text">
-                    <string>Reminder : Remember to click &quot;SAVE&quot; button on the right hand side after you finish writing your notes.</string>
+                    <string>Reminder : Please read instructions carefully.</string>
                    </property>
                   </widget>
                  </item>
@@ -2367,6 +2367,57 @@ margin-right : 10px;</string>
                          <property name="styleSheet">
                           <string notr="true">color : white; 
 font-family : &quot;Comfortaa&quot;;</string>
+                         </property>
+                         <property name="readOnly">
+                          <bool>true</bool>
+                         </property>
+                         <property name="plainText">
+                          <string>★★ 这是一个Notes Editor界面的使用说明，请不要删除此文档。★★
+	
+        本文档编辑器的文件储存目录为 软件路径/note（即为软件目录当中的note文件夹），如需操作请自行到文件夹下面进行操作，注意不要在软件运行的时候操作文件夹。	
+
+        右上角的按钮是保存按钮。请务必在每次写完文章后点击保存按钮，脚本将会识别中间文本编辑区的文本并传入对应的txt文件当中。（自动保存功能会在后续更新中加入）
+        左下角有三个按钮，按顺序依次是：
+                新建笔记，笔记重命名，删除笔记。
+
+        -- 新建笔记：
+	1. 先在最下方的输入框内输入笔记的名称，注意请不要在名称内包括空格，以及 \ / : * ? \&quot; &lt; &gt; | 这些系统默认不允许作为文件名称的字符。
+	2. 点击左下角的 新建笔记 按钮，即可在左边Notes Editor边栏里看到对应的按钮，点击按钮即可进入文档编辑。
+        -- 笔记重命名：
+	1. 先在最下方输入想要更改的笔记的名称，注意大小写，脚本会尝试匹配对应的按钮。
+	2. 当匹配成功后，对应的按钮下方将弹出新的输入框，请在新的输入框当中输入新的文件名，注意不要与其他文件重名或尝试输入非法字符。（此时文件夹下面的txt文档没有改名）
+	3. 修改完成后，按任意键或者点击界面内的任意地方即可完成修改，脚本会自动修改文件夹目录下面的txt文档。
+        -- 删除笔记：
+	1. 在最下方的输入框内输入想要删除的笔记的名称。
+	2. 点击 删除 按钮。（注意删除时不会弹出再次确认窗口且文件无法复原，请谨慎删除）
+
+        编辑框目前暂时不支持插入图片和编辑字体样式，后续会逐步更新内容。
+        祝使用愉快！(∠・ω&lt; )⌒★  Love from Kitazaki Hinata
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+★★ This is the usage guide for the Notes Editor interface. Please do not delete this document. ★★ 
+
+        The file storage directory of this document editor is &quot;software path/note&quot; (which is the &quot;note&quot; folder within the software directory). If you need to operate, please do it directly in the folder. Be careful not to operate the folder while the software is running. 
+        
+        The button on the upper right corner is the save button. Please make sure to click the save button after each time you finish writing the article. The script will recognize the text in the middle text editing area and transfer it to the corresponding txt file. (The automatic save function will be added in the subsequent updates.)
+        On the lower left corner, there are three buttons in sequence:
+                New note, Rename note, Delete note. 
+
+        -- Create a new note:
+        1. First, enter the name of the note in the bottom input box. Please make sure not to include spaces, as well as characters such as \ / : * ? &quot; &lt; &gt; | which are system-prohibited for use as file names.
+        2. Click the &quot;Create Note&quot; button at the bottom left corner, and you will see the corresponding button in the Notes Editor sidebar on the left. Click the button to enter the document editing mode.
+
+        -- Rename a note:
+        1. Enter the name of the note you want to change in the bottom input box. Pay attention to the case. The script will try to match the corresponding button.
+        2. Once the match is successful, a new input box will appear below the corresponding button. Please enter the new file name in the new input box. Be sure not to have the same name as other files or input illegal characters. (At this time, the txt document under the folder has not been renamed)
+        3. After the modification is completed, press any key or click anywhere on the interface to complete the modification. The script will automatically modify the txt document under the folder directory.
+        -- Delete a note:
+        1. Enter the name of the note you want to delete in the bottom input box.
+        2. Click the &quot;Delete&quot; button. (Note that no confirmation window will pop up when deleting and the file cannot be restored. Please be cautious when deleting) 
+
+        The edit box currently does not support inserting images or editing font styles. Updates will be gradually released in the future.
+        Enjoy your use! (∠·ω&lt; )⌒★ Love from Kitazaki Hinata</string>
                          </property>
                         </widget>
                        </item>
