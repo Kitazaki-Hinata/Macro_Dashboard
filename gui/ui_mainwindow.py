@@ -25,6 +25,11 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)  # type: ignore
         self.ui_functions = UiFunctions(self)
 
+        # 实例化所有小窗口
+        self.one_chart_settings_window = QWidget()
+        self.one_chart_ui = Ui_OneChartSettingsPanel()
+        self.one_chart_ui.setupUi(self.one_chart_settings_window)
+
         # 去除系统标题栏（使用 Qt6 命名空间的枚举）
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
 
@@ -78,9 +83,17 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_rename_btn.clicked.connect(self.ui_functions.note_rename_page)
         self.note_instructions_btn.clicked.connect(self.ui_functions.note_open_instruction)
 
-        # 初始化按钮
+        # 初始化note按钮，识别并读取txt文件
         self.initialize_txt_note_btn()
         self.save_text.clicked.connect(lambda: self.ui_functions.note_save_file(self._get_current_file_name()))
+
+        '''One Chart page btn '''
+        # 修改: 传递窗口对象而不是UI对象
+        self.one_set_preference.clicked.connect(lambda: self.ui_functions.open_settings_window(self.one_chart_settings_window))
+
+        '''One Chart SETTINGS page btn '''
+        self.one_chart_ui.finish_btn.clicked.connect(lambda : self.ui_functions.finish_settings(self.one_chart_ui, self.one_chart_settings_window))
+        self.one_chart_ui.cancel_btn.clicked.connect(lambda : self.ui_functions.close_setting_window(self.one_chart_settings_window))
 
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''

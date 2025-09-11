@@ -1575,6 +1575,52 @@ color : #90b6e7;</string>
              </layout>
             </widget>
             <widget class="QWidget" name="page_note_container">
+             <property name="styleSheet">
+              <string notr="true">QScrollBar:vertical {
+	border: none;
+    background: #ffffff;
+    width: 17.5px;
+    margin: 0;
+	border-radius: 0px;
+ }
+QScrollBar::handle:vertical {	
+	background: #90b6e7;
+	width :8px;
+    min-height: 25px;
+	border-radius: 4px
+ }
+
+
+/*设置上下按钮*/
+ QScrollBar::add-line:vertical {
+     border: none;
+    background: transparent;
+     height: 20px;
+	border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+     subcontrol-position: bottom;
+     subcontrol-origin: margin;
+ }
+ QScrollBar::sub-line:vertical {
+	border: none;
+    background: transparent;
+     height: 20px;
+	border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+     subcontrol-position: top;
+     subcontrol-origin: margin;
+ }
+
+
+/*防止遮住滑条背景颜色*/
+ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+     background: none;
+ }
+ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+     background: none;
+ }
+</string>
+             </property>
              <layout class="QHBoxLayout" name="horizontalLayout_7">
               <property name="spacing">
                <number>0</number>
@@ -2271,6 +2317,9 @@ color : #90b6e7;</string>
                     </item>
                     <item>
                      <widget class="QPushButton" name="save_text">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="maximumSize">
                        <size>
                         <width>25</width>

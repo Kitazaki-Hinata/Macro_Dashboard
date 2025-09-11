@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="png">
+    <file>sub_resource/accept.png</file>
+    <file>sub_resource/cancel.png</file>
+    <file>sub_resource/ico.png</file>
+  </qresource>
+</RCC>

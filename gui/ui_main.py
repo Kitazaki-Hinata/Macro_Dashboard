@@ -847,6 +847,51 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.page_four_container)
         self.page_note_container = QWidget()
         self.page_note_container.setObjectName(u"page_note_container")
+        self.page_note_container.setStyleSheet(u"QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: #ffffff;\n"
+"    width: 17.5px;\n"
+"    margin: 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+"QScrollBar::handle:vertical {	\n"
+"	background: #90b6e7;\n"
+"	width :8px;\n"
+"    min-height: 25px;\n"
+"	border-radius: 4px\n"
+" }\n"
+"\n"
+"\n"
+"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6309\u94ae*/\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"    background: transparent;\n"
+"     height: 20px;\n"
+"	border-bottom-left-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"     height: 20px;\n"
+"	border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+"\n"
+"\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc\u666f\u989c\u8272*/\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+" "
+                        "    background: none;\n"
+" }\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"     background: none;\n"
+" }\n"
+"")
         self.horizontalLayout_7 = QHBoxLayout(self.page_note_container)
         self.horizontalLayout_7.setSpacing(0)
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
@@ -1248,6 +1293,7 @@ class Ui_MainWindow(object):
 
         self.save_text = QPushButton(self.text_enter_container)
         self.save_text.setObjectName(u"save_text")
+        self.save_text.setEnabled(False)
         self.save_text.setMaximumSize(QSize(25, 25))
 
         self.horizontalLayout_8.addWidget(self.save_text)
@@ -2192,13 +2238,15 @@ class Ui_MainWindow(object):
 "\n"
 "        The file storage directory o"
                         "f this document editor is \"software path/note\" (which is the \"note\" folder within the software directory). If you need to operate, please do it directly in the folder. Be careful not to operate the folder while the software is running. \n"
+"        \n"
 "        The button on the upper right corner is the save button. Please make sure to click the save button after each time you finish writing the article. The script will recognize the text in the middle text editing area and transfer it to the corresponding txt file. (The automatic save function will be added in the subsequent updates.)\n"
 "        On the lower left corner, there are three buttons in sequence:\n"
 "                New note, Rename note, Delete note. \n"
+"\n"
 "        -- Create a new note:\n"
 "        1. First, enter the name of the note in the bottom input box. Please make sure not to include spaces, as well as characters such as \\ / : * ? \" < > | which are system-prohibited for use as file names.\n"
-"        2. Click the \"Create Note\" button at the bott"
-                        "om left corner, and you will see the corresponding button in the Notes Editor sidebar on the left. Click the button to enter the document editing mode.\n"
+"        2. Click the \"Create Note\" "
+                        "button at the bottom left corner, and you will see the corresponding button in the Notes Editor sidebar on the left. Click the button to enter the document editing mode.\n"
 "\n"
 "        -- Rename a note:\n"
 "        1. Enter the name of the note you want to change in the bottom input box. Pay attention to the case. The script will try to match the corresponding button.\n"
@@ -2206,8 +2254,8 @@ class Ui_MainWindow(object):
 "        3. After the modification is completed, press any key or click anywhere on the interface to complete the modification. The script will automatically modify the txt document under the folder directory.\n"
 "        -- Delete a note:\n"
 "        1. Enter the name of the note you want to delete in the bottom input box.\n"
-"        2. Click the \"Delete\""
-                        " button. (Note that no confirmation window will pop up when deleting and the file cannot be restored. Please be cautious when deleting) \n"
+"        2. C"
+                        "lick the \"Delete\" button. (Note that no confirmation window will pop up when deleting and the file cannot be restored. Please be cautious when deleting) \n"
 "\n"
 "        The edit box currently does not support inserting images or editing font styles. Updates will be gradually released in the future.\n"
 "        Enjoy your use! (\u2220\u00b7\u03c9< )\u2312\u2605 Love from Kitazaki Hinata", None))

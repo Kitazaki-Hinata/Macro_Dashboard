@@ -7,7 +7,7 @@ from . import resources_rc
 
 from .ui_main import Ui_MainWindow  # type: ignore
 from .ui_function import UiFunctions
-from .gui_animation import GuiAnimation
+from gui.subwindows.ui_oneChartSettings import Ui_OneChartSettingsPanel
 
 
 __all__ = [
@@ -37,5 +37,5 @@ __all__ = [
     "resources_rc",
     "Ui_MainWindow",
     "UiFunctions",
-    "GuiAnimation"
+    "Ui_OneChartSettingsPanel"
 ]
