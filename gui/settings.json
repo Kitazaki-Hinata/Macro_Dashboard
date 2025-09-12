@@ -13,7 +13,25 @@
     "third_data": {
       "data_name": "",
       "time_lags": 0,
-      "color": "#EE5C88"
+      "color": "#F6B7D0"
+    }
+  },
+  "four_chart_settings": {
+    "first_data": {
+      "data_name": "",
+      "color": "#90b6e7"
+    },
+    "second_data": {
+      "data_name": "",
+      "color": "#90b6e7"
+    },
+    "third_data": {
+      "data_name": "",
+      "color": "#90b6e7"
+    },
+    "fourth_data": {
+      "data_name": "",
+      "color": "#90b6e7"
     }
   }
 }

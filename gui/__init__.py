@@ -8,6 +8,7 @@ from . import resources_rc
 from .ui_main import Ui_MainWindow  # type: ignore
 from .ui_function import UiFunctions
 from gui.subwindows.ui_oneChartSettings import Ui_OneChartSettingsPanel
+from gui.subwindows.ui_fourChartSettings import Ui_FourChartSettingsPanel
 
 
 __all__ = [
@@ -33,9 +34,11 @@ __all__ = [
     "QTimer",
     "QRect",
     "QEvent",
+    "QColorDialog",
 
     "resources_rc",
     "Ui_MainWindow",
     "UiFunctions",
-    "Ui_OneChartSettingsPanel"
+    "Ui_OneChartSettingsPanel",
+    "Ui_FourChartSettingsPanel"
 ]

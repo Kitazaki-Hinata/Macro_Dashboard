@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>OneChartSettingsPanel</class>
- <widget class="QWidget" name="OneChartSettingsPanel">
+ <class>FourChartSettingsPanel</class>
+ <widget class="QWidget" name="FourChartSettingsPanel">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -173,19 +173,6 @@ QComboBox:focus {
       <property name="rightMargin">
        <number>15</number>
       </property>
-      <item row="2" column="3">
-       <widget class="QPushButton" name="second_color_btn">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background : #EE5C88</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1">
        <widget class="QComboBox" name="first_data_selection_box">
         <property name="editable">
@@ -193,6 +180,42 @@ QComboBox:focus {
         </property>
         <property name="minimumContentsLength">
          <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="second_color_btn">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background : #90b6e7</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="third_data_selection_box">
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="fourth_data_selection_box"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="third_color_btn">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background : #90b6e7</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
@@ -205,28 +228,60 @@ QComboBox:focus {
          </size>
         </property>
         <property name="text">
-         <string>First Data (Main)</string>
+         <string>First Chart</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QComboBox" name="third_data_selection_box">
+      <item row="2" column="1">
+       <widget class="QComboBox" name="second_data_selection_box">
         <property name="editable">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QSpinBox" name="second_time_lag">
-        <property name="maximum">
-         <number>10000</number>
+      <item row="0" column="2">
+       <widget class="QLabel" name="line_color_title">
+        <property name="maximumSize">
+         <size>
+          <width>40</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Color</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="third_data_title">
         <property name="text">
-         <string>Third Data</string>
+         <string>Third Chart</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QWidget" name="widget" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="second_data_title">
+        <property name="text">
+         <string>Second Chart</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="first_color_btn">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background : #90b6e7</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
@@ -246,11 +301,15 @@ QComboBox:focus {
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QPushButton" name="first_color_btn">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
+      <item row="4" column="0">
+       <widget class="QLabel" name="fourth_data_title">
+        <property name="text">
+         <string>Fourth Chart</string>
         </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="fourth_color_btn">
         <property name="styleSheet">
          <string notr="true">background : #90b6e7</string>
         </property>
@@ -258,82 +317,6 @@ QComboBox:focus {
          <string/>
         </property>
        </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="time_lag_title">
-        <property name="maximumSize">
-         <size>
-          <width>80</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Time Lags</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="line_color_title">
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Color</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QSpinBox" name="first_time_lag">
-        <property name="maximum">
-         <number>10000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QPushButton" name="third_color_btn">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background : #F6B7D0</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="second_data_selection_box">
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="second_data_title">
-        <property name="text">
-         <string>Second Data</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QSpinBox" name="third_time_lag">
-        <property name="maximum">
-         <number>10000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QWidget" name="widget" native="true"/>
       </item>
      </layout>
     </widget>

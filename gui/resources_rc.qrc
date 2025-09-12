@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="png">
     <file>png/ico_small.png</file>
+    <file>png/csv.png</file>
     <file>png/big_window.png</file>
     <file>png/rename.png</file>
     <file>png/save_2.png</file>
@@ -17,7 +18,6 @@
     <file>png/download.png</file>
     <file>png/false.png</file>
     <file>png/four.png</file>
-    <file>png/github.png</file>
     <file>png/minimize.png</file>
     <file>png/note_btn.png</file>
     <file>png/note_btn2.png</file>

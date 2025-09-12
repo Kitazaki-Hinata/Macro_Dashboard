@@ -521,22 +521,15 @@ class UiFunctions():  # 删除:mainWindow
 
 
     '''ONE CHART PAGE SETTINGS SLOTS METHODS'''
-    def finish_settings(self, window, widget):
-        # define variables
-        first_data = window.first_data_selection_box.currentText()
-        second_data = window.second_data_selection_box.currentText()
-        third_data = window.third_data_selection_box.currentText()
-        first_lag = window.first_time_lag.value()
-        second_lag = window.second_time_lag.value()
-        third_lag = window.third_time_lag.value()
-        first_color = window.first_color_btn.styleSheet().split(":")[1][1:]
-        second_color = window.second_color_btn.styleSheet().split(":")[1][1:]
-        third_color = window.third_color_btn.styleSheet().split(":")[1][1:]
-        
-        # 获取settings.json文件路径
+
+    def _get_json_settings_path(self)->str:
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        settings_file_path = os.path.join(current_dir, "settings.json")
-        
+        return os.path.join(current_dir, "settings.json")
+
+    def _get_settings_from_json(self)->Dict:
+        '''内部方法，用户打开并读取json文件'''
+        settings_file_path =  self._get_json_settings_path()
+
         # 读取现有设置文件（如果存在）
         try:
             if os.path.exists(settings_file_path):
@@ -547,30 +540,118 @@ class UiFunctions():  # 删除:mainWindow
         except Exception as e:
             logging.error(f"Error in reading json settings file: {e}")
             existing_data = {}
+        return existing_data
+
+    def one_finish_settings(self, window, widget):
+        '''确认按钮的槽函数'''
+        # define variables
+        first_data = window.first_data_selection_box.currentText()
+        second_data = window.second_data_selection_box.currentText()
+        third_data = window.third_data_selection_box.currentText()
+
+        first_lag = window.first_time_lag.value()
+        second_lag = window.second_time_lag.value()
+        third_lag = window.third_time_lag.value()
+
+        first_color = window.first_color_btn.styleSheet().split(":")[1][1:]
+        second_color = window.second_color_btn.styleSheet().split(":")[1][1:]
+        third_color = window.third_color_btn.styleSheet().split(":")[1][1:]
+
+        # 调用内部方法打开json文件
+        existing_data : Dict = self._get_settings_from_json()
 
         existing_data["one_chart_settings"]["first_data"]["data_name"] = first_data
         existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
         existing_data["one_chart_settings"]["third_data"]["data_name"] = third_data
+
         existing_data["one_chart_settings"]["first_data"]["time_lags"] = first_lag
         existing_data["one_chart_settings"]["second_data"]["time_lags"] = second_lag
-        existing_data["one_chart_settings"]["third_data"]["time_lags"] = second_lag
+        existing_data["one_chart_settings"]["third_data"]["time_lags"] = third_lag
+
         existing_data["one_chart_settings"]["first_data"]["color"] = first_color
         existing_data["one_chart_settings"]["second_data"]["color"] = second_color
-        existing_data["one_chart_settings"]["third_data"]["color"] = second_color
+        existing_data["one_chart_settings"]["third_data"]["color"] = third_color
 
-        # 写入json设置
+        # 写入json
         try:
-            with open(settings_file_path, 'w', encoding='utf-8') as f:
+            with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
                 json.dump(existing_data, f, indent=2, ensure_ascii=False)
         except Exception as e:
             logging.error(f"Error writing settings file: {e}")
         
-        # 关闭设置窗口
+        # 关闭窗口
         widget.close()
 
-    def close_setting_window(self, widget):
+    def one_close_setting_window(self, window, widget):
+        # 获取没有更改的设置，然后重置面板
+        original_settings : Dict = self._get_settings_from_json()
+        color_one : str = original_settings["one_chart_settings"]["first_data"]["color"]
+        color_two : str = original_settings["one_chart_settings"]["second_data"]["color"]
+        color_three : str = original_settings["one_chart_settings"]["third_data"]["color"]
+
+        window.first_color_btn.setStyleSheet(f"background: {color_one}")
+        window.second_color_btn.setStyleSheet(f"background: {color_two}")
+        window.third_color_btn.setStyleSheet(f"background: {color_three}")
+
         widget.close()
 
+
+    '''FOUR CHART PAGE SETTINGS SLOTS METHODS'''
+    def four_finish_settings(self, window, widget):
+        first_data = window.first_data_selection_box.currentText()
+        second_data = window.second_data_selection_box.currentText()
+        third_data = window.third_data_selection_box.currentText()
+        fourth_data = window.fourth_data_selection_box.currentText()
+
+        first_color = window.first_color_btn.styleSheet().split(":")[1][1:]
+        second_color = window.second_color_btn.styleSheet().split(":")[1][1:]
+        third_color = window.third_color_btn.styleSheet().split(":")[1][1:]
+        fourth_color = window.fourth_color_btn.styleSheet().split(":")[1][1:]
+
+        # 调用内部方法打开json文件
+        existing_data: Dict = self._get_settings_from_json()
+
+        existing_data["four_chart_settings"]["first_data"]["data_name"] = first_data
+        existing_data["four_chart_settings"]["second_data"]["data_name"] = second_data
+        existing_data["four_chart_settings"]["third_data"]["data_name"] = third_data
+        existing_data["four_chart_settings"]["fourth_data"]["data_name"] = fourth_data
+
+        existing_data["four_chart_settings"]["first_data"]["color"] = first_color
+        existing_data["four_chart_settings"]["second_data"]["color"] = second_color
+        existing_data["four_chart_settings"]["third_data"]["color"] = third_color
+        existing_data["four_chart_settings"]["fourth_data"]["color"] = fourth_color
+
+        # 写入json
+        try:
+            with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
+                json.dump(existing_data, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logging.error(f"Error writing settings file: {e}")
+
+        # 关闭窗口
+        widget.close()
+
+    def four_close_setting_window(self, window, widget):
+        original_settings: Dict = self._get_settings_from_json()
+        color_one: str = original_settings["four_chart_settings"]["first_data"]["color"]
+        color_two: str = original_settings["four_chart_settings"]["second_data"]["color"]
+        color_three: str = original_settings["four_chart_settings"]["third_data"]["color"]
+        color_four: str = original_settings["four_chart_settings"]["fourth_data"]["color"]
+
+        window.first_color_btn.setStyleSheet(f"background: {color_one}")
+        window.second_color_btn.setStyleSheet(f"background: {color_two}")
+        window.third_color_btn.setStyleSheet(f"background: {color_three}")
+        window.fourth_color_btn.setStyleSheet(f"background: {color_four}")
+
+        widget.close()
+
+
+
+
+    '''GENERAL SETTINGS SLOTS METHODS'''
+    def set_color(self, widget):
+        color = QColorDialog.getColor()
+        widget.setStyleSheet(f"background: {color.name()}")
 
 
 

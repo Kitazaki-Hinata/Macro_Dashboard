@@ -19,9 +19,8 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
     QLabel, QLineEdit, QMainWindow, QPlainTextEdit,
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
-    QSpinBox, QStackedWidget, QTabWidget, QTableView,
-    QTextEdit, QVBoxLayout, QWidget)
-
+    QSpinBox, QStackedWidget, QTableView, QTextEdit,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -434,17 +433,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.tab_window = QTabWidget(self.page_one_container)
-        self.tab_window.setObjectName(u"tab_window")
-        self.tab_window.setEnabled(True)
-        font1 = QFont()
-        font1.setFamilies([u"Comfortaa"])
-        font1.setBold(True)
-        self.tab_window.setFont(font1)
-        self.tab_window.setAcceptDrops(False)
-        self.tab_window.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.tab_window.setAutoFillBackground(False)
-        self.tab_window.setStyleSheet(u"* {\n"
+        self.widget_2 = QWidget(self.page_one_container)
+        self.widget_2.setObjectName(u"widget_2")
+        self.widget_2.setMinimumSize(QSize(0, 0))
+        self.widget_2.setStyleSheet(u"* {\n"
 "	background-color : #33363a;\n"
 "	font-family : \"Comfortaa\";\n"
 "}\n"
@@ -478,61 +470,51 @@ class Ui_MainWindow(object):
 "	size:50%\n"
 "}\n"
 "")
-        self.tab_window.setTabPosition(QTabWidget.TabPosition.North)
-        self.tab_window.setTabShape(QTabWidget.TabShape.Rounded)
-        self.tab_window.setElideMode(Qt.TextElideMode.ElideRight)
-        self.tab_window.setUsesScrollButtons(False)
-        self.tab_window.setDocumentMode(True)
-        self.tab_window.setTabsClosable(True)
-        self.tab_window.setMovable(True)
-        self.tab_window.setTabBarAutoHide(False)
-        self.tab = QWidget()
-        self.tab.setObjectName(u"tab")
-        self.verticalLayout_5 = QVBoxLayout(self.tab)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalSpacer_3 = QSpacerItem(0, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.verticalLayout_35 = QVBoxLayout(self.widget_2)
+        self.verticalLayout_35.setObjectName(u"verticalLayout_35")
+        self.verticalSpacer_10 = QSpacerItem(0, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
-        self.verticalLayout_5.addItem(self.verticalSpacer_3)
+        self.verticalLayout_35.addItem(self.verticalSpacer_10)
 
-        self.btn_and_text_container = QWidget(self.tab)
+        self.btn_and_text_container = QWidget(self.widget_2)
         self.btn_and_text_container.setObjectName(u"btn_and_text_container")
-        self.btn_and_text_container.setMaximumSize(QSize(16777215, 40))
+        self.btn_and_text_container.setMaximumSize(QSize(16777215, 65))
         self.btn_and_text_container.setStyleSheet(u"")
-        self.horizontalLayout_3 = QHBoxLayout(self.btn_and_text_container)
-        self.horizontalLayout_3.setSpacing(3)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.text_container = QWidget(self.btn_and_text_container)
-        self.text_container.setObjectName(u"text_container")
-        self.text_container.setMaximumSize(QSize(16777215, 40))
-        self.verticalLayout_6 = QVBoxLayout(self.text_container)
-        self.verticalLayout_6.setSpacing(6)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
-        self.title_label = QLabel(self.text_container)
-        self.title_label.setObjectName(u"title_label")
-        self.title_label.setMaximumSize(QSize(16777215, 20))
-        font2 = QFont()
-        font2.setFamilies([u"Comfortaa"])
-        font2.setPointSize(14)
-        font2.setBold(True)
-        self.title_label.setFont(font2)
-        self.title_label.setStyleSheet(u"color: #ffffff; \n"
+        self.horizontalLayout_21 = QHBoxLayout(self.btn_and_text_container)
+        self.horizontalLayout_21.setSpacing(3)
+        self.horizontalLayout_21.setObjectName(u"horizontalLayout_21")
+        self.horizontalLayout_21.setContentsMargins(0, 0, 0, 0)
+        self.text_container_3 = QWidget(self.btn_and_text_container)
+        self.text_container_3.setObjectName(u"text_container_3")
+        self.text_container_3.setMaximumSize(QSize(16777215, 40))
+        self.verticalLayout_34 = QVBoxLayout(self.text_container_3)
+        self.verticalLayout_34.setSpacing(6)
+        self.verticalLayout_34.setObjectName(u"verticalLayout_34")
+        self.verticalLayout_34.setContentsMargins(0, 0, 0, 0)
+        self.title_label_2 = QLabel(self.text_container_3)
+        self.title_label_2.setObjectName(u"title_label_2")
+        self.title_label_2.setMaximumSize(QSize(16777215, 20))
+        font1 = QFont()
+        font1.setFamilies([u"Comfortaa"])
+        font1.setPointSize(14)
+        font1.setBold(True)
+        self.title_label_2.setFont(font1)
+        self.title_label_2.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
-        self.verticalLayout_6.addWidget(self.title_label)
+        self.verticalLayout_34.addWidget(self.title_label_2)
 
-        self.update_label = QLabel(self.text_container)
-        self.update_label.setObjectName(u"update_label")
-        self.update_label.setMaximumSize(QSize(16777215, 12))
-        self.update_label.setFont(font)
-        self.update_label.setStyleSheet(u"margin-left : 10px; \n"
+        self.update_label_2 = QLabel(self.text_container_3)
+        self.update_label_2.setObjectName(u"update_label_2")
+        self.update_label_2.setMaximumSize(QSize(16777215, 12))
+        self.update_label_2.setFont(font)
+        self.update_label_2.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
 
-        self.verticalLayout_6.addWidget(self.update_label)
+        self.verticalLayout_34.addWidget(self.update_label_2)
 
 
-        self.horizontalLayout_3.addWidget(self.text_container)
+        self.horizontalLayout_21.addWidget(self.text_container_3)
 
         self.btn_frame = QFrame(self.btn_and_text_container)
         self.btn_frame.setObjectName(u"btn_frame")
@@ -552,15 +534,6 @@ class Ui_MainWindow(object):
 "	border-radius : 9px;\n"
 "}\n"
 "\n"
-"\n"
-"QPushButton#one_add_page {\n"
-"    icon: url(:/png/png/add_page.png);\n"
-"    icon-size: 17px 17px;\n"
-"}\n"
-"QPushButton#one_add_page:pressed {\n"
-"    icon: url(:/png_press/png/add_page_press.png);\n"
-"    icon-size: 17px 17px;\n"
-"}\n"
 "QPushButton#one_set_preference {\n"
 "    icon: url(:/png/png/set_preference.png);\n"
 "    icon-size: 17px 17px;\n"
@@ -572,50 +545,46 @@ class Ui_MainWindow(object):
         self.btn_frame.setFrameShape(QFrame.Shape.NoFrame)
         self.btn_frame.setFrameShadow(QFrame.Shadow.Plain)
         self.btn_frame.setLineWidth(0)
-        self.horizontalLayout_4 = QHBoxLayout(self.btn_frame)
-        self.horizontalLayout_4.setSpacing(0)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.one_add_page = QPushButton(self.btn_frame)
-        self.one_add_page.setObjectName(u"one_add_page")
-        self.one_add_page.setMaximumSize(QSize(25, 25))
-        self.one_add_page.setStyleSheet(u"")
+        self.horizontalLayout_22 = QHBoxLayout(self.btn_frame)
+        self.horizontalLayout_22.setSpacing(0)
+        self.horizontalLayout_22.setObjectName(u"horizontalLayout_22")
+        self.horizontalLayout_22.setContentsMargins(0, 0, 0, 0)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_4.addWidget(self.one_add_page)
+        self.horizontalLayout_22.addItem(self.horizontalSpacer)
 
         self.one_set_preference = QPushButton(self.btn_frame)
         self.one_set_preference.setObjectName(u"one_set_preference")
         self.one_set_preference.setMaximumSize(QSize(25, 25))
         self.one_set_preference.setStyleSheet(u"")
 
-        self.horizontalLayout_4.addWidget(self.one_set_preference)
+        self.horizontalLayout_22.addWidget(self.one_set_preference)
 
 
-        self.horizontalLayout_3.addWidget(self.btn_frame)
+        self.horizontalLayout_21.addWidget(self.btn_frame)
 
-        self.horizontalSpacer = QSpacerItem(10, 1, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_5 = QSpacerItem(10, 1, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_3.addItem(self.horizontalSpacer)
+        self.horizontalLayout_21.addItem(self.horizontalSpacer_5)
 
 
-        self.verticalLayout_5.addWidget(self.btn_and_text_container)
+        self.verticalLayout_35.addWidget(self.btn_and_text_container)
 
-        self.verticalSpacer_4 = QSpacerItem(20, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.verticalSpacer_9 = QSpacerItem(20, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
-        self.verticalLayout_5.addItem(self.verticalSpacer_4)
+        self.verticalLayout_35.addItem(self.verticalSpacer_9)
 
-        self.graph_widget = QWidget(self.tab)
-        self.graph_widget.setObjectName(u"graph_widget")
-        self.graph_widget.setStyleSheet(u"background-color : #262a2f;\n"
+        self.graph_widget_2 = QWidget(self.widget_2)
+        self.graph_widget_2.setObjectName(u"graph_widget_2")
+        self.graph_widget_2.setStyleSheet(u"background-color : #262a2f;\n"
 "border-radius:30px;\n"
 "margin-left : 10px;\n"
 "margin-right : 10px;")
 
-        self.verticalLayout_5.addWidget(self.graph_widget)
+        self.verticalLayout_35.addWidget(self.graph_widget_2)
 
-        self.tab_window.addTab(self.tab, "")
 
-        self.verticalLayout_4.addWidget(self.tab_window)
+        self.verticalLayout_4.addWidget(self.widget_2)
 
         self.stackedWidget.addWidget(self.page_one_container)
         self.page_table_container = QWidget()
@@ -655,7 +624,7 @@ class Ui_MainWindow(object):
         self.table_title_label = QLabel(self.text_container_2)
         self.table_title_label.setObjectName(u"table_title_label")
         self.table_title_label.setMaximumSize(QSize(16777215, 20))
-        self.table_title_label.setFont(font2)
+        self.table_title_label.setFont(font1)
         self.table_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -761,7 +730,7 @@ class Ui_MainWindow(object):
         self.four_title_label = QLabel(self.four_text_container)
         self.four_title_label.setObjectName(u"four_title_label")
         self.four_title_label.setMaximumSize(QSize(16777215, 20))
-        self.four_title_label.setFont(font2)
+        self.four_title_label.setFont(font1)
         self.four_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -782,7 +751,10 @@ class Ui_MainWindow(object):
         self.connect_charts = QCheckBox(self.four_text_widget)
         self.connect_charts.setObjectName(u"connect_charts")
         self.connect_charts.setMaximumSize(QSize(150, 16777215))
-        self.connect_charts.setFont(font1)
+        font2 = QFont()
+        font2.setFamilies([u"Comfortaa"])
+        font2.setBold(True)
+        self.connect_charts.setFont(font2)
         self.connect_charts.setStyleSheet(u"color:white;")
 
         self.horizontalLayout_5.addWidget(self.connect_charts)
@@ -1273,7 +1245,7 @@ class Ui_MainWindow(object):
         self.note_title_label = QLabel(self.note_text_container)
         self.note_title_label.setObjectName(u"note_title_label")
         self.note_title_label.setMaximumSize(QSize(16777215, 20))
-        self.note_title_label.setFont(font2)
+        self.note_title_label.setFont(font1)
         self.note_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -1307,7 +1279,7 @@ class Ui_MainWindow(object):
 
         self.note_label_notes = QLabel(self.content_area)
         self.note_label_notes.setObjectName(u"note_label_notes")
-        self.note_label_notes.setFont(font1)
+        self.note_label_notes.setFont(font2)
         self.note_label_notes.setStyleSheet(u"color : #EE5C88; margin-left : 20px")
 
         self.verticalLayout_11.addWidget(self.note_label_notes)
@@ -1415,7 +1387,7 @@ class Ui_MainWindow(object):
         self.note_title_label_2 = QLabel(self.note_text_container_2)
         self.note_title_label_2.setObjectName(u"note_title_label_2")
         self.note_title_label_2.setMaximumSize(QSize(16777215, 20))
-        self.note_title_label_2.setFont(font2)
+        self.note_title_label_2.setFont(font1)
         self.note_title_label_2.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 1px; ")
 
@@ -2119,7 +2091,7 @@ class Ui_MainWindow(object):
         self.author_name_and_time = QLabel(self.frame)
         self.author_name_and_time.setObjectName(u"author_name_and_time")
         self.author_name_and_time.setMaximumSize(QSize(16777215, 16777215))
-        self.author_name_and_time.setFont(font1)
+        self.author_name_and_time.setFont(font2)
         self.author_name_and_time.setStyleSheet(u"color:#90b6e7;\n"
 "font-family:\"Comfortaa\";\n"
 "padding:3px;\n"
@@ -2139,8 +2111,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
-        self.tab_window.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -2172,14 +2143,9 @@ class Ui_MainWindow(object):
         self.settings_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.settings_btn.setText("")
-#if QT_CONFIG(tooltip)
-        self.tab_window.setToolTip("")
-#endif // QT_CONFIG(tooltip)
-        self.title_label.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
-        self.update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
-        self.one_add_page.setText("")
+        self.title_label_2.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
+        self.update_label_2.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
         self.one_set_preference.setText("")
-        self.tab_window.setTabText(self.tab_window.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Tab Box 1", None))
         self.table_title_label.setText(QCoreApplication.translate("MainWindow", u"Table : Selected Table Name", None))
         self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
         self.page_table_set_preference.setText("")

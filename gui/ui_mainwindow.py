@@ -25,10 +25,36 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)  # type: ignore
         self.ui_functions = UiFunctions(self)
 
-        # 实例化所有小窗口
+        # 实例化ONE PAGE小窗口
         self.one_chart_settings_window = QWidget()
         self.one_chart_ui = Ui_OneChartSettingsPanel()
         self.one_chart_ui.setupUi(self.one_chart_settings_window)
+        self.one_chart_ui.first_color_btn.clicked.connect(
+            lambda : self.ui_functions.set_color(self.one_chart_ui.first_color_btn)
+        )
+        self.one_chart_ui.second_color_btn.clicked.connect(
+            lambda : self.ui_functions.set_color(self.one_chart_ui.second_color_btn)
+        )
+        self.one_chart_ui.third_color_btn.clicked.connect(
+            lambda : self.ui_functions.set_color(self.one_chart_ui.third_color_btn)
+        )
+
+        # 实例化FOUR PAGE小窗口
+        self.four_chart_settings_window = QWidget()
+        self.four_chart_ui = Ui_FourChartSettingsPanel()
+        self.four_chart_ui.setupUi(self.four_chart_settings_window)
+        self.four_chart_ui.first_color_btn.clicked.connect(
+            lambda: self.ui_functions.set_color(self.four_chart_ui.first_color_btn)
+        )
+        self.four_chart_ui.second_color_btn.clicked.connect(
+            lambda: self.ui_functions.set_color(self.four_chart_ui.second_color_btn)
+        )
+        self.four_chart_ui.third_color_btn.clicked.connect(
+            lambda: self.ui_functions.set_color(self.four_chart_ui.third_color_btn)
+        )
+        self.four_chart_ui.fourth_color_btn.clicked.connect(
+            lambda: self.ui_functions.set_color(self.four_chart_ui.third_color_btn)
+        )
 
         # 去除系统标题栏（使用 Qt6 命名空间的枚举）
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
@@ -90,10 +116,16 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         '''One Chart page btn '''
         # 修改: 传递窗口对象而不是UI对象
         self.one_set_preference.clicked.connect(lambda: self.ui_functions.open_settings_window(self.one_chart_settings_window))
+        self.four_settings_button.clicked.connect(lambda: self.ui_functions.open_settings_window(self.four_chart_settings_window))
 
-        '''One Chart SETTINGS page btn '''
-        self.one_chart_ui.finish_btn.clicked.connect(lambda : self.ui_functions.finish_settings(self.one_chart_ui, self.one_chart_settings_window))
-        self.one_chart_ui.cancel_btn.clicked.connect(lambda : self.ui_functions.close_setting_window(self.one_chart_settings_window))
+        '''SETTINGS page btn '''
+        self.one_chart_ui.finish_btn.clicked.connect(lambda : self.ui_functions.one_finish_settings(self.one_chart_ui, self.one_chart_settings_window))
+        self.one_chart_ui.cancel_btn.clicked.connect(lambda : self.ui_functions.one_close_setting_window(self.one_chart_ui, self.one_chart_settings_window))
+
+        self.four_chart_ui.finish_btn.clicked.connect(
+            lambda: self.ui_functions.four_finish_settings(self.four_chart_ui, self.four_chart_settings_window))
+        self.four_chart_ui.cancel_btn.clicked.connect(
+            lambda: self.ui_functions.four_close_setting_window(self.four_chart_ui, self.four_chart_settings_window))
 
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''
