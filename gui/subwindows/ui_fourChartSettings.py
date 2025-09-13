@@ -82,6 +82,53 @@ class Ui_FourChartSettingsPanel(object):
 "        QSpinBox::down-button:pressed {\n"
 "            background: #404043;\n"
 "        }\n"
+"\n"
+"\n"
+"\n"
+"/* scroll bar*/\n"
+" QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: #303030;\n"
+"    width: 8px;\n"
+"    margin: 21px 0 21px 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+" QScrollBar::handle:vertical {	\n"
+"	background: #90b6e7;\n"
+"    min-height: 25px;\n"
+"	border-radius: 4px\n"
+" }\n"
+"\n"
+"\n"
+"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6ed1\u6761\u6309\u94ae*/\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-bottom-left-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"     subcontrol-position: bo"
+                        "ttom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+"\n"
+"\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc\u666f\u989c\u8272*/\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"     background: none;\n"
+" }\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"     background: none;\n"
+" }\n"
 "        ")
         self.verticalLayout = QVBoxLayout(FourChartSettingsPanel)
         self.verticalLayout.setSpacing(0)
@@ -138,9 +185,11 @@ class Ui_FourChartSettingsPanel(object):
 "")
         self.gridLayout = QGridLayout(self.settings_panel)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.gridLayout.setVerticalSpacing(8)
         self.gridLayout.setContentsMargins(15, -1, 15, -1)
         self.first_data_selection_box = QComboBox(self.settings_panel)
         self.first_data_selection_box.setObjectName(u"first_data_selection_box")
+        self.first_data_selection_box.setMinimumSize(QSize(0, 25))
         self.first_data_selection_box.setEditable(True)
         self.first_data_selection_box.setMinimumContentsLength(0)
 
@@ -155,12 +204,15 @@ class Ui_FourChartSettingsPanel(object):
 
         self.third_data_selection_box = QComboBox(self.settings_panel)
         self.third_data_selection_box.setObjectName(u"third_data_selection_box")
+        self.third_data_selection_box.setMinimumSize(QSize(0, 25))
         self.third_data_selection_box.setEditable(True)
 
         self.gridLayout.addWidget(self.third_data_selection_box, 3, 1, 1, 1)
 
         self.fourth_data_selection_box = QComboBox(self.settings_panel)
         self.fourth_data_selection_box.setObjectName(u"fourth_data_selection_box")
+        self.fourth_data_selection_box.setMinimumSize(QSize(0, 25))
+        self.fourth_data_selection_box.setEditable(True)
 
         self.gridLayout.addWidget(self.fourth_data_selection_box, 4, 1, 1, 1)
 
@@ -179,6 +231,7 @@ class Ui_FourChartSettingsPanel(object):
 
         self.second_data_selection_box = QComboBox(self.settings_panel)
         self.second_data_selection_box.setObjectName(u"second_data_selection_box")
+        self.second_data_selection_box.setMinimumSize(QSize(0, 25))
         self.second_data_selection_box.setEditable(True)
 
         self.gridLayout.addWidget(self.second_data_selection_box, 2, 1, 1, 1)

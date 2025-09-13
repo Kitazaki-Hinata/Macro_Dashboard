@@ -24,6 +24,22 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)  # type: ignore
         self.ui_functions = UiFunctions(self)
+        self.chart_functions = ChartFunction(self)
+
+        # import fonts 使用字体
+        self.load_custom_fonts()
+
+        # 展示图表 测试
+        ##############################################################
+        self.chart_functions.show_one_chart("Nasdaq_Index", "one")
+        ##############################################################
+
+        # 读取更新日期设置
+        existing_data: dict = self.ui_functions.get_settings_from_json()
+        date_today = existing_data["recent_update_time"]
+        self.table_update_label.setText(f"Recent Update Time : {date_today}")
+        self.update_label_2.setText(f"Recent Update Time : {date_today}")
+        self.four_update_label.setText(f"Recent Update Time : {date_today}")
 
         # 实例化ONE PAGE小窗口
         self.one_chart_settings_window = QWidget()
@@ -55,6 +71,13 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.four_chart_ui.fourth_color_btn.clicked.connect(
             lambda: self.ui_functions.set_color(self.four_chart_ui.third_color_btn)
         )
+
+        # 实例化TABLE PAGE小窗口
+        self.table_settings_window = QWidget()
+        self.table_ui = Ui_TableSettingsPanel()
+        self.table_ui.setupUi(self.table_settings_window)
+
+
 
         # 去除系统标题栏（使用 Qt6 命名空间的枚举）
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
@@ -113,19 +136,28 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.initialize_txt_note_btn()
         self.save_text.clicked.connect(lambda: self.ui_functions.note_save_file(self._get_current_file_name()))
 
-        '''One Chart page btn '''
-        # 修改: 传递窗口对象而不是UI对象
-        self.one_set_preference.clicked.connect(lambda: self.ui_functions.open_settings_window(self.one_chart_settings_window))
-        self.four_settings_button.clicked.connect(lambda: self.ui_functions.open_settings_window(self.four_chart_settings_window))
+        '''Chart & Table page btn '''
+        self.one_set_preference.clicked.connect(lambda: self.ui_functions.open_settings_window(self.one_chart_ui, self.one_chart_settings_window, "one"))
+        self.four_settings_button.clicked.connect(lambda: self.ui_functions.open_settings_window(self.four_chart_ui, self.four_chart_settings_window, "four"))
+        self.page_table_set_preference.clicked.connect(lambda: self.ui_functions.open_settings_window(self.table_ui, self.table_settings_window, "table"))
 
         '''SETTINGS page btn '''
         self.one_chart_ui.finish_btn.clicked.connect(lambda : self.ui_functions.one_finish_settings(self.one_chart_ui, self.one_chart_settings_window))
         self.one_chart_ui.cancel_btn.clicked.connect(lambda : self.ui_functions.one_close_setting_window(self.one_chart_ui, self.one_chart_settings_window))
 
         self.four_chart_ui.finish_btn.clicked.connect(
-            lambda: self.ui_functions.four_finish_settings(self.four_chart_ui, self.four_chart_settings_window))
+            lambda: self.ui_functions.four_finish_settings(self.four_chart_ui, self.four_chart_settings_window)
+        )
         self.four_chart_ui.cancel_btn.clicked.connect(
-            lambda: self.ui_functions.four_close_setting_window(self.four_chart_ui, self.four_chart_settings_window))
+            lambda: self.ui_functions.four_close_setting_window(self.four_chart_ui, self.four_chart_settings_window)
+        )
+
+        self.table_ui.finish_btn.clicked.connect(
+            lambda: self.ui_functions.table_finish_settings(self.table_ui, self.table_settings_window)
+        )
+        self.table_ui.cancel_btn.clicked.connect(
+            lambda: self.ui_functions.table_close_setting_window(self.table_settings_window)
+        )
 
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''
@@ -255,6 +287,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 '''
             )
 
+
     def resizeEvent(self, event):
         # grip 跟随窗口大小变化自动调整
         super().resizeEvent(event)
@@ -321,3 +354,24 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         except Exception:
             # 发生异常时返回空字符串
             return ""
+
+    def load_custom_fonts(self):
+        '''提取文件下面的ttf字体文件然后安装字体'''
+        try:
+            current_file_path = os.path.dirname(os.path.abspath(__file__))
+            font_folder_path = os.path.join(current_file_path, "font")
+
+            comfortaa_families = QFontDatabase.applicationFontFamilies(
+                QFontDatabase.addApplicationFont(os.path.join(font_folder_path, "Comfortaa-Medium.ttf"))
+            )
+
+            if comfortaa_families:
+                comfortaa_font = QFont(comfortaa_families[0])
+                self.setFont(comfortaa_font)
+                print(f"已应用字体: {comfortaa_families[0]}")
+                logging.info("Applied font Comfortaa-Medium.ttf")
+            else:
+                raise Exception(f"Failed to load font: comfortaa, use default font")
+
+        except Exception as e:
+            logging.error(f"Failed to load custom fonts: {e}, continue")

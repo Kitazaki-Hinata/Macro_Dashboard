@@ -130,6 +130,56 @@ QCheckBox::indicator:disabled {
         QSpinBox::down-button:pressed {
             background: #404043;
         }
+
+
+/*================================== ====*/
+/* scroll bar*/
+ QScrollBar:vertical {
+	border: none;
+    background: #303030;
+    width: 8px;
+    margin: 21px 0 21px 0;
+	border-radius: 0px;
+ }
+ QScrollBar::handle:vertical {	
+	background: #90b6e7;
+    min-height: 25px;
+	border-radius: 4px
+ }
+
+
+/*设置上下滑条按钮*/
+ QScrollBar::add-line:vertical {
+     border: none;
+    background: #252526;
+     height: 20px;
+	border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+     subcontrol-position: bottom;
+     subcontrol-origin: margin;
+ }
+ QScrollBar::sub-line:vertical {
+	border: none;
+    background: #252526;
+     height: 20px;
+	border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+     subcontrol-position: top;
+     subcontrol-origin: margin;
+ }
+
+
+/*防止遮住滑条背景颜色*/
+ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+     background: none;
+ }
+ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+     background: none;
+ }
+        
+        
+
+
         
 </string>
   </property>
@@ -913,7 +963,7 @@ margin-left : 7px; </string>
 color : #90b6e7;</string>
                          </property>
                          <property name="text">
-                          <string>Recent Update Time : 2025-08-01</string>
+                          <string>Recent Update Time : </string>
                          </property>
                         </widget>
                        </item>
@@ -1181,11 +1231,11 @@ margin-left : 7px; </string>
                        </font>
                       </property>
                       <property name="styleSheet">
-                       <string notr="true">margin-left : 10px; 
+                       <string notr="true">margin-left : 9px; 
 color : #90b6e7;</string>
                       </property>
                       <property name="text">
-                       <string>Recent Update Time : 2025-08-01</string>
+                       <string>Recent Update Time : </string>
                       </property>
                      </widget>
                     </item>
@@ -1393,11 +1443,11 @@ margin-left : 7px; </string>
                        </font>
                       </property>
                       <property name="styleSheet">
-                       <string notr="true">margin-left : 10px; 
+                       <string notr="true">margin-left : 8px; 
 color : #90b6e7;</string>
                       </property>
                       <property name="text">
-                       <string>Recent Update Time : 2025-08-01</string>
+                       <string>Recent Update Time : </string>
                       </property>
                      </widget>
                     </item>

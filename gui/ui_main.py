@@ -135,6 +135,58 @@ class Ui_MainWindow(object):
 "        QSpinBox::down-button:pressed {\n"
 "            background: #404043;\n"
 "        }\n"
+"\n"
+"\n"
+"/*================================== ====*/\n"
+"/* scroll bar*/\n"
+" QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: #303030;\n"
+"    width: 8px;\n"
+"    margin: 2"
+                        "1px 0 21px 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+" QScrollBar::handle:vertical {	\n"
+"	background: #90b6e7;\n"
+"    min-height: 25px;\n"
+"	border-radius: 4px\n"
+" }\n"
+"\n"
+"\n"
+"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6ed1\u6761\u6309\u94ae*/\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-bottom-left-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+"\n"
+"\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc\u666f\u989c\u8272*/\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"     background: none;\n"
+" }\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"     back"
+                        "ground: none;\n"
+" }\n"
+"        \n"
+"        \n"
+"\n"
+"\n"
 "        \n"
 "")
         self.style_sheet = QWidget(MainWindow)
@@ -634,7 +686,7 @@ class Ui_MainWindow(object):
         self.table_update_label.setObjectName(u"table_update_label")
         self.table_update_label.setMaximumSize(QSize(16777215, 12))
         self.table_update_label.setFont(font)
-        self.table_update_label.setStyleSheet(u"margin-left : 10px; \n"
+        self.table_update_label.setStyleSheet(u"margin-left : 9px; \n"
 "color : #90b6e7;")
 
         self.verticalLayout_9.addWidget(self.table_update_label)
@@ -740,7 +792,7 @@ class Ui_MainWindow(object):
         self.four_update_label.setObjectName(u"four_update_label")
         self.four_update_label.setMaximumSize(QSize(16777215, 12))
         self.four_update_label.setFont(font)
-        self.four_update_label.setStyleSheet(u"margin-left : 10px; \n"
+        self.four_update_label.setStyleSheet(u"margin-left : 8px; \n"
 "color : #90b6e7;")
 
         self.verticalLayout_7.addWidget(self.four_update_label)
@@ -2144,13 +2196,13 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.settings_btn.setText("")
         self.title_label_2.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
-        self.update_label_2.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.update_label_2.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.one_set_preference.setText("")
         self.table_title_label.setText(QCoreApplication.translate("MainWindow", u"Table : Selected Table Name", None))
-        self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.page_table_set_preference.setText("")
         self.four_title_label.setText(QCoreApplication.translate("MainWindow", u"Four Charts Interface", None))
-        self.four_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.four_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.connect_charts.setText(QCoreApplication.translate("MainWindow", u" Connect Charts", None))
         self.four_settings_button.setText("")
 #if QT_CONFIG(tooltip)

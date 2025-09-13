@@ -80,6 +80,52 @@ background : #262a2f;
         QSpinBox::down-button:pressed {
             background: #404043;
         }
+
+
+/* scroll bar*/
+ QScrollBar:vertical {
+	border: none;
+    background: #303030;
+    width: 8px;
+    margin: 21px 0 21px 0;
+	border-radius: 0px;
+ }
+ QScrollBar::handle:vertical {	
+	background: #90b6e7;
+    min-height: 25px;
+	border-radius: 4px
+ }
+
+
+/*设置上下滑条按钮*/
+ QScrollBar::add-line:vertical {
+     border: none;
+    background: #252526;
+     height: 20px;
+	border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+     subcontrol-position: bottom;
+     subcontrol-origin: margin;
+ }
+ QScrollBar::sub-line:vertical {
+	border: none;
+    background: #252526;
+     height: 20px;
+	border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+     subcontrol-position: top;
+     subcontrol-origin: margin;
+ }
+
+
+/*防止遮住滑条背景颜色*/
+ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+     background: none;
+ }
+ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+     background: none;
+ }
+        
         </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -173,6 +219,9 @@ QComboBox:focus {
       <property name="rightMargin">
        <number>15</number>
       </property>
+      <property name="verticalSpacing">
+       <number>8</number>
+      </property>
       <item row="2" column="3">
        <widget class="QPushButton" name="second_color_btn">
         <property name="cursor">
@@ -188,6 +237,12 @@ QComboBox:focus {
       </item>
       <item row="1" column="1">
        <widget class="QComboBox" name="first_data_selection_box">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
         <property name="editable">
          <bool>true</bool>
         </property>
@@ -211,6 +266,12 @@ QComboBox:focus {
       </item>
       <item row="3" column="1">
        <widget class="QComboBox" name="third_data_selection_box">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
         <property name="editable">
          <bool>true</bool>
         </property>
@@ -313,6 +374,12 @@ QComboBox:focus {
       </item>
       <item row="2" column="1">
        <widget class="QComboBox" name="second_data_selection_box">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
         <property name="editable">
          <bool>true</bool>
         </property>

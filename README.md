@@ -3,9 +3,10 @@
 **debug waitlist :**
 1. log经过面板console输出后无法写入.log文件
 2. all选项框与数据单选框没有设置不能同时选中
-3. Comfortaa字体使用
-4. One_chart的颜色选择页面
-5. One_chart导入db里面的列名以及限制输入框只能输入列名
+3. One_chart导入db里面的列名以及限制输入框只能输入列名
+4. 选择颜色，如果关闭颜色选择页面按钮颜色会自动设置成黑色
+5. 输入框内无法限制输入名称
+6. YFinance数据在统一下载的时候下载不了
 
 > Version: v1.0.0
 

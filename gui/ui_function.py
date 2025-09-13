@@ -6,7 +6,9 @@
 import os
 import sys
 import logging
+import sqlite3
 import json
+from datetime import datetime
 from typing import Optional, Dict, Any, Protocol
 
 from gui import *
@@ -516,7 +518,49 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_label_notes.setStyleSheet("color: #ee5c88; margin-left : 20px")
 
     '''ONE CHART PAGE SLOTS METHODS'''
-    def open_settings_window(self, window):
+    def open_settings_window(self, ui, window, name : str):
+        # 先添加下拉框里面的所有选项
+        combo_box_name : list = self._get_sqlite_col_name()
+
+        if name == "one" or name == "four":
+            # 清空选项框
+            try:
+                ui.first_data_selection_box.clear()
+                ui.second_data_selection_box.clear()
+                ui.third_data_selection_box.clear()
+                ui.fourth_data_selection_box.clear()
+            except Exception as e:   # 如果没有控件，就pass
+                pass
+
+            # 添加数据名称
+            try:
+                ui.first_data_selection_box.addItems(combo_box_name)
+                ui.second_data_selection_box.addItems(combo_box_name)
+                ui.third_data_selection_box.addItems(combo_box_name)
+                ui.fourth_data_selection_box.addItems(combo_box_name)
+            except Exception as e:   # 如果没有控件，就pass
+                pass
+
+        if name == "one":
+            try:
+                existing_data: Dict = self.get_settings_from_json()
+                ui.first_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["first_data"]["data_name"])
+                ui.second_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["second_data"]["data_name"])
+                ui.third_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["third_data"]["data_name"])
+            except:
+                pass
+
+        if name == "four":
+            try:
+                existing_data: Dict = self.get_settings_from_json()
+                ui.first_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["first_data"]["data_name"])
+                ui.second_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["second_data"]["data_name"])
+                ui.third_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["third_data"]["data_name"])
+                ui.fourth_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["fourth_data"]["data_name"])
+            except:
+                pass
+
+        # 打开窗口
         window.show()
 
 
@@ -526,7 +570,7 @@ class UiFunctions():  # 删除:mainWindow
         current_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(current_dir, "settings.json")
 
-    def _get_settings_from_json(self)->Dict:
+    def get_settings_from_json(self)->Dict:
         '''内部方法，用户打开并读取json文件'''
         settings_file_path =  self._get_json_settings_path()
 
@@ -558,7 +602,7 @@ class UiFunctions():  # 删除:mainWindow
         third_color = window.third_color_btn.styleSheet().split(":")[1][1:]
 
         # 调用内部方法打开json文件
-        existing_data : Dict = self._get_settings_from_json()
+        existing_data : Dict = self.get_settings_from_json()
 
         existing_data["one_chart_settings"]["first_data"]["data_name"] = first_data
         existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
@@ -581,10 +625,11 @@ class UiFunctions():  # 删除:mainWindow
         
         # 关闭窗口
         widget.close()
+        self.main_window.title_label_2.setText(f"{first_data.replace("_", " ")}")
 
     def one_close_setting_window(self, window, widget):
         # 获取没有更改的设置，然后重置面板
-        original_settings : Dict = self._get_settings_from_json()
+        original_settings : Dict = self.get_settings_from_json()
         color_one : str = original_settings["one_chart_settings"]["first_data"]["color"]
         color_two : str = original_settings["one_chart_settings"]["second_data"]["color"]
         color_three : str = original_settings["one_chart_settings"]["third_data"]["color"]
@@ -597,6 +642,7 @@ class UiFunctions():  # 删除:mainWindow
 
 
     '''FOUR CHART PAGE SETTINGS SLOTS METHODS'''
+
     def four_finish_settings(self, window, widget):
         first_data = window.first_data_selection_box.currentText()
         second_data = window.second_data_selection_box.currentText()
@@ -609,7 +655,7 @@ class UiFunctions():  # 删除:mainWindow
         fourth_color = window.fourth_color_btn.styleSheet().split(":")[1][1:]
 
         # 调用内部方法打开json文件
-        existing_data: Dict = self._get_settings_from_json()
+        existing_data: Dict = self.get_settings_from_json()
 
         existing_data["four_chart_settings"]["first_data"]["data_name"] = first_data
         existing_data["four_chart_settings"]["second_data"]["data_name"] = second_data
@@ -632,7 +678,7 @@ class UiFunctions():  # 删除:mainWindow
         widget.close()
 
     def four_close_setting_window(self, window, widget):
-        original_settings: Dict = self._get_settings_from_json()
+        original_settings: Dict = self.get_settings_from_json()
         color_one: str = original_settings["four_chart_settings"]["first_data"]["color"]
         color_two: str = original_settings["four_chart_settings"]["second_data"]["color"]
         color_three: str = original_settings["four_chart_settings"]["third_data"]["color"]
@@ -646,12 +692,69 @@ class UiFunctions():  # 删除:mainWindow
         widget.close()
 
 
+    '''TABLE PAGE SETTINGS SLOTS METHODS'''
+    def table_finish_settings(self, window, widget):
+        table_data = window.first_data_selection_box.currentText()
+
+        existing_data: Dict = self.get_settings_from_json()
+
+        # 写入json
+        existing_data["table_settings"]["table_name"] = table_data
+
+        # 写入json
+        try:
+            with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
+                json.dump(existing_data, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logging.error(f"Error writing settings file: {e}")
+
+        # 关闭窗口
+        widget.close()
+
+    def table_close_setting_window(self, widget):
+        widget.close()
 
 
     '''GENERAL SETTINGS SLOTS METHODS'''
     def set_color(self, widget):
         color = QColorDialog.getColor()
         widget.setStyleSheet(f"background: {color.name()}")
+
+    def _get_sqlite_col_name(self)-> list:
+        '''获取sqlite列名称'''
+        try:
+            current_file_path = os.path.dirname(os.path.abspath(__file__))
+            sqlite_file_path = os.path.join(current_file_path, "..", "data.db")
+
+            # if not create db
+            if not os.path.exists(sqlite_file_path):
+                error_msg = "Haven't create database file, please download data, the program will automatically create database file"
+                raise FileNotFoundError(error_msg)
+
+            conn = sqlite3.connect(sqlite_file_path)
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Time_Series'")
+            table_exists = cursor.fetchone()
+
+            # check whether TIME_SERIES table exists
+            if not table_exists:
+                error_msg = "Sheet Time_Series does not exist in database, please download data, the program will automatically create Time_series sheet"
+                conn.close()
+                raise FileNotFoundError(error_msg)
+
+            cursor.execute(f"SELECT * FROM Time_Series LIMIT 0")    # get col names from table TIME_SERIES
+            column_names = [description[0] for description in cursor.description][1:]
+            conn.close()
+            return column_names
+
+        except FileNotFoundError as e:
+            logging.error(f"{e}")
+            return []
+
+        except Exception as e:
+            logging.error(f"Failed to get sqlite column name: {e}, continue")
+            return []
 
 
 
@@ -748,12 +851,24 @@ class UiFunctions():  # 删除:mainWindow
             # clear parallel exec
             self._parallel_exec = None
         finally:
+            date_today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self._dl_thread = None
             self._worker = None
             self.main_window.download_btn.setEnabled(True)
             self.main_window.cancel_btn.setEnabled(False)
             self._append_console("ALL TASKS COMPLETE !!! (∠・ω< )⌒★")
 
+            existing_data: Dict = self.get_settings_from_json()
+            existing_data["recent_update_time"] = date_today
+
+            self.main_window.table_update_label.setText(f"Recent Update Time : {date_today}")
+            self.main_window.update_label_2.setText(f"Recent Update Time : {date_today}")
+            self.main_window.four_update_label.setText(f"Recent Update Time : {date_today}")
+            try:
+                with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
+                    json.dump(existing_data, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                logging.error(f"Error writing settings file: {e}")
     def cancel_download(self):
         did = False
         if self._worker is not None:
