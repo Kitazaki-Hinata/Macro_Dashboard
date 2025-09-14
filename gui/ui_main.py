@@ -530,6 +530,7 @@ class Ui_MainWindow(object):
 
         self.btn_and_text_container = QWidget(self.widget_2)
         self.btn_and_text_container.setObjectName(u"btn_and_text_container")
+        self.btn_and_text_container.setMinimumSize(QSize(0, 65))
         self.btn_and_text_container.setMaximumSize(QSize(16777215, 65))
         self.btn_and_text_container.setStyleSheet(u"")
         self.horizontalLayout_21 = QHBoxLayout(self.btn_and_text_container)
@@ -646,7 +647,7 @@ class Ui_MainWindow(object):
         self.text_and_btn = QWidget(self.page_table_container)
         self.text_and_btn.setObjectName(u"text_and_btn")
         self.text_and_btn.setMinimumSize(QSize(0, 82))
-        self.text_and_btn.setMaximumSize(QSize(16777215, 16777215))
+        self.text_and_btn.setMaximumSize(QSize(16777215, 82))
         self.text_and_btn.setStyleSheet(u"QPushButton {\n"
 "	background-color : #252526;\n"
 "	border-radius : 9px;\n"
@@ -742,6 +743,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.four_text_widget = QWidget(self.page_four_container)
         self.four_text_widget.setObjectName(u"four_text_widget")
+        self.four_text_widget.setMinimumSize(QSize(0, 80))
         self.four_text_widget.setMaximumSize(QSize(16777215, 80))
         self.four_text_widget.setStyleSheet(u"QPushButton {\n"
 "	background-color : #252526;\n"
@@ -1119,7 +1121,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 224, 554))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 116, 54))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"

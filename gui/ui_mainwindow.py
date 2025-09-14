@@ -29,11 +29,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # import fonts 使用字体
         self.load_custom_fonts()
 
-        # 展示图表 测试
-        ##############################################################
-        self.chart_functions.show_one_chart("Nasdaq_Index", "one")
-        ##############################################################
-
         # 读取更新日期设置
         existing_data: dict = self.ui_functions.get_settings_from_json()
         date_today = existing_data["recent_update_time"]
@@ -158,6 +153,10 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.table_ui.cancel_btn.clicked.connect(
             lambda: self.ui_functions.table_close_setting_window(self.table_settings_window)
         )
+
+
+        '''DRAW CHART'''
+        self.chart_functions.plot_data("Nasdaq_Index")
 
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''

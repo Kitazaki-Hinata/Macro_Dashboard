@@ -870,6 +870,12 @@ image:url(:/svg/svg/close_2.svg);
                  </item>
                  <item>
                   <widget class="QWidget" name="btn_and_text_container" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>65</height>
+                    </size>
+                   </property>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
@@ -1126,7 +1132,7 @@ margin-right : 10px;</string>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>16777215</height>
+                  <height>82</height>
                  </size>
                 </property>
                 <property name="styleSheet">
@@ -1330,6 +1336,12 @@ margin-right : 10px;</string>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <widget class="QWidget" name="four_text_widget" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>80</height>
+                 </size>
+                </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
@@ -1967,8 +1979,8 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>224</width>
-                      <height>554</height>
+                      <width>116</width>
+                      <height>54</height>
                      </rect>
                     </property>
                     <property name="styleSheet">
