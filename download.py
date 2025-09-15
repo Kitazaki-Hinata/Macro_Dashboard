@@ -1037,10 +1037,10 @@ class TEDownloader(DataDownloader):
         self._dismiss_te_popups(data_name)
 
         # click "5y" button
-        # Try various strategies to click 5Y
-        if not self._click_5y(data_name):
-            logger.error(f"{data_name} FAILED TO CLICK 5y button")
-            return None
+        # Try various strategies to click 5Y；若失败则回退为使用当前可见范围的数据
+        clicked_5y = self._click_5y(data_name)
+        if not clicked_5y:
+            logger.warning(f"{data_name} FAILED TO CLICK 5y button, fallback to current visible range")
 
         # 检查是否已是柱状图；若不是再切换，避免多余步骤
         def _wait_bars(timeout: int = 8) -> List[Any]:
@@ -1096,20 +1096,35 @@ class TEDownloader(DataDownloader):
                 logger.error(f"{data_name} FAILED TO CLICK 'chart type' button, {e}")
                 return None
 
-        # extract table data（改用 Selenium 直接提取，避免整页解析开销）
+        # 读取统计面板中的“当前/上期/日期”三要素
         try:
-            row = WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, 'tr.datatable-row'))
-            )
+            # 多定位器兜底，面板区域在 #panelData 内常见
+            row = None
+            row_selectors = [
+                (By.CSS_SELECTOR, '#panelData .datatable-row'),
+                (By.CSS_SELECTOR, '#panelData table tbody tr'),
+                (By.XPATH, '//*[@id="panelData"]//tr[contains(@class, "datatable-row") or position()=1]')
+            ]
+            for by, sel in row_selectors:
+                try:
+                    row = WebDriverWait(self.driver, TEDownloader.time_wait).until(
+                        EC.presence_of_element_located((by, sel))
+                    )
+                    break
+                except Exception:
+                    continue
+            if row is None:
+                raise Exception("panel row not found")
+
             tds = row.find_elements(By.TAG_NAME, 'td')
             if len(tds) >= 5:
-                current_num = float(tds[1].text.strip())    # 列表中的 current 数字
-                previous_num = float(tds[2].text.strip())   # 上一期数据
-                current_data_date = str(tds[4].text.replace(" ", "_"))  # 最新数据的日期
+                current_num = float(tds[1].text.strip())
+                previous_num = float(tds[2].text.strip())
+                current_data_date = str(tds[4].text.replace(" ", "_"))
             else:
                 raise Exception("datatable-row tds < 5")
 
-            # extract bar height value for actual data
+            # 提取柱状图高度，至少需要两个点用于反推线性关系
             rects = self.driver.find_elements(By.CSS_SELECTOR, 'svg rect.highcharts-point')
             heights: List[float] = []
             for rect in rects:
@@ -1119,31 +1134,31 @@ class TEDownloader(DataDownloader):
                         heights.append(float(str(h)))
                 except Exception:
                     continue
+            if len(heights) < 2:
+                raise Exception("not enough bars to derive scale (need >=2)")
 
-            # 利用两个数据计算数据与bar高度的线性关系，y是结果，x是高度
-            gradient, intercept = self._calc_function(heights[-1], heights[-2], current_num, previous_num,)
-            data_list = []   # store final data value
+            # 线性关系：以最后两个柱对应当前/上期数值来求解
+            gradient, intercept = self._calc_function(heights[-1], heights[-2], current_num, previous_num)
+            data_list: List[float] = []
             for num in heights:
-                final_data = intercept + gradient * num
-                data_list.append(final_data)
+                data_list.append(intercept + gradient * num)
 
-            # construct a DATE mapping
+            # 构造与柱子数量等长的月份序列（从最早到最新）
             month_map = {
                 "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4,
                 "May": 5, "Jun": 6, "Jul": 7, "Aug": 8,
                 "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
             }
             month_abbr, year_str = current_data_date.split("_")
-            month_int: int = month_map[month_abbr]
-            year_int: int = int(year_str)
-            end_date = datetime(year_int, month_int, 1)
+            end_date = datetime(int(year_str), month_map[month_abbr], 1)
+            months_len = len(heights)
             months_list = [
                 (end_date - relativedelta(months=i)).strftime("%b_%Y")
-                for i in reversed(range(61))  # 包含Mar_2020 ~ Mar_2025
+                for i in reversed(range(months_len))
             ]
+
             df = pd.DataFrame(data={"date": months_list, "value": data_list})
             logger.info("TE extracted %s rows=%d", data_name, len(df))
-            # 写入缓存
             self._cache_write(data_name, df)
             return df
         except Exception as e:
@@ -1176,7 +1191,7 @@ class TEDownloader(DataDownloader):
             (By.XPATH, '//a[contains(@href, "5y")]'),
             (By.CSS_SELECTOR, '#dateSpansDiv a:nth-child(3)')
         ]
-        for attempt in range(2):
+        for _ in range(2):
             for by, sel in locators:
                 try:
                     btn = WebDriverWait(self.driver, TEDownloader.time_wait).until(EC.element_to_be_clickable((by, sel)))
