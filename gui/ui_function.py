@@ -233,11 +233,30 @@ class UiFunctions():  # 删除:mainWindow
             logging.error(f"Failed to create .env file at path: {path}, since {e}")
 
     def clear_logs(self):
-        path = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(path, "..", "doc", "error.log")
-        with open(path, 'w'):
+        # 1) 清空 GUI 控件中的日志内容
+        try:
+            if hasattr(self.main_window, 'console_area') and self.main_window.console_area is not None:
+                # QTextEdit 支持 clear()
+                self.main_window.console_area.clear()
+        except Exception as e:
+            logging.error(f"Failed to clear console text area: {e}")
+
+        # 2) 可选：清空日志文件（保持原有行为）
+        try:
+            path = os.path.abspath(os.path.dirname(__file__))
+            path = os.path.join(path, "..", "doc", "error.log")
+            with open(path, 'w', encoding='utf-8'):
+                # 直接截断文件
+                pass
+        except Exception as e:
+            logging.error(f"Failed to truncate log file: {e}")
+
+        # 3) 在控制台区提示已清空（这条新消息会显示在空白后，便于确认操作成功）
+        try:
+            self._append_console("Log window cleared successfully")
+        except Exception:
+            # 如果 _append_console 依赖 console_area 已被清空，不再强制写入
             pass
-        self._append_console("Log file cleared successfully")
 
     '''NOTE PAGE SLOTS METHODS'''
     def note_add_extra_page(self):
