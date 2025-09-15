@@ -193,7 +193,7 @@ class UiFunctions():  # 删除:mainWindow
 
     def settings_api_save(self):
         # find whether exist .env file
-        print("save")
+        logging.info("settings_api_save invoked")
         path = self._env_file_path()
 
         # get api_text from line edit
@@ -355,7 +355,7 @@ class UiFunctions():  # 删除:mainWindow
                     widget.setText("Enter and press any to finish")
                     widget.setStyleSheet('''
                         color : #90b6e7;
-                        font-family : "Comfortaa";
+                        font-family : "Comfortaa", "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
                         font-weight : Bold;
                     ''')
 
@@ -364,7 +364,7 @@ class UiFunctions():  # 删除:mainWindow
                     line_edit.setStyleSheet('''
                         color : white;
                         font-weight : Bold;
-                        font-family : "Comfortaa";
+                        font-family : "Comfortaa", "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
                         font-size : 8px;
                         min-height : 15px;
                         max-height : 15px;
@@ -762,6 +762,11 @@ class UiFunctions():  # 删除:mainWindow
     def _append_console(self, text: str):
         try:
             self.main_window.console_area.append(text)
+        except Exception:
+            pass
+        # 同步写入日志（INFO 级别），便于文件追踪
+        try:
+            logging.getLogger(__name__).info(text)
         except Exception:
             pass
 

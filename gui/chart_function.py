@@ -40,7 +40,7 @@ class ChartFunction():
         self.chart_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.chart_title.setStyleSheet(
             '''
-            font-family : "Comfortaa";
+            font-family : "Comfortaa", "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
             font-weight : Normal;
             font-size : 16px;
             color : #ffffff;
@@ -57,7 +57,7 @@ class ChartFunction():
         # 设置坐标轴标签字体
         font = pg.QtGui.QFont()
         font.setPixelSize(12)
-        font.setFamily("Comfortaa")
+        font.setFamilies(["Comfortaa", "Microsoft YaHei UI", "Segoe UI", "Arial"])
         self.single_plot_widget.getAxis('left').setTickFont(font)
         self.single_plot_widget.getAxis('bottom').setTickFont(font)
         self.single_plot_widget.addLegend()
@@ -120,46 +120,39 @@ class ChartFunction():
             logger.error(f"Unexpected error: {e}")
             return [], []
 
-    def plot_data(self, data_name, color : str = '#90b6e7'):
+    def plot_data(self, data_name, color : list[str] = ["#90b6e7"]):
         """Plot data to single chart，绘制数据并展示"""
 
         self.single_plot_widget.clear()
         # 设置轴标签字体
         font = pg.QtGui.QFont()
         font.setPixelSize(12)
-        font.setFamily("Arial")
-        self.single_plot_widget.setLabel('left', 'Value', color='w', **{'font-family': "Comfortaa", 'font-size': '12px'})
-        self.single_plot_widget.setLabel('bottom', 'Date', color='w', **{'font-family': "Comfortaa", 'font-size': '12px'})
+        font.setFamilies(["Comfortaa", "Microsoft YaHei UI", "Segoe UI", "Arial"])
+        self.single_plot_widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa, Microsoft YaHei UI, Segoe UI, Arial, sans-serif", 'font-size': '12px'})
+        self.single_plot_widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa, Microsoft YaHei UI, Segoe UI, Arial, sans-serif", 'font-size': '12px'})
 
-        dates, values = self._get_data_from_database(data_name)
+        dates , values = self._get_data_from_database(data_name)
 
-        x_data = list(range(len(dates)))
-        pen = pg.mkPen(color=color, width=2)
+        x_data = list(range(len(dates)))  # 0-很多位数，绘图的时候用这个数字，后续再将日期映射过来
+        pen = pg.mkPen(color=color[0], width=2)
 
         self.single_plot_widget.plot(
             x=x_data,
             y=values,
             pen=pen,
-            name=data_name,
-            symbol='o',
-            symbolSize=5,
-            symbolBrush='#90b6e7'
+            name=data_name,  # 显示在legend而不是标题头
+            symbol='o',  #数据点的标记符号，o是圆形
+            symbolSize=2,    #标记点大小，px像素
+            symbolBrush=color[0]  # 标记点填充颜色
         )
 
         axis = self.single_plot_widget.getAxis('bottom')
-        tick_interval = max(1, len(dates) // 10)
-        ticks = []
-
-        for i, date_str in enumerate(dates):
-            if i % tick_interval == 0 or i == len(dates) - 1:
-                short_date = date_str[:10] if len(date_str) > 10 else date_str
-                ticks.append((i, short_date))
-
-        axis.setTicks([ticks])
+        axis.setTicks(dates)
         # 设置坐标轴刻度标签字体
         font = pg.QtGui.QFont()
         font.setPixelSize(10)
-        font.setFamily("Arial")
+        font.setFamilies(["Comfortaa", "Microsoft YaHei UI", "Segoe UI", "Arial"])
+
         self.single_plot_widget.getAxis('left').setTickFont(font)
         self.single_plot_widget.getAxis('bottom').setTickFont(font)
         self.single_plot_widget.addLegend()

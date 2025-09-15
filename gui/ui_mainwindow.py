@@ -5,6 +5,7 @@
 
 import os
 import logging
+from PySide6.QtWidgets import QApplication
 from gui import *
 from .ui_function import UiFunctions
 from gui.custom_grip import CustomGrip
@@ -355,22 +356,36 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             return ""
 
     def load_custom_fonts(self):
-        '''提取文件下面的ttf字体文件然后安装字体'''
+        '''提取文件下面的ttf字体文件然后安装字体，并设置后备字体避免缺字'''
         try:
             current_file_path = os.path.dirname(os.path.abspath(__file__))
             font_folder_path = os.path.join(current_file_path, "font")
 
-            comfortaa_families = QFontDatabase.applicationFontFamilies(
-                QFontDatabase.addApplicationFont(os.path.join(font_folder_path, "Comfortaa-Medium.ttf"))
-            )
+            # 尝试加载 Comfortaa 字体
+            comfortaa_id = QFontDatabase.addApplicationFont(os.path.join(font_folder_path, "Comfortaa-Medium.ttf"))
+            comfortaa_families = QFontDatabase.applicationFontFamilies(comfortaa_id)
+
+            # 设定字体栈，包含常见的中英文字体作为后备
+            families = []
+            if comfortaa_families:
+                families.append(comfortaa_families[0])
+            # Windows 常见中文/英文字体后备
+            families.extend(["Microsoft YaHei UI", "Segoe UI", "Arial", "sans-serif"])
+
+            app_font = QFont()
+            app_font.setFamilies(families)
+            # 可根据 UI 视觉设置默认字号（不强制）
+            # app_font.setPointSize(10)
+
+            # 应用到整个应用程序，优先级高于单个控件默认
+            QApplication.setFont(app_font)
+            self.setFont(app_font)
 
             if comfortaa_families:
-                comfortaa_font = QFont(comfortaa_families[0])
-                self.setFont(comfortaa_font)
-                print(f"已应用字体: {comfortaa_families[0]}")
-                logging.info("Applied font Comfortaa-Medium.ttf")
+                logging.info(f"Applied font: {comfortaa_families[0]}")
+                logging.info("Applied font Comfortaa-Medium.ttf with fallbacks")
             else:
-                raise Exception(f"Failed to load font: comfortaa, use default font")
+                logging.info("Comfortaa not loaded; using fallback font stack")
 
         except Exception as e:
-            logging.error(f"Failed to load custom fonts: {e}, continue")
+            logging.error(f"Failed to load custom fonts: {e}, continue with system defaults")
