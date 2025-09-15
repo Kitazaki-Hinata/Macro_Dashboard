@@ -119,7 +119,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 点击api确认按钮，保存输入的API
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
         # 重置日志文件按钮
-        self.clear_lag_btn.clicked.connect(self.ui_functions.clear_logs)
+        self.clear_log_btn.clicked.connect(self.ui_functions.clear_logs)
 
         '''Notes Editor page btn '''
         self.note_add_btn.clicked.connect(self.ui_functions.note_add_extra_page)

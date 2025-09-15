@@ -3807,7 +3807,7 @@ QPushButton#clear_lag_btn::pressed {
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QPushButton" name="clear_lag_btn">
+                                 <widget class="QPushButton" name="clear_log_btn">
                                   <property name="font">
                                    <font>
                                     <family>Comfortaa</family>

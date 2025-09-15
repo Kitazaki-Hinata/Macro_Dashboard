@@ -2043,12 +2043,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_27.addWidget(self.cancel_btn)
 
-        self.clear_lag_btn = QPushButton(self.download_btn_container)
-        self.clear_lag_btn.setObjectName(u"clear_lag_btn")
-        self.clear_lag_btn.setFont(font5)
-        self.clear_lag_btn.setStyleSheet(u"")
+        self.clear_log_btn = QPushButton(self.download_btn_container)
+        self.clear_log_btn.setObjectName(u"clear_log_btn")
+        self.clear_log_btn.setFont(font5)
+        self.clear_log_btn.setStyleSheet(u"")
 
-        self.verticalLayout_27.addWidget(self.clear_lag_btn)
+        self.verticalLayout_27.addWidget(self.clear_log_btn)
 
 
         self.verticalLayout_32.addWidget(self.download_btn_container)
@@ -2327,7 +2327,7 @@ class Ui_MainWindow(object):
         self.download_for_all_check.setText(QCoreApplication.translate("MainWindow", u"Download ALL data", None))
         self.download_btn.setText(QCoreApplication.translate("MainWindow", u"Download", None))
         self.cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Cancel Download", None))
-        self.clear_lag_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
+        self.clear_log_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
         self.parallel_download_check.setText(QCoreApplication.translate("MainWindow", u"Enable parallel downloads", None))
         self.max_threads_label.setText(QCoreApplication.translate("MainWindow", u"Max threads", None))
         self.console_text.setText(QCoreApplication.translate("MainWindow", u"Console & Logging Information", None))
