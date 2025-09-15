@@ -542,7 +542,7 @@ class DatabaseConverter:
                             self.conn.commit()
                             logger.debug("added column '%s' to Time_Series", data_name)
                         except Exception:
-                            logger.warning(f"{data_name} col name already exists in Time_Series, continue")
+                            pass
 
                         df_db = pd.read_sql("SELECT * FROM Time_Series", self.conn)  # 只读取日期列
                         result_db = df_db.merge(df_after_modify_time, on="date", how="left")
@@ -773,32 +773,28 @@ class YFDownloader(DataDownloader):
                 logger.error("to_db, %s FAILED EXTRACT DATA from Yfinance, %s", table_name, e)
                 return table_name, None
 
-        # Lower concurrency to mitigate YF rate limit
+        # 逐个执行下载任务，不使用多线程
         load_dotenv()
-        env_workers = os.environ.get('YF_WORKERS')
-        workers = max_workers or (int(env_workers) if env_workers and env_workers.isdigit() else min(6, (os.cpu_count() or 4)))
-        logger.info("YF submitting %d tasks (workers=%d)", len(items), workers)
-        with ThreadPoolExecutor(max_workers=workers) as ex:
-            future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
-            for fut in as_completed(future_map):
-                tn = future_map[fut]
-                try:
-                    name, df = fut.result()
-                    if df is not None:
-                        df_dict[name] = df
-                    if return_csv:
-                        for name, df in df_dict.items():
-                            try:
-                                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
-                                os.makedirs(data_folder_path, exist_ok=True)
-                                csv_path = os.path.join(data_folder_path, f"{name}.csv")
-                                df.to_csv(csv_path, index=True)
-                                logging.info(f"{name} saved to {csv_path} Successfully!")
-                            except Exception as e:
-                                logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_db', since {e}")
-                                continue
-                except Exception as e:
-                    logging.error(f"YF future for {tn} raised: {e}")
+        logger.info("YF submitting %d tasks (sequential execution)", len(items))
+        # 逐个执行任务
+        for tn, cfg in items:
+            try:
+                name, df = worker(tn, cfg)
+                if df is not None:
+                    df_dict[name] = df
+                if return_csv:
+                    for name, df in df_dict.items():
+                        try:
+                            data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                            os.makedirs(data_folder_path, exist_ok=True)
+                            csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                            df.to_csv(csv_path, index=True)
+                            logging.info(f"{name} saved to {csv_path} Successfully!")
+                        except Exception as e:
+                            logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_db', since {e}")
+                            continue
+            except Exception as e:
+                logging.error(f"YF task for {tn} raised: {e}")
 
 
 class FREDDownloader(DataDownloader):

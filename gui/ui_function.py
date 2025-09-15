@@ -241,13 +241,22 @@ class UiFunctions():  # 删除:mainWindow
         except Exception as e:
             logging.error(f"Failed to clear console text area: {e}")
 
-        # 2) 可选：清空日志文件（保持原有行为）
+        # 2) 清空日志文件
         try:
             path = os.path.abspath(os.path.dirname(__file__))
-            path = os.path.join(path, "..", "doc", "error.log")
-            with open(path, 'w', encoding='utf-8'):
-                # 直接截断文件
-                pass
+            file_name_list = [
+                "debug_worker.log",
+                "error_gui.log",
+                "error_worker.log",
+                "info_gui.log",
+                "info_worker.log",
+                "warning_worker.log"
+            ]
+            for name in file_name_list:
+                path_file = os.path.join(path, "..", "logs", name)
+                with open(path_file, 'w', encoding='utf-8'):
+                    # 直接截断文件
+                    pass
         except Exception as e:
             logging.error(f"Failed to truncate log file: {e}")
 
