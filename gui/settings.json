@@ -2,7 +2,7 @@
   "one_chart_settings": {
     "first_data": {
       "data_name": "ECI_Employment_Cost_index",
-      "time_lags": 4,
+      "time_lags": 0,
       "color": "#90b6e7"
     },
     "second_data": {
@@ -37,5 +37,5 @@
   "table_settings": {
     "table_name": ""
   },
-  "recent_update_time": "2025-09-14 00:39:16"
+  "recent_update_time": "2025-09-15 13:06:24"
 }

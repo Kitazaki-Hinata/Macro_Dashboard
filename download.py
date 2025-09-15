@@ -141,7 +141,7 @@ class DatabaseConverter:
 
         # 3) FRED（包含 'date' 列 + 一个数值列）
         try:
-            if "date" in df.columns and str(df["date"][1])[4] == "-":
+            if "date" in df.columns and str(df["date"].iloc[1])[4] == "-":
                 # 找到第一个非 date 的数据列
                 value_cols = [c for c in df.columns if c != "date"]
                 if value_cols:
