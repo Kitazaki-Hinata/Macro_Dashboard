@@ -1,6 +1,7 @@
 # Macro Dashboard 轻量级宏观经济工作台
 
 **debug waitlist :**
+
 1. log经过面板console输出后无法写入.log文件
 2. all选项框与数据单选框没有设置不能同时选中
 3. One_chart导入db里面的列名以及限制输入框只能输入列名
@@ -54,7 +55,9 @@ uv sync
 ```
 
 ### 3. 获取 API key
+
 请访问以下地址获取免费API key：
+
 - BEA: <https://apps.bea.gov/api/signup/>
 - FRED St. Louis: <https://fredaccount.stlouisfed.org/apikeys>
 - BLS: <https://data.bls.gov/registrationEngine/>
@@ -69,9 +72,34 @@ fred = "YOURAPIKEY-123456"
 bls = "YOUR-API-KEY-000000"
 ```
 
+- 也可以复制仓库根目录下的 `.env.example` 为 `.env`，并按注释修改。
+
 - 保存「.env」后打开入口文件
 - 如果没有下载数据，选择开始年份（最早 2020），并下载数据
 - 等待下载完成后，设置图表样式和想要展示的数据
+
+### 5. 环境变量（运行参数与缓存设置）
+
+以下环境变量可在项目根目录的 `.env` 文件中配置（推荐），或在运行环境中设置：
+
+- 基础 API Keys
+  - `bea`、`fred`、`bls`：对应各数据源 API Key（示例见上节）。
+
+- 并发与超时
+  - `BEA_WORKERS`、`FRED_WORKERS`、`BLS_WORKERS`、`YF_WORKERS`、`TE_WORKERS`：各来源的线程数；不设置则使用内置合理默认。
+  - `BLS_POST_TIMEOUT`：BLS POST 请求超时（秒），默认 60；网络较慢时可提高至 120。
+
+- TradingEconomics 运行参数
+  - `TE_HEADLESS`：是否无头运行（true/false），默认 false（显示浏览器，便于调试）。
+  - `TE_SHOW_BROWSER`：强制显示浏览器（true 优先级高于 TE_HEADLESS）。
+  - `TE_FORCE_HEADLESS`：强制无头运行（true 优先级最高）。
+  - `TE_DISABLE_CACHE`：是否禁用 TE 下载缓存，默认 true（禁用）。禁用后不读取/写入 `cache/te`，可避免旧数据或“看似重复”的缓存命中。
+  - `TE_CACHE_TTL_SECONDS`：TE 磁盘/内存缓存的生存时间（秒），默认 600；仅在 `TE_DISABLE_CACHE=false` 时生效。
+
+建议：
+
+- 调试 TradingEconomics 页面定位时，将 `TE_SHOW_BROWSER=true` 或 `TE_HEADLESS=false`，便于观察页面元素。
+- 普通使用建议保持 `TE_DISABLE_CACHE=true`（默认），需要提升重复抓取效率时再设为 `false` 并根据网络情况调整 `TE_CACHE_TTL_SECONDS`。
 
 ***
 
@@ -88,11 +116,18 @@ bls = "YOUR-API-KEY-000000"
 - TradingEconomics
 - 其他来源的数据
 
+### 建议的并发与抓取参数
+
+- Yahoo Finance：建议 `YF_WORKERS=1`，避免被限流
+- BLS：`BLS_WORKERS=2`，`BLS_POST_TIMEOUT=120`（秒）
+- TradingEconomics：调试期可 `TE_SHOW_BROWSER=true` 以显示浏览器；生产环境可 `TE_FORCE_HEADLESS=true` 无界面运行。
+- TradingEconomics 缓存：默认禁用（`TE_DISABLE_CACHE=true`）。如需开启缓存，请设置 `TE_DISABLE_CACHE=false` 并可配合 `TE_CACHE_TTL_SECONDS=900` 减少重复抓取。
+
 ### 正在更新的数据源
 
 <!-- markdownlint-disable MD033 -->
 <details>
-	<summary>点击查看详情</summary>
+  <summary>点击查看详情</summary>
 
 - AAII散户投资人情绪指数
 - NAAIM经理人持仓指数
@@ -147,7 +182,7 @@ bls = "YOUR-API-KEY-000000"
 - 彭博经济意外指数
 - 标普500同比与基钦周期
 
-</details>
+ </details>
 <!-- markdownlint-enable MD033 -->
 
 ***

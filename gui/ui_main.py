@@ -8,15 +8,15 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale, # pyright: ignore[reportUnusedImport]
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+    QPalette, QPixmap, QTransform)
 from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFrame,
-    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
+    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView, # type: ignore
     QLabel, QLineEdit, QMainWindow, QPlainTextEdit,
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
     QSpinBox, QStackedWidget, QTableView, QTextEdit,
@@ -27,16 +27,17 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1267, 792)
-        MainWindow.setMinimumSize(QSize(1267, 792))
-        MainWindow.setMaximumSize(QSize(2304, 1440))
-        MainWindow.setStyleSheet(u"* {\n"
-"	background-color: #33363a;\n"
+        MainWindow.setMinimumSize(QSize(1267, 792)) # pyright: ignore[reportUnknownMemberType]
+        MainWindow.setMaximumSize(QSize(2304, 1440)) # pyright: ignore[reportUnknownMemberType]
+        MainWindow.setStyleSheet(u"* {\n" # type: ignore
+"\tbackground-color: #33363a;\n"
+"\tfont-family: \"Comfortaa\", \"Microsoft YaHei UI\", \"Segoe UI\", Arial, sans-serif;\n"
 "}\n"
 "\n"
 "QToolTip {\n"
 "    /* \u8bbe\u7f6e\u63d0\u793a\u6846color */\n"
 "    background-color: #ffffff;\n"
-"	font-family : \"Comfortaa\";\n"
+"\tfont-family: \"Comfortaa\", \"Microsoft YaHei UI\", \"Segoe UI\", Arial, sans-serif;\n"
 "    background-image: none;\n"
 "    color: #90b6e7;\n"
 "    border: 0;\n"
@@ -189,7 +190,7 @@ class Ui_MainWindow(object):
 "\n"
 "        \n"
 "")
-        self.style_sheet = QWidget(MainWindow)
+        self.style_sheet = QWidget(MainWindow) # pyright: ignore[reportUnknownArgumentType]
         self.style_sheet.setObjectName(u"style_sheet")
         self.style_sheet.setStyleSheet(u"QWidget#header_bar {\n"
 "background : #2b2e32;\n"
@@ -1717,7 +1718,7 @@ class Ui_MainWindow(object):
         font6.setPointSize(12)
         self.textEdit.setFont(font6)
         self.textEdit.setStyleSheet(u"color:white; \n"
-"font-famlily:\"Comfortaa\";\n"
+"font-family:\"Comfortaa\";\n"
 "border :0;\n"
 "background:#262a2f;\n"
 "padding :5px;\n"
@@ -2016,14 +2017,14 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "/*clear lags*/\n"
-"QPushButton#clear_log_btn {\n"
+"QPushButton#clear_lag_btn {\n"
 "	background-color:#EE5C88;\n"
 "	color : #252526;\n"
 "}\n"
-"QPushButton#clear_log_btn::hover {\n"
+"QPushButton#clear_lag_btn::hover {\n"
 "	background : #fa88aa;\n"
 "}\n"
-"QPushButton#clear_log_btn::pressed {\n"
+"QPushButton#clear_lag_btn::pressed {\n"
 "	background : #EE5C88;\n"
 "}")
         self.verticalLayout_27 = QVBoxLayout(self.download_btn_container)
@@ -2043,12 +2044,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_27.addWidget(self.cancel_btn)
 
-        self.clear_log_btn = QPushButton(self.download_btn_container)
-        self.clear_log_btn.setObjectName(u"clear_log_btn")
-        self.clear_log_btn.setFont(font5)
-        self.clear_log_btn.setStyleSheet(u"")
+        self.clear_lag_btn = QPushButton(self.download_btn_container)
+        self.clear_lag_btn.setObjectName(u"clear_lag_btn")
+        self.clear_lag_btn.setFont(font5)
+        self.clear_lag_btn.setStyleSheet(u"")
 
-        self.verticalLayout_27.addWidget(self.clear_log_btn)
+        self.verticalLayout_27.addWidget(self.clear_lag_btn)
 
 
         self.verticalLayout_32.addWidget(self.download_btn_container)
@@ -2117,7 +2118,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.console_area.sizePolicy().hasHeightForWidth())
         self.console_area.setSizePolicy(sizePolicy1)
         self.console_area.setStyleSheet(u"color:white; \n"
-"font-famlily:\"Comfortaa\";\n"
+"font-family:\"Comfortaa\";\n"
 "border :0;\n"
 "background:transparent;\n"
 "padding :5px;\n"
@@ -2163,7 +2164,7 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.style_sheet)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi(MainWindow) # type: ignore
 
         self.stackedWidget.setCurrentIndex(0)
 
@@ -2327,7 +2328,7 @@ class Ui_MainWindow(object):
         self.download_for_all_check.setText(QCoreApplication.translate("MainWindow", u"Download ALL data", None))
         self.download_btn.setText(QCoreApplication.translate("MainWindow", u"Download", None))
         self.cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Cancel Download", None))
-        self.clear_log_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
+        self.clear_lag_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
         self.parallel_download_check.setText(QCoreApplication.translate("MainWindow", u"Enable parallel downloads", None))
         self.max_threads_label.setText(QCoreApplication.translate("MainWindow", u"Max threads", None))
         self.console_text.setText(QCoreApplication.translate("MainWindow", u"Console & Logging Information", None))

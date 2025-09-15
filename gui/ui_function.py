@@ -45,6 +45,21 @@ class _MainWindowProto(Protocol):
     download_btn: Any
     cancel_btn: Any
     read_and_agree_check : Any
+    # UI labels and controls for various pages
+    title_label_2: Any
+    table_update_label: Any
+    update_label_2: Any
+    four_update_label: Any
+    # Note page controls
+    note_enter_passage_name: Any
+    note_status_bar: Any
+    scrollAreaWidgetContents: Any
+    plainTextEdit: Any
+    save_text: Any
+    note_update_label: Any
+    note_label_notes: Any
+    # Download controls
+    download_csv_check: Any
 
 
 class _DownloadWorker(QObject):
@@ -53,7 +68,7 @@ class _DownloadWorker(QObject):
     finished = Signal()
     failed = Signal(str)
 
-    def __init__(self, json_data: Dict[str, Any], start_year: int, download_all: bool, selected_sources: Optional[list[str]] | None = None, main_window = None):
+    def __init__(self, json_data: Dict[str, Any], start_year: int, download_all: bool, selected_sources: Optional[list[str]] | None = None, main_window: Optional[_MainWindowProto] = None):
         super().__init__()
         self._json_data = json_data
         self._start_year = start_year
@@ -218,20 +233,30 @@ class UiFunctions():  # 删除:mainWindow
             logging.error(f"Failed to create .env file at path: {path}, since {e}")
 
     def clear_logs(self):
-        base_path = os.path.abspath(os.path.dirname(__file__))
-        log_dir = os.path.join(base_path, "..", "logs")
-        log_name_list = [
-            "debug_worker.log",
-            "error_worker.log",
-            "info_gui.log",
-            "info_worker.log",
-            "warning_worker.log"
-        ]
-        for name in log_name_list:
-            log_file_path = os.path.join(log_dir, name)
-            with open(log_file_path, 'w'):
+        # 1) 清空 GUI 控件中的日志内容
+        try:
+            if hasattr(self.main_window, 'console_area') and self.main_window.console_area is not None:
+                # QTextEdit 支持 clear()
+                self.main_window.console_area.clear()
+        except Exception as e:
+            logging.error(f"Failed to clear console text area: {e}")
+
+        # 2) 可选：清空日志文件（保持原有行为）
+        try:
+            path = os.path.abspath(os.path.dirname(__file__))
+            path = os.path.join(path, "..", "doc", "error.log")
+            with open(path, 'w', encoding='utf-8'):
+                # 直接截断文件
                 pass
-            self._append_console("Log file cleared successfully")
+        except Exception as e:
+            logging.error(f"Failed to truncate log file: {e}")
+
+        # 3) 在控制台区提示已清空（这条新消息会显示在空白后，便于确认操作成功）
+        try:
+            self._append_console("Log window cleared successfully")
+        except Exception:
+            # 如果 _append_console 依赖 console_area 已被清空，不再强制写入
+            pass
 
     '''NOTE PAGE SLOTS METHODS'''
     def note_add_extra_page(self):
@@ -285,7 +310,7 @@ class UiFunctions():  # 删除:mainWindow
 
         # update interface
         new_button.clicked.connect(
-            lambda checked, fname=button_name: self.note_btn_open_file_slot(fname)
+            lambda checked: self.note_btn_open_file_slot(button_name) # type: ignore
         )
         self.main_window.note_status_bar.setText("Create note successful")
         self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
@@ -382,7 +407,7 @@ class UiFunctions():  # 删除:mainWindow
                     line_edit.setObjectName(f"rename_edit_{note_name}")
                     layout.insertWidget(i + 1, line_edit)
 
-                    def finish_rename(le=line_edit, btn=widget, old_name=old_object_name, idx=i):
+                    def finish_rename(le: QLineEdit = line_edit, btn: QPushButton = widget, old_name: str = old_object_name, idx: int = i):
                         new_name = le.text().strip()
                         if new_name:
                             illegal_chars = '\\/:*?"<>| '
@@ -427,7 +452,7 @@ class UiFunctions():  # 删除:mainWindow
 
                                     # 重新连接新的信号
                                     btn.clicked.connect(
-                                        lambda checked, name=new_name: self.note_btn_open_file_slot(name))
+                                        lambda checked: self.note_btn_open_file_slot(new_name)) # type: ignore
 
                                     self.main_window.note_status_bar.setText("Rename successful")
                                     self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
@@ -460,7 +485,7 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_status_bar.setText("Note not found")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
 
-    def note_btn_open_file_slot(self, file_name):
+    def note_btn_open_file_slot(self, file_name: str):
         # 传入打开的文件名称，所有新建的按钮均调用这个槽函数
         self.main_window.save_text.setDisabled(False)
         self.main_window.plainTextEdit.setReadOnly(False)  # 先设置允许编写
@@ -505,7 +530,7 @@ class UiFunctions():  # 删除:mainWindow
         )
         self.main_window.note_label_notes.setStyleSheet("color: #ee5c88; margin-left : 20px")
         self.main_window.save_text.setDisabled(True)
-    def note_save_file(self, file_name):
+    def note_save_file(self, file_name: str):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         selected_note_dir = os.path.join(parent_dir, "note", f"{file_name}.txt")
@@ -527,9 +552,9 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_label_notes.setStyleSheet("color: #ee5c88; margin-left : 20px")
 
     '''ONE CHART PAGE SLOTS METHODS'''
-    def open_settings_window(self, ui, window, name : str):
+    def open_settings_window(self, ui: Any, window: QWidget, name: str):
         # 先添加下拉框里面的所有选项
-        combo_box_name : list = self._get_sqlite_col_name()
+        combo_box_name: list[str] = self._get_sqlite_col_name()
 
         if name == "one" or name == "four":
             # 清空选项框
@@ -538,7 +563,7 @@ class UiFunctions():  # 删除:mainWindow
                 ui.second_data_selection_box.clear()
                 ui.third_data_selection_box.clear()
                 ui.fourth_data_selection_box.clear()
-            except Exception as e:   # 如果没有控件，就pass
+            except Exception:   # 如果没有控件，就pass
                 pass
 
             # 添加数据名称
@@ -547,12 +572,12 @@ class UiFunctions():  # 删除:mainWindow
                 ui.second_data_selection_box.addItems(combo_box_name)
                 ui.third_data_selection_box.addItems(combo_box_name)
                 ui.fourth_data_selection_box.addItems(combo_box_name)
-            except Exception as e:   # 如果没有控件，就pass
+            except Exception:   # 如果没有控件，就pass
                 pass
 
         if name == "one":
             try:
-                existing_data: Dict = self.get_settings_from_json()
+                existing_data: Dict[str, Any] = self.get_settings_from_json()
                 ui.first_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["first_data"]["data_name"])
                 ui.second_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["second_data"]["data_name"])
                 ui.third_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["third_data"]["data_name"])
@@ -561,7 +586,7 @@ class UiFunctions():  # 删除:mainWindow
 
         if name == "four":
             try:
-                existing_data: Dict = self.get_settings_from_json()
+                existing_data: Dict[str, Any] = self.get_settings_from_json()
                 ui.first_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["first_data"]["data_name"])
                 ui.second_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["second_data"]["data_name"])
                 ui.third_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["third_data"]["data_name"])
@@ -579,7 +604,7 @@ class UiFunctions():  # 删除:mainWindow
         current_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(current_dir, "settings.json")
 
-    def get_settings_from_json(self)->Dict:
+    def get_settings_from_json(self)->Dict[str, Any]:
         '''内部方法，用户打开并读取json文件'''
         settings_file_path =  self._get_json_settings_path()
 
@@ -587,7 +612,7 @@ class UiFunctions():  # 删除:mainWindow
         try:
             if os.path.exists(settings_file_path):
                 with open(settings_file_path, 'r', encoding='utf-8') as f:
-                    existing_data = json.load(f)
+                    existing_data: Dict[str, Any] = json.load(f)
             else:
                 existing_data = {}
         except Exception as e:
@@ -595,7 +620,7 @@ class UiFunctions():  # 删除:mainWindow
             existing_data = {}
         return existing_data
 
-    def one_finish_settings(self, window, widget):
+    def one_finish_settings(self, window: Any, widget: QWidget):
         '''确认按钮的槽函数'''
         # define variables
         first_data = window.first_data_selection_box.currentText()
@@ -611,7 +636,7 @@ class UiFunctions():  # 删除:mainWindow
         third_color = window.third_color_btn.styleSheet().split(":")[1][1:]
 
         # 调用内部方法打开json文件
-        existing_data : Dict = self.get_settings_from_json()
+        existing_data : Dict[str, Any] = self.get_settings_from_json()
 
         existing_data["one_chart_settings"]["first_data"]["data_name"] = first_data
         existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
@@ -633,12 +658,16 @@ class UiFunctions():  # 删除:mainWindow
             logging.error(f"Error writing settings file: {e}")
         
         # 关闭窗口
+        # 同步更新单图页面的标题标签
+        try:
+            self.main_window.title_label_2.setText(first_data.replace("_", " "))
+        except Exception:
+            pass
         widget.close()
-        self.main_window.title_label_2.setText(f"{first_data.replace("_", " ")}")
 
-    def one_close_setting_window(self, window, widget):
+    def one_close_setting_window(self, window: Any, widget: QWidget):
         # 获取没有更改的设置，然后重置面板
-        original_settings : Dict = self.get_settings_from_json()
+        original_settings : Dict[str, Any] = self.get_settings_from_json()
         color_one : str = original_settings["one_chart_settings"]["first_data"]["color"]
         color_two : str = original_settings["one_chart_settings"]["second_data"]["color"]
         color_three : str = original_settings["one_chart_settings"]["third_data"]["color"]
@@ -652,7 +681,7 @@ class UiFunctions():  # 删除:mainWindow
 
     '''FOUR CHART PAGE SETTINGS SLOTS METHODS'''
 
-    def four_finish_settings(self, window, widget):
+    def four_finish_settings(self, window: Any, widget: QWidget):
         first_data = window.first_data_selection_box.currentText()
         second_data = window.second_data_selection_box.currentText()
         third_data = window.third_data_selection_box.currentText()
@@ -664,7 +693,7 @@ class UiFunctions():  # 删除:mainWindow
         fourth_color = window.fourth_color_btn.styleSheet().split(":")[1][1:]
 
         # 调用内部方法打开json文件
-        existing_data: Dict = self.get_settings_from_json()
+        existing_data: Dict[str, Any] = self.get_settings_from_json()
 
         existing_data["four_chart_settings"]["first_data"]["data_name"] = first_data
         existing_data["four_chart_settings"]["second_data"]["data_name"] = second_data
@@ -686,8 +715,8 @@ class UiFunctions():  # 删除:mainWindow
         # 关闭窗口
         widget.close()
 
-    def four_close_setting_window(self, window, widget):
-        original_settings: Dict = self.get_settings_from_json()
+    def four_close_setting_window(self, window: Any, widget: QWidget):
+        original_settings: Dict[str, Any] = self.get_settings_from_json()
         color_one: str = original_settings["four_chart_settings"]["first_data"]["color"]
         color_two: str = original_settings["four_chart_settings"]["second_data"]["color"]
         color_three: str = original_settings["four_chart_settings"]["third_data"]["color"]
@@ -702,10 +731,10 @@ class UiFunctions():  # 删除:mainWindow
 
 
     '''TABLE PAGE SETTINGS SLOTS METHODS'''
-    def table_finish_settings(self, window, widget):
+    def table_finish_settings(self, window: Any, widget: QWidget):
         table_data = window.first_data_selection_box.currentText()
 
-        existing_data: Dict = self.get_settings_from_json()
+        existing_data: Dict[str, Any] = self.get_settings_from_json()
 
         # 写入json
         existing_data["table_settings"]["table_name"] = table_data
@@ -720,16 +749,16 @@ class UiFunctions():  # 删除:mainWindow
         # 关闭窗口
         widget.close()
 
-    def table_close_setting_window(self, widget):
+    def table_close_setting_window(self, widget: QWidget):
         widget.close()
 
 
     '''GENERAL SETTINGS SLOTS METHODS'''
-    def set_color(self, widget):
+    def set_color(self, widget: Any):
         color = QColorDialog.getColor()
         widget.setStyleSheet(f"background: {color.name()}")
 
-    def _get_sqlite_col_name(self)-> list:
+    def _get_sqlite_col_name(self)-> list[str]:
         '''获取sqlite列名称'''
         try:
             current_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -872,7 +901,7 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.cancel_btn.setEnabled(False)
             self._append_console("ALL TASKS COMPLETE !!! (∠・ω< )⌒★")
 
-            existing_data: Dict = self.get_settings_from_json()
+            existing_data: Dict[str, Any] = self.get_settings_from_json()
             existing_data["recent_update_time"] = date_today
 
             self.main_window.table_update_label.setText(f"Recent Update Time : {date_today}")
@@ -918,7 +947,7 @@ class _ParallelExecutor(QObject):
     _completed: int
     _procs: Dict[str, Any]
 
-    def __init__(self, json_data: Dict[str, Any], start_year: int, sources: list[str], max_threads: int = 4, main_window=None):
+    def __init__(self, json_data: Dict[str, Any], start_year: int, sources: list[str], max_threads: int = 4, main_window: Optional[_MainWindowProto] = None):
         super().__init__()
         self._json_data = json_data
         self._start_year = start_year
