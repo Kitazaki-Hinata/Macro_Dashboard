@@ -1,6 +1,7 @@
 # Macro Dashboard 轻量级宏观经济工作台
 
 **debug waitlist :**
+
 1. log经过面板console输出后无法写入.log文件
 2. all选项框与数据单选框没有设置不能同时选中
 3. One_chart导入db里面的列名以及限制输入框只能输入列名
@@ -54,7 +55,9 @@ uv sync
 ```
 
 ### 3. 获取 API key
+
 请访问以下地址获取免费API key：
+
 - BEA: <https://apps.bea.gov/api/signup/>
 - FRED St. Louis: <https://fredaccount.stlouisfed.org/apikeys>
 - BLS: <https://data.bls.gov/registrationEngine/>
@@ -68,6 +71,8 @@ bea = "XXXXXX-YOUR-API-KEY"
 fred = "YOURAPIKEY-123456"
 bls = "YOUR-API-KEY-000000"
 ```
+
+- 也可以复制仓库根目录下的 `.env.example` 为 `.env`，并按注释修改。
 
 - 保存「.env」后打开入口文件
 - 如果没有下载数据，选择开始年份（最早 2020），并下载数据
@@ -88,11 +93,17 @@ bls = "YOUR-API-KEY-000000"
 - TradingEconomics
 - 其他来源的数据
 
+### 建议的并发与抓取参数
+
+- Yahoo Finance：建议 `YF_WORKERS=1`，避免被限流
+- BLS：`BLS_WORKERS=2`，`BLS_POST_TIMEOUT=120`（秒）
+- TradingEconomics：调试期可 `TE_SHOW_BROWSER=true` 以显示浏览器；生产环境可 `TE_FORCE_HEADLESS=true` 无界面运行；开启缓存 `TE_CACHE_TTL_SECONDS=900` 减少重复抓取
+
 ### 正在更新的数据源
 
 <!-- markdownlint-disable MD033 -->
 <details>
-	<summary>点击查看详情</summary>
+  <summary>点击查看详情</summary>
 
 - AAII散户投资人情绪指数
 - NAAIM经理人持仓指数
@@ -147,7 +158,7 @@ bls = "YOUR-API-KEY-000000"
 - 彭博经济意外指数
 - 标普500同比与基钦周期
 
-</details>
+ </details>
 <!-- markdownlint-enable MD033 -->
 
 ***
