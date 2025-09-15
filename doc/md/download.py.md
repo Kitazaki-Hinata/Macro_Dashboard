@@ -7,32 +7,107 @@
 ---
 ## Module doc
 
-_No docstring._
+数据下载与入库模块（核心）
+
+职责概览：
+- 提供面向不同来源（BEA/FRED/BLS/Yahoo Finance/TradingEconomics）的下载器实现
+- 统一重试/退避策略与请求日志
+- 将异构数据规范化为统一的「date + value」形式并写入 SQLite 的 `Time_Series` 表
+- 采用全局写锁串行化写入，避免并发写 SQLite 引发冲突
+
+使用约定：
+- 通过 `DownloaderFactory.create_downloader(source, json_data, request_year)` 构造具体下载器
+- 通过 `to_db()` 触发下载与入库。可选 `return_csv=True` 仅导出 CSV
+
+环境变量（节选）：
+- BEA_WORKERS / FRED_WORKERS / BLS_WORKERS / YF_WORKERS 控制并发
+- BLS_POST_TIMEOUT 控制 BLS 请求超时；BLS 固定 5s 重试间隔
+- TE_SHOW_BROWSER / TE_FORCE_HEADLESS / TE_HEADLESS 控制 TE 是否可视化/无头
+- TE_CACHE_TTL_SECONDS 控制 TE 短期缓存 TTL
+
+注意：本模块仅负责“数据侧”，GUI 与业务编排在 `main.py`/`worker_run_source.py`。
 
 ## Functions
 
 ### _exponential_backoff_delays(max_attempts, base, factor, jitter)
 
-Generate delays for exponential backoff with jitter.
+生成指数退避延时序列（带抖动）。
+
+Args:
+    max_attempts: 最大尝试次数（返回的延时个数）
+    base: 初始延时秒数
+    factor: 每次递增的倍率
+    jitter: 在每次延时基础上的随机扰动幅度（±jitter）
+
+Returns:
+    一个长度为 `max_attempts` 的延时秒数列表。
 ### http_get_with_retry(url, *, params, headers, timeout, max_attempts)
 
-_No docstring._
+带重试的 HTTP GET。
+
+Args:
+    url: 目标 URL
+    params: 查询参数
+    headers: 请求头
+    timeout: 单次请求超时（秒）
+    max_attempts: 最大尝试次数（指数退避）
+
+Returns:
+    requests.Response 对象（仅在 resp.ok 时返回）
+
+Raises:
+    Exception: 在所有尝试失败时抛出，信息包含最后一次错误。
 ### http_post_with_retry(url, *, data, json_data, headers, timeout, max_attempts, delay_seconds)
 
-_No docstring._
+带重试的 HTTP POST（支持固定间隔或指数退避）。
+
+Args:
+    url: 目标 URL
+    data: 表单数据（与 json_data 互斥）
+    json_data: JSON 负载（与 data 互斥）
+    headers: 请求头
+    timeout: 单次请求超时（秒）
+    max_attempts: 最大尝试次数
+    delay_seconds: 若提供，则两次尝试之间使用固定间隔（例如 BLS 要求 5s）；否则使用指数退避
+
+Returns:
+    requests.Response 对象（仅在 resp.ok 时返回）
+
+Raises:
+    Exception: 在所有尝试失败时抛出。
 ### yf_download_with_retry(symbol, *, start, end, interval, max_attempts)
 
-Wrapper around yfinance.download with exponential backoff.
+yfinance.download 包装器（带指数退避与限流容错）。
 
-- Explicitly sets auto_adjust=False to avoid FutureWarning noise and preserves raw OHLCV.
-- Sets threads=False to reduce internal concurrency (we already manage external concurrency).
-- Retries on YFRateLimitError or empty DataFrame results.
+设计要点：
+- 固定 `auto_adjust=False` 保留原始 OHLCV，避免未来警告
+- 固定 `threads=False`，外部已控制并发
+- 若返回空 DataFrame 或触发限流异常则重试
+
+Args:
+    symbol: 证券代码
+    start: 开始日期（YYYY-MM-DD）
+    end: 结束日期（YYYY-MM-DD）
+    interval: 采样间隔（默认 1d）
+    max_attempts: 最大尝试次数
+
+Returns:
+    DataFrame，索引为日期，包含标准 OHLCV 列；若最终失败会抛出异常。
+
+Raises:
+    Exception: 所有尝试失败或最终为空时抛出。
 
 ## Classes
 
 ### class DatabaseConverter
 
-_No docstring._
+将不同来源的 DataFrame 规范化并写入 SQLite。
+
+功能：
+- 识别多种来源的时间/数值格式（BEA/FRED/BLS/TE/YF）
+- 统一为两列：date(YYYY-MM-DD) + value(重命名为 data_name)
+- 维护/扩展 `Time_Series` 表，合并列并保留最新值
+- 使用全局写锁确保并发安全
 #### DatabaseConverter.__init__(self, db_file)
 
 _No docstring._
@@ -41,112 +116,207 @@ _No docstring._
 _No docstring._
 #### DatabaseConverter._rename_bea_date_col(df)
 
-modify time index, unify all time index in different dataframe(time series dataframe
+将 BEA 数据的时间索引标准化为列 `date` 并置于首列。
 #### DatabaseConverter._format_converter(df, data_name, is_pct_data)
 
-将不同来源的数据统一为两列: date(YYYY-MM-DD) + value 列名为 data_name。
-足够健壮地应对 None/Timestamp/int 等类型，并容忍短表、重复、缺失。
+将异构来源的数据规范化为 `date + value` 形式。
+
+Args:
+    df: 待规范化的 DataFrame
+    data_name: 目标列名（写入 DB 的列名）
+    is_pct_data: 是否按百分比系列处理（个别来源会影响列选择）
+
+Returns:
+    仅含 `date` 与 `data_name` 两列的 DataFrame；若输入为空/无法解析则返回空表。
 #### DatabaseConverter._create_ts_sheet(self, start_date)
 
-If time_series_table does not exist, then create new db
-如果sheet不存在，创建sheet
+确保 `Time_Series` 表存在并补齐日期。
+
+行为：
+- 若不存在则创建，并从 `start_date` 起写入至今日的每日日期
+- 若已存在则仅追加缺失日期至今日
 #### DatabaseConverter.write_into_db(self, df, data_name, start_date, is_time_series, is_pct_data)
 
-params df: df that used to write into db
-params data_name: used in db columns and errors
-params start_date, start date of  all data, used when create db sheet
-params is_time_series: judge whether it is time series data, incl. BEA, BLS, YF, TE, FRED
-params is_pct_data: input json data, bool value, "needs_pct"
+将数据写入 SQLite。
+
+Args:
+    df: 待写入数据表
+    data_name: 作为列名写入 `Time_Series` 或新表的名称
+    start_date: 用于初始化 `Time_Series` 的起始日期（YYYY-MM-DD）
+    is_time_series: 是否写入到 `Time_Series`（否则写入独立表）
+    is_pct_data: 对个别来源的百分比系列的提示（目前仅参与规范化逻辑）
+
+Returns:
+    若写入 `Time_Series`：返回最后两列的 DataFrame 片段（便于后续使用）；否则返回原始 df。
+
+Notes:
+    - 使用全局写锁保证并发安全
+    - `Time_Series` 采用全表替换以合并新列，写入后会保留历史列值
 ### class DataDownloader
 
-_No docstring._
+下载器抽象基类。
+
+约定：
+- to_db() 负责抓取源数据并根据 is_time_series 写入到 `Time_Series` 或独立表
+- return_csv=True 时，仅导出 CSV 不入库（按各实现处理）
 #### DataDownloader.to_db(self, return_csv, max_workers)
 
-Download data and either write to DB or return DataFrames per table.
-If return_df=True, return a dict mapping table_name -> DataFrame; otherwise None.
-max_workers: Optional[int] for concurrent downloads (None => sensible default).
+抓取并写入数据库，或返回每张表对应的 DataFrame。
+
+Args:
+    return_csv: 是否仅导出 CSV 而不入库
+    max_workers: 并发度（None 表示按实现的默认/环境变量决定）
+
+Returns:
+    可选的字典：表名 -> DataFrame（仅当实现选择返回时）。
 ### class BEADownloader
 
-_No docstring._
+美国经济分析局（BEA）下载器。
+
+- 使用 beaapi 获取表数据，按 `LineDescription` 选取主列后透视为单列时间序列
+- 支持按年份范围抓取，并写入 `Time_Series`
 #### BEADownloader.__init__(self, json_dict, api_key, request_year)
 
 _No docstring._
 #### BEADownloader.to_db(self, return_csv, max_workers)
 
-_No docstring._
+抓取并写入 BEA 数据。
+
+Args:
+    return_csv: 是否保存为 CSV（位于 `csv/<name>/<name>.csv`）
+    max_workers: 并发度；若为空则从环境变量 BEA_WORKERS 或 CPU 自动推断
 ### class YFDownloader
 
-_No docstring._
+Yahoo Finance 下载器。
+
+- 通过 yfinance 获取日频 OHLCV，统一映射为 Close 列写入
+- 控制并发以降低被限流概率
 #### YFDownloader.__init__(self, json_dict, api_key, request_year)
 
 _No docstring._
 #### YFDownloader.to_db(self, return_csv, max_workers)
 
-_No docstring._
+抓取并写入 YF 数据。参数含义同基类。
 ### class FREDDownloader
 
-_No docstring._
+圣路易斯联储（FRED）下载器。
+
+- 使用官方 REST API 获取 `observations`，可选择百分比形式
 #### FREDDownloader.__init__(self, json_dict, api_key, request_year)
 
 _No docstring._
 #### FREDDownloader.to_db(self, return_csv, max_workers)
 
-_No docstring._
+抓取并写入 FRED 数据。参数含义同基类。
 ### class BLSDownloader
 
-_No docstring._
+美国劳工统计局（BLS）下载器。
+
+- POST v2 timeseries API；支持固定 5s 重试间隔（可降低限流/风控问题）
+- 并发度可通过 `BLS_WORKERS` 设置，超时 `BLS_POST_TIMEOUT`
 #### BLSDownloader.__init__(self, json_dict, api_key, request_year)
 
 _No docstring._
-#### BLSDownloader.to_db(self, return_csv, debug, max_workers)
+#### BLSDownloader.to_db(self, return_csv, max_workers)
 
-_No docstring._
+抓取并写入 BLS 数据。
+
+Args:
+    return_csv: 额外导出 CSV
+    max_workers: 并发度；若为空则读取 `BLS_WORKERS`
 ### class TEDownloader
 
-_No docstring._
+TradingEconomics 下载器（自动化 + 缓存）。
+
+特性：
+- Selenium 自动化访问指标页面，优先点击 5Y 范围并切换柱状图
+- 若 5Y 点击失败则回退到当前可见范围，仍可通过两柱反推线性比例得到历史数据
+- 内置内存与磁盘缓存（TTL 可通过 `TE_CACHE_TTL_SECONDS` 控制）
+- 支持可视化/无头模式（`TE_SHOW_BROWSER`/`TE_FORCE_HEADLESS`/`TE_HEADLESS`）
+- 小规模驱动池用于并发抓取，降低频繁创建/销毁开销
 #### TEDownloader._build_chrome_options(headless)
 
-_No docstring._
+构建 Chrome 启动参数。
+
+Args:
+    headless: 是否无头
+
+Returns:
+    Selenium Chrome Options 实例。
 #### TEDownloader.__init__(self, json_dict, api_key, request_year, *, headless)
 
 _No docstring._
 #### TEDownloader._cache_path(self, data_name)
 
-_No docstring._
+根据指标名生成磁盘缓存路径（安全化文件名）。
 #### TEDownloader._cache_read(self, data_name)
 
-_No docstring._
+读取缓存：优先内存，其次磁盘；命中则返回副本。
 #### TEDownloader._cache_write(self, data_name, df)
 
-_No docstring._
+写入缓存：同时更新内存与磁盘。
 #### TEDownloader._get_config_by_name(self, data_name)
 
-_No docstring._
+在 JSON 配置中按 name 查找对应项（若存在）。
 #### TEDownloader._resolve_locators(self, kind, data_name, defaults)
 
-_No docstring._
+解析定位器集合，支持配置覆盖与默认兜底。
+
+Args:
+    kind: 定位器类别（例如 'fiveY' / 'chartTypeButton' / 'barButton'）
+    data_name: 指标名称
+    defaults: 默认定位器列表（('xpath'|'css'|By, selector)）
+
+Returns:
+    统一为 (By, selector) 的列表。
 #### TEDownloader._calc_function(self, x1, x2, y1, y2)
 
-解二元一次方程，用于计算数据 used for data calculation
+解二元一次方程（根据两点求线性映射）。
+
+给定 (x1->y1) 与 (x2->y2)，求 y = kx + b 的 (k, b)。
 #### TEDownloader._get_data_from_trading_economics_month(self, data_name)
 
-提取月度数据的代码，季度数据需要单独写
-主要流程：访问页面，点击5y按钮，点击bar按钮，提取table数字，提取bar长度，反向计算数据
+抓取并解析 TE 月度数据（柱状图反推）。
+
+流程：
+1. 打开指标页面，优先尝试点击 5Y
+2. 切换为柱状图（必要时）
+3. 从统计面板读取当前/上期/日期，并采集柱子高度
+4. 使用最后两根柱与两期值反推线性比例，套用到所有柱得到数值序列
+5. 构造与柱数等长的月份序列，得到 DataFrame(date,value)
+
+Notes:
+- 若 5Y 点击失败，回退为当前可见范围
+- 至少需要 2 根柱才能反推线性比例
 #### TEDownloader._dismiss_te_popups(self, data_name)
 
-Best-effort: close cookie/terms banners or overlays to avoid click intercepts.
+尽最大努力关闭 cookie/条款弹窗，减少点击被拦截的概率。
 #### TEDownloader._click_5y(self, data_name)
 
-Click the 5Y range button using multiple locators and a retry once.
+尝试点击 5Y 按钮（多定位器 + 一次二次尝试）。
 #### TEDownloader.to_db(self, return_csv, max_workers)
 
-_No docstring._
+批量抓取并写入 TE 数据。
+
+- 单任务模式复用单个 driver；并发模式下使用小型驱动池
+- 若 `return_csv=True` 会在 `csv/<name>/` 下导出对应文件
 ### class DownloaderFactory
 
-API/Interface, factory that direct to different data-instance classes
+Downloader 工厂：按来源创建对应下载器实例。
+
+- 统一读取 `.env` 中的 API Key
+- 解析 TE 可视化/无头运行参数
 #### DownloaderFactory._get_api_key(cls, source)
 
-获取api key，从env文件获得
+从环境变量（.env）读取对应来源的 API Key。
 #### DownloaderFactory.create_downloader(cls, source, json_data, request_year)
 
-_No docstring._
+创建具体下载器实例。
+
+Args:
+    source: 数据来源标识（'bea'/'yf'/'fred'/'bls'/'te'）
+    json_data: 完整的配置 JSON（包含各来源的指标清单与元数据）
+    request_year: 起始年份
+
+Returns:
+    对应来源的下载器；若 source 无效或缺少配置则返回 None。

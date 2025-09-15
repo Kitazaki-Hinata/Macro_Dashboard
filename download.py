@@ -1,3 +1,23 @@
+"""数据下载与入库模块（核心）
+
+职责概览：
+- 提供面向不同来源（BEA/FRED/BLS/Yahoo Finance/TradingEconomics）的下载器实现
+- 统一重试/退避策略与请求日志
+- 将异构数据规范化为统一的「date + value」形式并写入 SQLite 的 `Time_Series` 表
+- 采用全局写锁串行化写入，避免并发写 SQLite 引发冲突
+
+使用约定：
+- 通过 `DownloaderFactory.create_downloader(source, json_data, request_year)` 构造具体下载器
+- 通过 `to_db()` 触发下载与入库。可选 `return_csv=True` 仅导出 CSV
+
+环境变量（节选）：
+- BEA_WORKERS / FRED_WORKERS / BLS_WORKERS / YF_WORKERS 控制并发
+- BLS_POST_TIMEOUT 控制 BLS 请求超时；BLS 固定 5s 重试间隔
+- TE_SHOW_BROWSER / TE_FORCE_HEADLESS / TE_HEADLESS 控制 TE 是否可视化/无头
+- TE_CACHE_TTL_SECONDS 控制 TE 短期缓存 TTL
+
+注意：本模块仅负责“数据侧”，GUI 与业务编排在 `main.py`/`worker_run_source.py`。
+"""
 # pyright: reportMissingTypeStubs=false
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownVariableType=false
@@ -23,8 +43,6 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, Dict, List, Tuple
 from typing import cast
 
-from bs4 import BeautifulSoup
-from bs4.element import Tag
 from selenium import webdriver
 from selenium.common.exceptions import (NoSuchElementException, TimeoutException,
                                         ElementClickInterceptedException, StaleElementReferenceException)
@@ -46,7 +64,17 @@ logger = logging.getLogger(__name__)
 
 
 def _exponential_backoff_delays(max_attempts: int, base: float = 0.5, factor: float = 2.0, jitter: float = 0.25) -> List[float]:
-    """Generate delays for exponential backoff with jitter."""
+    """生成指数退避延时序列（带抖动）。
+
+    Args:
+        max_attempts: 最大尝试次数（返回的延时个数）
+        base: 初始延时秒数
+        factor: 每次递增的倍率
+        jitter: 在每次延时基础上的随机扰动幅度（±jitter）
+
+    Returns:
+        一个长度为 `max_attempts` 的延时秒数列表。
+    """
     delays: List[float] = []
     d = base
     for _ in range(max_attempts):
@@ -56,6 +84,21 @@ def _exponential_backoff_delays(max_attempts: int, base: float = 0.5, factor: fl
 
 
 def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4) -> requests.Response:
+    """带重试的 HTTP GET。
+
+    Args:
+        url: 目标 URL
+        params: 查询参数
+        headers: 请求头
+        timeout: 单次请求超时（秒）
+        max_attempts: 最大尝试次数（指数退避）
+
+    Returns:
+        requests.Response 对象（仅在 resp.ok 时返回）
+
+    Raises:
+        Exception: 在所有尝试失败时抛出，信息包含最后一次错误。
+    """
     delays = _exponential_backoff_delays(max_attempts)
     last_exc: Optional[Exception] = None
     for i, delay in enumerate(delays, start=1):
@@ -77,6 +120,23 @@ def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, he
 
 
 def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4, delay_seconds: Optional[float] = None) -> requests.Response:
+    """带重试的 HTTP POST（支持固定间隔或指数退避）。
+
+    Args:
+        url: 目标 URL
+        data: 表单数据（与 json_data 互斥）
+        json_data: JSON 负载（与 data 互斥）
+        headers: 请求头
+        timeout: 单次请求超时（秒）
+        max_attempts: 最大尝试次数
+        delay_seconds: 若提供，则两次尝试之间使用固定间隔（例如 BLS 要求 5s）；否则使用指数退避
+
+    Returns:
+        requests.Response 对象（仅在 resp.ok 时返回）
+
+    Raises:
+        Exception: 在所有尝试失败时抛出。
+    """
     # 支持固定重试间隔（例如 BLS 要求 5s），否则使用指数回退
     delays = [delay_seconds] * max_attempts if delay_seconds is not None else _exponential_backoff_delays(max_attempts)
     last_exc: Optional[Exception] = None
@@ -94,9 +154,6 @@ def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, h
             logger.warning("HTTP POST %s attempt=%d failed: %s", url, i, e)
         if i < max_attempts:
             try:
-                if delay is None:
-                    # 无延迟（极端情况），直接继续
-                    continue
                 logger.info("Retrying POST in %.1fs (attempt %d/%d)", float(delay), i + 1, max_attempts)
                 time.sleep(float(delay))
             except Exception:
@@ -106,20 +163,30 @@ def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, h
 
 
 def yf_download_with_retry(symbol: str, *, start: str, end: str, interval: str = "1d", max_attempts: int = 5) -> pd.DataFrame:
-    """Wrapper around yfinance.download with exponential backoff.
+    """yfinance.download 包装器（带指数退避与限流容错）。
 
-    - Explicitly sets auto_adjust=False to avoid FutureWarning noise and preserves raw OHLCV.
-    - Sets threads=False to reduce internal concurrency (we already manage external concurrency).
-    - Retries on YFRateLimitError or empty DataFrame results.
+    设计要点：
+    - 固定 `auto_adjust=False` 保留原始 OHLCV，避免未来警告
+    - 固定 `threads=False`，外部已控制并发
+    - 若返回空 DataFrame 或触发限流异常则重试
+
+    Args:
+        symbol: 证券代码
+        start: 开始日期（YYYY-MM-DD）
+        end: 结束日期（YYYY-MM-DD）
+        interval: 采样间隔（默认 1d）
+        max_attempts: 最大尝试次数
+
+    Returns:
+        DataFrame，索引为日期，包含标准 OHLCV 列；若最终失败会抛出异常。
+
+    Raises:
+        Exception: 所有尝试失败或最终为空时抛出。
     """
     delays = _exponential_backoff_delays(max_attempts=max_attempts, base=1.0, factor=2.0, jitter=0.5)
     last_err: Optional[Exception] = None
     # Lazy import to avoid hard dependency for exception
-    try:
-        from yfinance.exceptions import YFRateLimitError  # type: ignore
-    except Exception:  # pragma: no cover - fallback when API surface changes
-        class YFRateLimitError(Exception):
-            pass
+    # 兼容不同 yfinance 版本：不强依赖特定异常类型
 
     for i, dly in enumerate(delays, start=1):
         try:
@@ -152,6 +219,14 @@ def yf_download_with_retry(symbol: str, *, start: str, end: str, interval: str =
 
 
 class DatabaseConverter:
+    """将不同来源的 DataFrame 规范化并写入 SQLite。
+
+    功能：
+    - 识别多种来源的时间/数值格式（BEA/FRED/BLS/TE/YF）
+    - 统一为两列：date(YYYY-MM-DD) + value(重命名为 data_name)
+    - 维护/扩展 `Time_Series` 表，合并列并保留最新值
+    - 使用全局写锁确保并发安全
+    """
     _MONTH_MAP = {
         "jan": 1, "feb": 2, "mar": 3, "apr": 4,
         "may": 5, "jun": 6, "jul": 7, "aug": 8,
@@ -170,7 +245,7 @@ class DatabaseConverter:
 
     @staticmethod
     def _rename_bea_date_col(df: pd.DataFrame) -> pd.DataFrame:
-        '''modify time index, unify all time index in different dataframe(time series dataframe'''
+        """将 BEA 数据的时间索引标准化为列 `date` 并置于首列。"""
         try:
             # df.drop("TimePeriod", axis=1, inplace=True)  # remove original date index
             date_col = df.pop("date")  # type: ignore
@@ -183,8 +258,15 @@ class DatabaseConverter:
 
     @staticmethod
     def _format_converter(df: Optional[pd.DataFrame], data_name: str, is_pct_data: bool) -> pd.DataFrame:
-        """将不同来源的数据统一为两列: date(YYYY-MM-DD) + value 列名为 data_name。
-        足够健壮地应对 None/Timestamp/int 等类型，并容忍短表、重复、缺失。
+        """将异构来源的数据规范化为 `date + value` 形式。
+
+        Args:
+            df: 待规范化的 DataFrame
+            data_name: 目标列名（写入 DB 的列名）
+            is_pct_data: 是否按百分比系列处理（个别来源会影响列选择）
+
+        Returns:
+            仅含 `date` 与 `data_name` 两列的 DataFrame；若输入为空/无法解析则返回空表。
         """
         if df is None or df.empty:
             return pd.DataFrame()
@@ -296,7 +378,7 @@ class DatabaseConverter:
                 year_num = pd.to_numeric(df["year"], errors="coerce")
                 year_num = year_num.where(month_series != "01", year_num + 1)
                 month_num = pd.to_numeric(month_series, errors="coerce")
-                dt = pd.to_datetime({"year": year_num, "month": month_num, "day": 1}, errors="coerce")
+                dt = pd.to_datetime(pd.DataFrame({"year": year_num, "month": month_num, "day": 1}), errors="coerce")
                 df["date"] = dt.dt.strftime("%Y-%m-%d")
                 # 选择数值列
                 val_col = "value" if "value" in df.columns else "MoM_growth"
@@ -318,7 +400,7 @@ class DatabaseConverter:
                 month = month_str.apply(DatabaseConverter._convert_month_str_to_num)
                 month = month.where(~dec_mask, 1)
                 month_num = pd.to_numeric(month, errors="coerce")
-                dt = pd.to_datetime({"year": year, "month": month_num, "day": 1}, errors="coerce")
+                dt = pd.to_datetime(pd.DataFrame({"year": year, "month": month_num, "day": 1}), errors="coerce")
                 df["date"] = dt.dt.strftime("%Y-%m-%d")
                 df = df.drop(columns=["Date"], errors="ignore")
                 date_col = df.pop("date")
@@ -344,8 +426,12 @@ class DatabaseConverter:
             return df
 
     def _create_ts_sheet(self, start_date : str) -> sqlite3.Cursor:
-        """If time_series_table does not exist, then create new db
-        如果sheet不存在，创建sheet"""
+        """确保 `Time_Series` 表存在并补齐日期。
+
+        行为：
+        - 若不存在则创建，并从 `start_date` 起写入至今日的每日日期
+        - 若已存在则仅追加缺失日期至今日
+        """
         cursor = self.cursor
         logger.debug("ensure Time_Series table exists (start_date=%s)", start_date)
 
@@ -406,12 +492,22 @@ class DatabaseConverter:
             is_time_series: bool = False,
             is_pct_data: bool = False
     ):
-        '''params df: df that used to write into db
-        params data_name: used in db columns and errors
-        params start_date, start date of  all data, used when create db sheet
-        params is_time_series: judge whether it is time series data, incl. BEA, BLS, YF, TE, FRED
-        params is_pct_data: input json data, bool value, "needs_pct"
-        '''
+        """将数据写入 SQLite。
+
+        Args:
+            df: 待写入数据表
+            data_name: 作为列名写入 `Time_Series` 或新表的名称
+            start_date: 用于初始化 `Time_Series` 的起始日期（YYYY-MM-DD）
+            is_time_series: 是否写入到 `Time_Series`（否则写入独立表）
+            is_pct_data: 对个别来源的百分比系列的提示（目前仅参与规范化逻辑）
+
+        Returns:
+            若写入 `Time_Series`：返回最后两列的 DataFrame 片段（便于后续使用）；否则返回原始 df。
+
+        Notes:
+            - 使用全局写锁保证并发安全
+            - `Time_Series` 采用全表替换以合并新列，写入后会保留历史列值
+        """
         # 串行化整个写入过程，防止 Time_Series 全表替换时的竞态
         with DB_WRITE_LOCK:
             t_all = time.perf_counter()
@@ -490,16 +586,32 @@ class DatabaseConverter:
 
 
 class DataDownloader(ABC):
+    """下载器抽象基类。
+
+    约定：
+    - to_db() 负责抓取源数据并根据 is_time_series 写入到 `Time_Series` 或独立表
+    - return_csv=True 时，仅导出 CSV 不入库（按各实现处理）
+    """
     @abstractmethod
     def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
-        """Download data and either write to DB or return DataFrames per table.
-        If return_df=True, return a dict mapping table_name -> DataFrame; otherwise None.
-        max_workers: Optional[int] for concurrent downloads (None => sensible default).
+        """抓取并写入数据库，或返回每张表对应的 DataFrame。
+
+        Args:
+            return_csv: 是否仅导出 CSV 而不入库
+            max_workers: 并发度（None 表示按实现的默认/环境变量决定）
+
+        Returns:
+            可选的字典：表名 -> DataFrame（仅当实现选择返回时）。
         """
         raise NotImplementedError
 
 
 class BEADownloader(DataDownloader):
+    """美国经济分析局（BEA）下载器。
+
+    - 使用 beaapi 获取表数据，按 `LineDescription` 选取主列后透视为单列时间序列
+    - 支持按年份范围抓取，并写入 `Time_Series`
+    """
     current_year : int = date.today().year
     download_py_file_path : str = os.path.dirname(os.path.abspath(__file__))
     csv_data_folder : str = os.path.join(download_py_file_path, "csv")
@@ -512,6 +624,12 @@ class BEADownloader(DataDownloader):
         self.time_range_lag : str = self.time_range[:-5]  # 去除最后5个字符，即去除最后一年
 
     def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+        """抓取并写入 BEA 数据。
+
+        Args:
+            return_csv: 是否保存为 CSV（位于 `csv/<name>/<name>.csv`）
+            max_workers: 并发度；若为空则从环境变量 BEA_WORKERS 或 CPU 自动推断
+        """
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
@@ -603,12 +721,18 @@ class BEADownloader(DataDownloader):
 
 
 class YFDownloader(DataDownloader):
+    """Yahoo Finance 下载器。
+
+    - 通过 yfinance 获取日频 OHLCV，统一映射为 Close 列写入
+    - 控制并发以降低被限流概率
+    """
     def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: Optional[str], request_year : int):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.start_date : str  = str(request_year)+"-01-01"
         self.end_date : str = str(date.today())
 
     def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+        """抓取并写入 YF 数据。参数含义同基类。"""
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
@@ -670,6 +794,10 @@ class YFDownloader(DataDownloader):
 
 
 class FREDDownloader(DataDownloader):
+    """圣路易斯联储（FRED）下载器。
+
+    - 使用官方 REST API 获取 `observations`，可选择百分比形式
+    """
     url : str = r"https://api.stlouisfed.org/fred/series/observations"
 
     def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year : int):
@@ -679,6 +807,7 @@ class FREDDownloader(DataDownloader):
         self.end_date : str = str(date.today())
 
     def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+        """抓取并写入 FRED 数据。参数含义同基类。"""
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
@@ -695,7 +824,6 @@ class FREDDownloader(DataDownloader):
                 }
                 log_params = {k: v for k, v in params.items() if k != "api_key"}
                 logger.info("FRED GET %s params=%s", FREDDownloader.url, log_params)
-                t0 = time.perf_counter()
                 resp = http_get_with_retry(FREDDownloader.url, params=params)
                 data = resp.json()
                 df = pd.DataFrame(data.get("observations", []))
@@ -757,6 +885,11 @@ class FREDDownloader(DataDownloader):
 
 
 class BLSDownloader(DataDownloader):
+    """美国劳工统计局（BLS）下载器。
+
+    - POST v2 timeseries API；支持固定 5s 重试间隔（可降低限流/风控问题）
+    - 并发度可通过 `BLS_WORKERS` 设置，超时 `BLS_POST_TIMEOUT`
+    """
     url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/"
     headers: Tuple[str, str] = ('Content-type', 'application/json')
 
@@ -766,9 +899,16 @@ class BLSDownloader(DataDownloader):
         self.start_year: int  = request_year
         self.start_date : str  = str(request_year)+"-01-01"
 
-    def to_db(self, return_csv : bool = False, debug : bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(self, return_csv : bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+        """抓取并写入 BLS 数据。
+
+        Args:
+            return_csv: 额外导出 CSV
+            max_workers: 并发度；若为空则读取 `BLS_WORKERS`
+        """
         df_dict: Dict[str, pd.DataFrame] = {}
-        if debug is True:
+        bls_debug = os.environ.get('BLS_DEBUG', '').strip().lower() in ('1','true','yes')
+        if bls_debug:
             converter = DatabaseConverter()
             converter.write_into_db(
                 df=mock_api.return_bls_data(),
@@ -793,7 +933,6 @@ class BLSDownloader(DataDownloader):
                             "registrationKey": self.api_key
                             }
                         )
-                    t0 = time.perf_counter()
                     load_dotenv()
                     bls_timeout_env = os.environ.get('BLS_POST_TIMEOUT')
                     bls_timeout = float(bls_timeout_env) if bls_timeout_env else 60.0
@@ -871,6 +1010,15 @@ class BLSDownloader(DataDownloader):
 
 
 class TEDownloader(DataDownloader):
+    """TradingEconomics 下载器（自动化 + 缓存）。
+
+    特性：
+    - Selenium 自动化访问指标页面，优先点击 5Y 范围并切换柱状图
+    - 若 5Y 点击失败则回退到当前可见范围，仍可通过两柱反推线性比例得到历史数据
+    - 内置内存与磁盘缓存（TTL 可通过 `TE_CACHE_TTL_SECONDS` 控制）
+    - 支持可视化/无头模式（`TE_SHOW_BROWSER`/`TE_FORCE_HEADLESS`/`TE_HEADLESS`）
+    - 小规模驱动池用于并发抓取，降低频繁创建/销毁开销
+    """
     url : str = "https://tradingeconomics.com/united-states/"
     # 将固定 sleep 降低，更多依赖显式等待；必要时仍有微小 pause
     time_pause : float = 0.2
@@ -878,6 +1026,14 @@ class TEDownloader(DataDownloader):
 
     @staticmethod
     def _build_chrome_options(headless: bool) -> Options:
+        """构建 Chrome 启动参数。
+
+        Args:
+            headless: 是否无头
+
+        Returns:
+            Selenium Chrome Options 实例。
+        """
         options = Options()
         if headless:
             options.add_argument("--headless=new")
@@ -932,10 +1088,12 @@ class TEDownloader(DataDownloader):
         logger.info("TE WebDriver initialized (headless=%s)", self._headless)
 
     def _cache_path(self, data_name: str) -> str:
+        """根据指标名生成磁盘缓存路径（安全化文件名）。"""
         safe = re.sub(r"[^a-zA-Z0-9_\-]", "_", data_name)
         return os.path.join(self._cache_dir, f"{safe}.csv")
 
     def _cache_read(self, data_name: str) -> Optional[pd.DataFrame]:
+        """读取缓存：优先内存，其次磁盘；命中则返回副本。"""
         now = time.time()
         # 内存缓存优先
         mem = self._mem_cache.get(data_name)
@@ -960,6 +1118,7 @@ class TEDownloader(DataDownloader):
         return None
 
     def _cache_write(self, data_name: str, df: pd.DataFrame) -> None:
+        """写入缓存：同时更新内存与磁盘。"""
         try:
             self._mem_cache[data_name] = (time.time(), df.copy())
             path = self._cache_path(data_name)
@@ -968,7 +1127,8 @@ class TEDownloader(DataDownloader):
             logger.warning("TE cache write failed for %s: %s", data_name, e)
 
     def _get_config_by_name(self, data_name: str) -> Optional[Dict[str, Any]]:
-        for tn, cfg in self.json_dict.items():
+        """在 JSON 配置中按 name 查找对应项（若存在）。"""
+        for _, cfg in self.json_dict.items():
             try:
                 if cfg.get('name') == data_name:
                     return cfg
@@ -977,6 +1137,16 @@ class TEDownloader(DataDownloader):
         return None
 
     def _resolve_locators(self, kind: str, data_name: str, defaults: List[Tuple[str, str]]) -> List[Tuple[Any, str]]:
+        """解析定位器集合，支持配置覆盖与默认兜底。
+
+        Args:
+            kind: 定位器类别（例如 'fiveY' / 'chartTypeButton' / 'barButton'）
+            data_name: 指标名称
+            defaults: 默认定位器列表（('xpath'|'css'|By, selector)）
+
+        Returns:
+            统一为 (By, selector) 的列表。
+        """
         # 支持在 json 配置里为某个指标覆写定位器：
         # { "locators": { "fiveY": ["xpath://div...", "css:#dateSpansDiv a:nth-child(3)"] } }
         cfg = self._get_config_by_name(data_name) or {}
@@ -999,24 +1169,35 @@ class TEDownloader(DataDownloader):
                     continue
         # 追加默认候选，保证兜底
         for kind_by, kind_sel in defaults:
-            if isinstance(kind_by, str):
-                # 将字符串表述转换为 selenium By
-                by = By.CSS_SELECTOR if kind_by.lower() == 'css' else By.XPATH
-                locs.append((by, kind_sel))
-            else:
-                locs.append((kind_by, kind_sel))
+            # 默认 defaults 为字符串标记的定位器类型
+            by = By.CSS_SELECTOR if str(kind_by).lower() == 'css' else By.XPATH
+            locs.append((by, kind_sel))
         return locs
 
     def _calc_function(self, x1: float, x2: float, y1: float, y2: float) -> Tuple[float, float]:
-        """解二元一次方程，用于计算数据 used for data calculation"""
+        """解二元一次方程（根据两点求线性映射）。
+
+        给定 (x1->y1) 与 (x2->y2)，求 y = kx + b 的 (k, b)。
+        """
         gradient = np.round((y1 - y2)/(x1-x2), 3)
         intercept = np.round((y1 - gradient*x1), 3)
         # 确保返回内置 float，避免类型检查告警
         return float(gradient), float(intercept)
 
     def _get_data_from_trading_economics_month(self, data_name: str) -> Optional[pd.DataFrame]:
-        """提取月度数据的代码，季度数据需要单独写
-        主要流程：访问页面，点击5y按钮，点击bar按钮，提取table数字，提取bar长度，反向计算数据"""
+        """抓取并解析 TE 月度数据（柱状图反推）。
+
+        流程：
+        1. 打开指标页面，优先尝试点击 5Y
+        2. 切换为柱状图（必要时）
+        3. 从统计面板读取当前/上期/日期，并采集柱子高度
+        4. 使用最后两根柱与两期值反推线性比例，套用到所有柱得到数值序列
+        5. 构造与柱数等长的月份序列，得到 DataFrame(date,value)
+
+        Notes:
+        - 若 5Y 点击失败，回退为当前可见范围
+        - 至少需要 2 根柱才能反推线性比例
+        """
 
         url = self.url + data_name.replace("_", "-")
         t0 = time.perf_counter()
@@ -1166,7 +1347,7 @@ class TEDownloader(DataDownloader):
             return None
 
     def _dismiss_te_popups(self, data_name: str) -> None:
-        """Best-effort: close cookie/terms banners or overlays to avoid click intercepts."""
+        """尽最大努力关闭 cookie/条款弹窗，减少点击被拦截的概率。"""
         selectors = [
             (By.XPATH, '//button[contains(@class, "accept")]'),
             (By.XPATH, '//button[contains(., "Accept")]'),
@@ -1184,7 +1365,7 @@ class TEDownloader(DataDownloader):
                 continue
 
     def _click_5y(self, data_name: str) -> bool:
-        """Click the 5Y range button using multiple locators and a retry once."""
+        """尝试点击 5Y 按钮（多定位器 + 一次二次尝试）。"""
         locators = [
             (By.XPATH, '//*[@id="dateSpansDiv"]/a[3]'),
             (By.XPATH, '//div[@id="dateSpansDiv"]//a[contains(., "5y") or contains(., "5Y")]'),
@@ -1211,6 +1392,11 @@ class TEDownloader(DataDownloader):
         return False
 
     def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+        """批量抓取并写入 TE 数据。
+
+        - 单任务模式复用单个 driver；并发模式下使用小型驱动池
+        - 若 `return_csv=True` 会在 `csv/<name>/` 下导出对应文件
+        """
         # 并发策略：优先使用小规模驱动池，减少频繁创建/销毁开销；每个任务独占一个临时 driver 实例
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
@@ -1325,10 +1511,14 @@ class TEDownloader(DataDownloader):
 
 
 class DownloaderFactory:
-    '''API/Interface, factory that direct to different data-instance classes'''
+    """Downloader 工厂：按来源创建对应下载器实例。
+
+    - 统一读取 `.env` 中的 API Key
+    - 解析 TE 可视化/无头运行参数
+    """
     @classmethod
     def _get_api_key(cls, source: str) -> Optional[str]:
-        '''获取api key，从env文件获得'''
+        """从环境变量（.env）读取对应来源的 API Key。"""
         load_dotenv()
         api = os.environ.get(source)
         if not api:
@@ -1343,6 +1533,16 @@ class DownloaderFactory:
         json_data: Dict[str, Any],   # full json data, not just one item in the dict
         request_year : int,
     ) -> Optional['DataDownloader']:
+        """创建具体下载器实例。
+
+        Args:
+            source: 数据来源标识（'bea'/'yf'/'fred'/'bls'/'te'）
+            json_data: 完整的配置 JSON（包含各来源的指标清单与元数据）
+            request_year: 起始年份
+
+        Returns:
+            对应来源的下载器；若 source 无效或缺少配置则返回 None。
+        """
 
         api_key = cls._get_api_key(source)
         json_dict_data_index_info = json_data.get(source, None)
