@@ -5,19 +5,7 @@ import logging
 from PySide6.QtWidgets import QApplication
 from gui.ui_mainwindow import mainWindow
 from download import DownloaderFactory
-
-
-def setup_logging():
-    """配置日志系统"""
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s [line:%(lineno)d] - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        handlers=[
-            logging.FileHandler('doc/error.log'),
-            logging.StreamHandler()
-        ]
-    )
+from logging_config import start_logging, stop_logging
 
 def read_json() -> dict:
     '''read request_id.json file, return whole json context as a whole dictionary'''
@@ -32,22 +20,26 @@ def read_json() -> dict:
 
 
 if __name__ == "__main__":
-    setup_logging()  # 初始化日志系统
-    json_data: dict = read_json()
+    start_logging(process_tag="gui")  # 初始化异步日志系统
+    try:
+        json_data: dict = read_json()
 
-    # app = QApplication([])
-    # window = mainWindow()
-    # window.show()
-    # app.exec()
+        app = QApplication([])
+        window = mainWindow()
+        window.show()
+        app.exec()
+    finally:
+        # 确保进程退出前停止日志监听，优雅关闭文件句柄
+        stop_logging()
 
     '''Testing download file'''
-    request_year: int = 2020
-    fred_downloader = DownloaderFactory.create_downloader(
-        source = "yf",
-        json_data = json_data,
-        request_year = request_year
-    )
-    fred_downloader.to_db(return_csv = False)
+    # request_year: int = 2020
+    # fred_downloader = DownloaderFactory.create_downloader(
+    #     source = "yf",
+    #     json_data = json_data,
+    #     request_year = request_year
+    # )
+    # fred_downloader.to_db(return_csv = False)
 
 
 

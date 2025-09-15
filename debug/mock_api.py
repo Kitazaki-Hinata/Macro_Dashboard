@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 
 def return_bls_data() -> pd.DataFrame:
@@ -31,6 +32,6 @@ def return_bls_data() -> pd.DataFrame:
     'period': period,
     'MoM_growth': value
     }
-    print(len(year), len(period), len(value))
+    logging.debug("mock_api lengths - year=%d, period=%d, value=%d", len(year), len(period), len(value))
     df = pd.DataFrame(data)
     return df

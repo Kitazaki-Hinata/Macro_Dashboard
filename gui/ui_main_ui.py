@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
     QSpinBox, QStackedWidget, QTableView, QTextEdit,
     QVBoxLayout, QWidget)
+import resources_rc_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -30,14 +31,13 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QSize(1267, 792))
         MainWindow.setMaximumSize(QSize(2304, 1440))
         MainWindow.setStyleSheet(u"* {\n"
-"\tbackground-color: #33363a;\n"
-"\tfont-family: \"Comfortaa\", \"Microsoft YaHei UI\", \"Segoe UI\", Arial, sans-serif;\n"
+"	background-color: #33363a;\n"
 "}\n"
 "\n"
 "QToolTip {\n"
 "    /* \u8bbe\u7f6e\u63d0\u793a\u6846color */\n"
 "    background-color: #ffffff;\n"
-"\tfont-family: \"Comfortaa\", \"Microsoft YaHei UI\", \"Segoe UI\", Arial, sans-serif;\n"
+"	font-family : \"Comfortaa\";\n"
 "    background-image: none;\n"
 "    color: #90b6e7;\n"
 "    border: 0;\n"

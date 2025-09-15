@@ -40,7 +40,7 @@ class ChartFunction():
         self.chart_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.chart_title.setStyleSheet(
             '''
-            font-family : "Comfortaa";
+            font-family : "Comfortaa", "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
             font-weight : Normal;
             font-size : 16px;
             color : #ffffff;
@@ -57,7 +57,7 @@ class ChartFunction():
         # 设置坐标轴标签字体
         font = pg.QtGui.QFont()
         font.setPixelSize(12)
-        font.setFamily("Comfortaa")
+        font.setFamilies(["Comfortaa", "Microsoft YaHei UI", "Segoe UI", "Arial"])
         self.single_plot_widget.getAxis('left').setTickFont(font)
         self.single_plot_widget.getAxis('bottom').setTickFont(font)
         self.single_plot_widget.addLegend()
@@ -127,9 +127,9 @@ class ChartFunction():
         # 设置轴标签字体
         font = pg.QtGui.QFont()
         font.setPixelSize(12)
-        font.setFamily("Arial")
-        self.single_plot_widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
-        self.single_plot_widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
+        font.setFamilies(["Comfortaa", "Microsoft YaHei UI", "Segoe UI", "Arial"])
+        self.single_plot_widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa, Microsoft YaHei UI, Segoe UI, Arial, sans-serif", 'font-size': '12px'})
+        self.single_plot_widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa, Microsoft YaHei UI, Segoe UI, Arial, sans-serif", 'font-size': '12px'})
 
         dates , values = self._get_data_from_database(data_name)
 
@@ -151,7 +151,7 @@ class ChartFunction():
         # 设置坐标轴刻度标签字体
         font = pg.QtGui.QFont()
         font.setPixelSize(10)
-        font.setFamily("Comfortaa")
+        font.setFamilies(["Comfortaa", "Microsoft YaHei UI", "Segoe UI", "Arial"])
 
         self.single_plot_widget.getAxis('left').setTickFont(font)
         self.single_plot_widget.getAxis('bottom').setTickFont(font)
