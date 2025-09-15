@@ -1,17 +1,26 @@
 '''
 主窗口的设置与控件信号
-启动窗口请前往main.py文件
+class mainWindow(QMainWindow, Ui_MainWindow):
+    # 明确声明拖动状态的类型，避免"类型未知"
+    _dragging: bool
+    _drag_offset: QPoint
+
+    # 新增：记录窗口原始位置和大小
+    _normal_geometry: Optional[QRect] = Nonemain.py文件
 '''
 
 import os
 import logging
+from typing import Optional, Any
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QObject, QEvent, QPoint, QRect
+from PySide6.QtGui import QResizeEvent, QMouseEvent
 from gui import *
 from .ui_function import UiFunctions
 from gui.custom_grip import CustomGrip
 
 # 全局化窗口是否全屏，开始是false
-GLOBAL_STATE = False
+global_state = False
 
 class mainWindow(QMainWindow, Ui_MainWindow):
     # 明确声明拖动状态的类型，避免“类型未知”
@@ -19,7 +28,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
     _drag_offset: QPoint
 
     # 新增：记录窗口原始位置和大小
-    _normal_geometry: QRect = None
+    _normal_geometry: Optional[QRect] = None
 
     def __init__(self):
         super().__init__()
@@ -31,8 +40,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.load_custom_fonts()
 
         # 读取更新日期设置
-        existing_data: dict = self.ui_functions.get_settings_from_json()
-        date_today = existing_data["recent_update_time"]
+        existing_data: dict[str, Any] = self.ui_functions.get_settings_from_json()
+        date_today: str = existing_data["recent_update_time"]
         self.table_update_label.setText(f"Recent Update Time : {date_today}")
         self.update_label_2.setText(f"Recent Update Time : {date_today}")
         self.four_update_label.setText(f"Recent Update Time : {date_today}")
@@ -40,7 +49,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 实例化ONE PAGE小窗口
         self.one_chart_settings_window = QWidget()
         self.one_chart_ui = Ui_OneChartSettingsPanel()
-        self.one_chart_ui.setupUi(self.one_chart_settings_window)
+        self.one_chart_ui.setupUi(self.one_chart_settings_window) # type: ignore
         self.one_chart_ui.first_color_btn.clicked.connect(
             lambda : self.ui_functions.set_color(self.one_chart_ui.first_color_btn)
         )
@@ -54,7 +63,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 实例化FOUR PAGE小窗口
         self.four_chart_settings_window = QWidget()
         self.four_chart_ui = Ui_FourChartSettingsPanel()
-        self.four_chart_ui.setupUi(self.four_chart_settings_window)
+        self.four_chart_ui.setupUi(self.four_chart_settings_window) # pyright: ignore[reportUnknownMemberType]
         self.four_chart_ui.first_color_btn.clicked.connect(
             lambda: self.ui_functions.set_color(self.four_chart_ui.first_color_btn)
         )
@@ -71,7 +80,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 实例化TABLE PAGE小窗口
         self.table_settings_window = QWidget()
         self.table_ui = Ui_TableSettingsPanel()
-        self.table_ui.setupUi(self.table_settings_window)
+        self.table_ui.setupUi(self.table_settings_window) # type: ignore
 
 
 
@@ -111,10 +120,10 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.bottom_grip = CustomGrip(self, Qt.Edge.BottomEdge, True)
 
         # 四角 grip（用 Qt.Corner 枚举）
-        self.topleft_grip = CustomGrip(self, Qt.TopLeftCorner, True)
-        self.topright_grip = CustomGrip(self, Qt.TopRightCorner, True)
-        self.bottomleft_grip = CustomGrip(self, Qt.BottomLeftCorner, True)
-        self.bottomright_grip = CustomGrip(self, Qt.BottomRightCorner, True)
+        self.topleft_grip = CustomGrip(self, Qt.Corner.TopLeftCorner, True)
+        self.topright_grip = CustomGrip(self, Qt.Corner.TopRightCorner, True)
+        self.bottomleft_grip = CustomGrip(self, Qt.Corner.BottomLeftCorner, True)
+        self.bottomright_grip = CustomGrip(self, Qt.Corner.BottomRightCorner, True)
 
         '''Settings page btn signal connection'''
         # 点击api确认按钮，保存输入的API
@@ -174,7 +183,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         }
 
         # clear effect 清除自带的效果保留qss效果
-        for name, button in btn_dict.items():
+        for _, button in btn_dict.items():
             if button != btn:  # 比较按钮对象而不是名称
                 button.setChecked(False)
                 button.setStyleSheet("")
@@ -242,27 +251,27 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 pass
 
     # 事件过滤器，拖动窗口
-    def eventFilter(self, obj, event):
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:
         # 禁止最大化或全屏时拖动窗口
         if self.isMaximized() or self.isFullScreen():
             return super().eventFilter(obj, event)
         if obj == self.header_right_btn_container or obj == self.header_text_and_icon:
-            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+            if event.type() == QEvent.Type.MouseButtonPress and isinstance(event, QMouseEvent) and event.button() == Qt.MouseButton.LeftButton:
                 self._dragging = True
-                self._drag_offset = event.globalPos() - self.frameGeometry().topLeft()
+                self._drag_offset = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
                 return True
-            elif event.type() == QEvent.MouseMove and getattr(self, '_dragging', False):
-                self.move(event.globalPos() - self._drag_offset)
+            elif event.type() == QEvent.Type.MouseMove and isinstance(event, QMouseEvent) and getattr(self, '_dragging', False):
+                self.move(event.globalPosition().toPoint() - self._drag_offset)
                 return True
-            elif event.type() == QEvent.MouseButtonRelease:
+            elif event.type() == QEvent.Type.MouseButtonRelease:
                 self._dragging = False
                 return True
         return super().eventFilter(obj, event)
 
     def _toggle_max_restore(self):
-        global GLOBAL_STATE
-        if GLOBAL_STATE == True:
-            GLOBAL_STATE = False
+        global global_state
+        if global_state == True:
+            global_state = False
             # 恢复窗口位置和大小
             if self._normal_geometry:
                 self.setGeometry(self._normal_geometry)
@@ -276,7 +285,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             )
             self.resize(self.width()+0, self.height()+0)
         else:
-            GLOBAL_STATE = True
+            global_state = True
             # 记住窗口位置和大小
             self.showMaximized()
             self.window_btn.setStyleSheet(
@@ -288,7 +297,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             )
 
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event: QResizeEvent) -> None:
         # grip 跟随窗口大小变化自动调整
         super().resizeEvent(event)
         self.left_grip.update_geometry()
@@ -313,7 +322,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 获取当前目录下的文件
         try:
             all_items = os.listdir(note_dir)
-            txt_files = []
+            txt_files: list[str] = []
             for item in all_items:
                 full_path = os.path.join(note_dir, item)
                 if os.path.isfile(full_path) and item.endswith('.txt'):
@@ -321,7 +330,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
 
             # 过滤User_instructions.txt
             txt_files = [f for f in txt_files if not f.endswith("User_instructions.txt")]
-        except Exception as e:
+        except Exception:
             logging.error("Failed to get txt file in note folder, continue")
             return
 
@@ -333,12 +342,12 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             safe_var_name = note_name_no_ext.replace(' ', '_').replace('-', '_')    # 去除非法字符
             new_button = QPushButton(note_name_no_ext)
             new_button.setObjectName(note_name_no_ext)
-            layout.insertWidget(0, new_button)
+            layout.insertWidget(0, new_button) # type: ignore
 
             # 设置为mainWindow的属性
             setattr(self, safe_var_name, new_button)
             # 连接槽函数，传递文件名参数
-            new_button.clicked.connect(lambda checked, fname=note_name_no_ext: self.ui_functions.note_btn_open_file_slot(fname))
+            new_button.clicked.connect(lambda checked: self.ui_functions.note_btn_open_file_slot(note_name_no_ext)) # type: ignore
         return
 
     def _get_current_file_name(self):
@@ -366,7 +375,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             comfortaa_families = QFontDatabase.applicationFontFamilies(comfortaa_id)
 
             # 设定字体栈，包含常见的中英文字体作为后备
-            families = []
+            families: list[str] = []
             if comfortaa_families:
                 families.append(comfortaa_families[0])
             # Windows 常见中文/英文字体后备
