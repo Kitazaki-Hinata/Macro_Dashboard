@@ -106,10 +106,14 @@ def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, he
             t0 = time.perf_counter()
             resp = requests.get(url, params=params, headers=headers, timeout=timeout)
             dt = time.perf_counter() - t0
-            logger.info("HTTP GET %s attempt=%d status=%s in %.3fs", url, i, getattr(resp, 'status_code', 'NA'), dt)
+            status = getattr(resp, 'status_code', None)
+            logger.info("HTTP GET %s attempt=%d status=%s in %.3fs", url, i, status, dt)
             if resp.ok:
                 return resp
-            last_exc = Exception(f"status={resp.status_code}")
+            # 对常见非瞬时 4xx 错误不重试，直接失败
+            if status is not None and 400 <= int(status) < 500 and int(status) in {400, 401, 403, 404, 405, 406, 410, 422}:
+                raise Exception(f"non-retriable client error: status={status}")
+            last_exc = Exception(f"status={status}")
         except Exception as e:
             last_exc = e
             logger.warning("HTTP GET %s attempt=%d failed: %s", url, i, e)
@@ -145,10 +149,14 @@ def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, h
             t0 = time.perf_counter()
             resp = requests.post(url, data=data, json=json_data, headers=headers, timeout=timeout)
             dt = time.perf_counter() - t0
-            logger.info("HTTP POST %s attempt=%d status=%s in %.3fs", url, i, getattr(resp, 'status_code', 'NA'), dt)
+            status = getattr(resp, 'status_code', None)
+            logger.info("HTTP POST %s attempt=%d status=%s in %.3fs", url, i, status, dt)
             if resp.ok:
                 return resp
-            last_exc = Exception(f"status={resp.status_code}")
+            # 对常见非瞬时 4xx 错误不重试，直接失败
+            if status is not None and 400 <= int(status) < 500 and int(status) in {400, 401, 403, 404, 405, 406, 410, 422}:
+                raise Exception(f"non-retriable client error: status={status}")
+            last_exc = Exception(f"status={status}")
         except Exception as e:
             last_exc = e
             logger.warning("HTTP POST %s attempt=%d failed: %s", url, i, e)
@@ -1073,6 +1081,13 @@ class TEDownloader(DataDownloader):
         self._popups_dismissed = False
         # 请求级缓存：内存 + 本地 CSV（短期复用）
         self._mem_cache: Dict[str, Tuple[float, pd.DataFrame]] = {}
+        # 允许通过环境变量开关缓存（默认禁用，以满足“取消下载缓存”需求）
+        try:
+            disable_cache_env = os.environ.get('TE_DISABLE_CACHE', 'true').strip().lower()
+            self._cache_disabled = disable_cache_env in ('1', 'true', 'yes', 'on')
+        except Exception:
+            self._cache_disabled = True
+        logger.info("TE caching %s", "DISABLED" if self._cache_disabled else "ENABLED")
         try:
             self._cache_ttl_seconds = int(os.environ.get('TE_CACHE_TTL_SECONDS', '600'))
         except Exception:
@@ -1094,6 +1109,8 @@ class TEDownloader(DataDownloader):
 
     def _cache_read(self, data_name: str) -> Optional[pd.DataFrame]:
         """读取缓存：优先内存，其次磁盘；命中则返回副本。"""
+        if getattr(self, "_cache_disabled", True):
+            return None
         now = time.time()
         # 内存缓存优先
         mem = self._mem_cache.get(data_name)
@@ -1119,6 +1136,8 @@ class TEDownloader(DataDownloader):
 
     def _cache_write(self, data_name: str, df: pd.DataFrame) -> None:
         """写入缓存：同时更新内存与磁盘。"""
+        if getattr(self, "_cache_disabled", True):
+            return
         try:
             self._mem_cache[data_name] = (time.time(), df.copy())
             path = self._cache_path(data_name)
