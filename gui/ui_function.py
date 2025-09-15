@@ -624,8 +624,12 @@ class UiFunctions():  # 删除:mainWindow
             logging.error(f"Error writing settings file: {e}")
         
         # 关闭窗口
+        # 同步更新单图页面的标题标签
+        try:
+            self.main_window.title_label_2.setText(first_data.replace("_", " "))
+        except Exception:
+            pass
         widget.close()
-        self.main_window.title_label_2.setText(f"{first_data.replace("_", " ")}")
 
     def one_close_setting_window(self, window, widget):
         # 获取没有更改的设置，然后重置面板
