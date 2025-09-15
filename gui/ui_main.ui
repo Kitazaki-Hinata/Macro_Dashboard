@@ -3175,7 +3175,7 @@ margin-right:20px;
                       </property>
                       <property name="styleSheet">
                        <string notr="true">color:white; 
-font-family:&quot;Comfortaa&quot;;
+font-famlily:&quot;Comfortaa&quot;;
 border :0;
 background:#262a2f;
 padding :5px;
@@ -3757,14 +3757,14 @@ QPushButton#cancel_btn::pressed {
 
 
 /*clear lags*/
-QPushButton#clear_lag_btn {
+QPushButton#clear_log_btn {
 	background-color:#EE5C88;
 	color : #252526;
 }
-QPushButton#clear_lag_btn::hover {
+QPushButton#clear_log_btn::hover {
 	background : #fa88aa;
 }
-QPushButton#clear_lag_btn::pressed {
+QPushButton#clear_log_btn::pressed {
 	background : #EE5C88;
 }</string>
                                </property>
@@ -3948,7 +3948,7 @@ margin-left: 1px;</string>
                             </property>
                             <property name="styleSheet">
                              <string notr="true">color:white; 
-font-family:&quot;Comfortaa&quot;;
+font-famlily:&quot;Comfortaa&quot;;
 border :0;
 background:transparent;
 padding :5px;

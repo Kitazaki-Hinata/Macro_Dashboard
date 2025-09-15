@@ -30,14 +30,13 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QSize(1267, 792))
         MainWindow.setMaximumSize(QSize(2304, 1440))
         MainWindow.setStyleSheet(u"* {\n"
-"\tbackground-color: #33363a;\n"
-"\tfont-family: \"Comfortaa\", \"Microsoft YaHei UI\", \"Segoe UI\", Arial, sans-serif;\n"
+"	background-color: #33363a;\n"
 "}\n"
 "\n"
 "QToolTip {\n"
 "    /* \u8bbe\u7f6e\u63d0\u793a\u6846color */\n"
 "    background-color: #ffffff;\n"
-"\tfont-family: \"Comfortaa\", \"Microsoft YaHei UI\", \"Segoe UI\", Arial, sans-serif;\n"
+"	font-family : \"Comfortaa\";\n"
 "    background-image: none;\n"
 "    color: #90b6e7;\n"
 "    border: 0;\n"
@@ -1718,7 +1717,7 @@ class Ui_MainWindow(object):
         font6.setPointSize(12)
         self.textEdit.setFont(font6)
         self.textEdit.setStyleSheet(u"color:white; \n"
-"font-family:\"Comfortaa\";\n"
+"font-famlily:\"Comfortaa\";\n"
 "border :0;\n"
 "background:#262a2f;\n"
 "padding :5px;\n"
@@ -2017,14 +2016,14 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "/*clear lags*/\n"
-"QPushButton#clear_lag_btn {\n"
+"QPushButton#clear_log_btn {\n"
 "	background-color:#EE5C88;\n"
 "	color : #252526;\n"
 "}\n"
-"QPushButton#clear_lag_btn::hover {\n"
+"QPushButton#clear_log_btn::hover {\n"
 "	background : #fa88aa;\n"
 "}\n"
-"QPushButton#clear_lag_btn::pressed {\n"
+"QPushButton#clear_log_btn::pressed {\n"
 "	background : #EE5C88;\n"
 "}")
         self.verticalLayout_27 = QVBoxLayout(self.download_btn_container)
@@ -2118,7 +2117,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.console_area.sizePolicy().hasHeightForWidth())
         self.console_area.setSizePolicy(sizePolicy1)
         self.console_area.setStyleSheet(u"color:white; \n"
-"font-family:\"Comfortaa\";\n"
+"font-famlily:\"Comfortaa\";\n"
 "border :0;\n"
 "background:transparent;\n"
 "padding :5px;\n"

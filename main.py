@@ -32,14 +32,14 @@ if __name__ == "__main__":
         # 确保进程退出前停止日志监听，优雅关闭文件句柄
         stop_logging()
 
-    '''Testing download file'''
+    # '''Testing download file'''
     # request_year: int = 2020
-    # fred_downloader = DownloaderFactory.create_downloader(
+    # yf_downloader = DownloaderFactory.create_downloader(
     #     source = "yf",
     #     json_data = json_data,
     #     request_year = request_year
     # )
-    # fred_downloader.to_db(return_csv = False)
+    # yf_downloader.to_db(return_csv = False)
 
 
 

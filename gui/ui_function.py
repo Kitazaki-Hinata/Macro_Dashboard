@@ -218,11 +218,20 @@ class UiFunctions():  # 删除:mainWindow
             logging.error(f"Failed to create .env file at path: {path}, since {e}")
 
     def clear_logs(self):
-        path = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(path, "..", "doc", "error.log")
-        with open(path, 'w'):
-            pass
-        self._append_console("Log file cleared successfully")
+        base_path = os.path.abspath(os.path.dirname(__file__))
+        log_dir = os.path.join(base_path, "..", "logs")
+        log_name_list = [
+            "debug_worker.log",
+            "error_worker.log",
+            "info_gui.log",
+            "info_worker.log",
+            "warning_worker.log"
+        ]
+        for name in log_name_list:
+            log_file_path = os.path.join(log_dir, name)
+            with open(log_file_path, 'w'):
+                pass
+            self._append_console("Log file cleared successfully")
 
     '''NOTE PAGE SLOTS METHODS'''
     def note_add_extra_page(self):

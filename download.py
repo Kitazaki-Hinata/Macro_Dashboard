@@ -424,6 +424,8 @@ class DatabaseConverter:
                 else:
                     if is_time_series:  # check whether Time_Series table exists
                         t0 = time.perf_counter()
+
+                        # 进行format convert
                         df_after_modify_time: pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
                         logger.debug("%s after format: columns=%s, shape=%s", data_name, list(df_after_modify_time.columns), tuple(df_after_modify_time.shape))
                         if df_after_modify_time.empty or 'date' not in df_after_modify_time.columns:
@@ -438,7 +440,7 @@ class DatabaseConverter:
                             self.conn.commit()
                             logger.debug("added column '%s' to Time_Series", data_name)
                         except Exception:
-                            logger.warning(f"{data_name} col name already exists in Time_Series, continue")
+                            pass    # 不用写warning，会增加很多的日志
 
                         df_db = pd.read_sql("SELECT * FROM Time_Series", self.conn)  # 只读取日期列
                         result_db = df_db.merge(df_after_modify_time, on="date", how="left")
@@ -481,7 +483,6 @@ class DatabaseConverter:
                         self.conn.commit()
                         logger.info("write_into_db(sheet=%s): wrote %d rows (to_sql %.3fs)", data_name, len(df), time.perf_counter() - t_sql)
                         logger.info("write_into_db finished: data=%s (%.3fs)", data_name, time.perf_counter() - t_all)
-                        self.conn.close()
                         return df
 
             except Exception as e:
