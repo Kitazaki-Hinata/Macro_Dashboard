@@ -76,8 +76,9 @@ def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, he
     raise Exception(f"GET {url} failed after {max_attempts} attempts: {last_exc}")
 
 
-def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4) -> requests.Response:
-    delays = _exponential_backoff_delays(max_attempts)
+def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4, delay_seconds: Optional[float] = None) -> requests.Response:
+    # 支持固定重试间隔（例如 BLS 要求 5s），否则使用指数回退
+    delays = [delay_seconds] * max_attempts if delay_seconds is not None else _exponential_backoff_delays(max_attempts)
     last_exc: Optional[Exception] = None
     for i, delay in enumerate(delays, start=1):
         try:
@@ -92,7 +93,15 @@ def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, h
             last_exc = e
             logger.warning("HTTP POST %s attempt=%d failed: %s", url, i, e)
         if i < max_attempts:
-            time.sleep(delay)
+            try:
+                if delay is None:
+                    # 无延迟（极端情况），直接继续
+                    continue
+                logger.info("Retrying POST in %.1fs (attempt %d/%d)", float(delay), i + 1, max_attempts)
+                time.sleep(float(delay))
+            except Exception:
+                # 任何睡眠异常都不应阻断重试
+                pass
     raise Exception(f"POST {url} failed after {max_attempts} attempts: {last_exc}")
 
 
@@ -567,7 +576,8 @@ class BEADownloader(DataDownloader):
                 logger.error(f"{table_name} FAILED DOWNLOAD/REFORMAT in BEA worker: {e}")
                 return table_name, None
 
-        workers  = max_workers or min(8, (os.cpu_count() or 4) * 2)    # workers是int，确认进程数量
+        env_workers = os.environ.get('BEA_WORKERS')
+        workers  = max_workers or (int(env_workers) if env_workers and env_workers.isdigit() else min(8, (os.cpu_count() or 4) * 2))    # workers是int，确认进程数量
         logger.info("BEA submitting %d tasks (workers=%d)", len(items), workers)
         with ThreadPoolExecutor(max_workers=workers) as ex:   # 创建一个线程池
             future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}   # 往线程池里面添加submit，每个submit添加worker函数用于下载，tn数据名称，cfg是json的参数
@@ -632,7 +642,9 @@ class YFDownloader(DataDownloader):
                 return table_name, None
 
         # Lower concurrency to mitigate YF rate limit
-        workers = max_workers or min(6, (os.cpu_count() or 4))
+        load_dotenv()
+        env_workers = os.environ.get('YF_WORKERS')
+        workers = max_workers or (int(env_workers) if env_workers and env_workers.isdigit() else min(6, (os.cpu_count() or 4)))
         logger.info("YF submitting %d tasks (workers=%d)", len(items), workers)
         with ThreadPoolExecutor(max_workers=workers) as ex:
             future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
@@ -717,7 +729,9 @@ class FREDDownloader(DataDownloader):
                 logger.error(f"{table_name} FAILED EXTRACT DATA from FRED: {e}")
                 return table_name, None
 
-        workers = max_workers or min(12, (os.cpu_count() or 4) * 2)
+        load_dotenv()
+        env_workers = os.environ.get('FRED_WORKERS')
+        workers = max_workers or (int(env_workers) if env_workers and env_workers.isdigit() else min(12, (os.cpu_count() or 4) * 2))
         logger.info("FRED submitting %d tasks (workers=%d)", len(items), workers)
         with ThreadPoolExecutor(max_workers=workers) as ex:
             future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
@@ -780,11 +794,16 @@ class BLSDownloader(DataDownloader):
                             }
                         )
                     t0 = time.perf_counter()
+                    load_dotenv()
+                    bls_timeout_env = os.environ.get('BLS_POST_TIMEOUT')
+                    bls_timeout = float(bls_timeout_env) if bls_timeout_env else 60.0
                     context = http_post_with_retry(
                         BLSDownloader.url,
                         data=params,
                         headers=dict([BLSDownloader.headers]),
-                        timeout=60.0
+                        timeout=bls_timeout,
+                        max_attempts=4,
+                        delay_seconds=5.0
                     )
                     json_data = json.loads(context.text)
                     logger.info(f"{table_name} Successfully download data")
@@ -823,8 +842,10 @@ class BLSDownloader(DataDownloader):
                 logger.info(f"{table_name} Successfully extracted! rows={len(df)}")
                 return table_name, final_result_df
 
-            # Keep BLS concurrency conservative to avoid server throttling
-            workers = max_workers or 4
+            # Keep BLS concurrency conservative to avoid server throttling（支持环境变量覆盖）
+            load_dotenv()
+            env_workers = os.environ.get('BLS_WORKERS')
+            workers = max_workers or (int(env_workers) if env_workers and env_workers.isdigit() else 4)
             logger.info("BLS submitting %d tasks (workers=%d)", len(items), workers)
             with ThreadPoolExecutor(max_workers=workers) as ex:
                 future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
@@ -1184,8 +1205,12 @@ class TEDownloader(DataDownloader):
         # 构建驱动池（仅在并发时启用）
         pool: Optional["queue.Queue[webdriver.Chrome]"] = None
         pool_size = 0
-        if (max_workers or 1) > 1:
-            pool_size = max(1, min(int(max_workers or 1), 3))  # 控制池大小，避免过多实例
+        load_dotenv()
+        env_te_workers = os.environ.get('TE_WORKERS')
+        env_te_pool = os.environ.get('TE_POOL_SIZE')
+        resolved_workers = max_workers or (int(env_te_workers) if env_te_workers and env_te_workers.isdigit() else 1)
+        if resolved_workers > 1:
+            pool_size = max(1, min(int(env_te_pool) if env_te_pool and env_te_pool.isdigit() else resolved_workers, 3))  # 控制池大小，避免过多实例
             pool = queue.Queue(maxsize=pool_size)
             for _ in range(pool_size):
                 opts = TEDownloader._build_chrome_options(self._headless)
@@ -1217,7 +1242,7 @@ class TEDownloader(DataDownloader):
             else:
                 return self._get_data_from_trading_economics_month(data_name=data_name)
 
-        workers = max_workers or 1
+        workers = resolved_workers
         if workers > 1:
             logger.info("TE submitting %d tasks (workers=%d, headless=%s)", len(items), workers, self._headless)
             from concurrent.futures import ThreadPoolExecutor, as_completed
