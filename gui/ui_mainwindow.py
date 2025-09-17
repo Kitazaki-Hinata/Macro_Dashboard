@@ -165,8 +165,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         )
 
 
-        '''DRAW CHART'''
-        self.chart_functions.plot_data("Nasdaq_Index")
+
 
     def left_bar_button_slot(self):
         '''left bar btn clicked slot, when click, change page (stack)'''
@@ -184,9 +183,12 @@ class mainWindow(QMainWindow, Ui_MainWindow):
 
         # clear effect 清除自带的效果保留qss效果
         for _, button in btn_dict.items():
-            if button != btn:  # 比较按钮对象而不是名称
+            if button != btn:
                 button.setChecked(False)
-                button.setStyleSheet("")
+                button.setStyleSheet("")  # 恢复QSS
+                button.style().unpolish(button)
+                button.style().polish(button)
+                button.update()
 
         # show stack pages
         if btn_name == "one_page_btn":

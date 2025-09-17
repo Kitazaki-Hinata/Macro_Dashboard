@@ -38,6 +38,7 @@ __all__ = [
     "QEvent",
     "QColorDialog",
     "QFontDatabase",
+    "QLabel",
 
     "resources_rc",
     "Ui_MainWindow",

@@ -50,26 +50,22 @@ class ChartFunction:
     def __init__(self, main_window: MainWindowProtocol) -> None:
         self.main_window: MainWindowProtocol = main_window
 
-        # 初始化每个图表部分的图表控件
-        self.init_chart_widgets(self.main_window.graph_widget_2)
+        # 初始化图表控件并命名
+        self.init_chart_widgets(self.main_window.graph_widget_2, "main_plot_widget")
+        self.init_chart_widgets(self.main_window.four_chart_one, "four_chart_one_plot")
+        self.init_chart_widgets(self.main_window.four_chart_two, "four_chart_two_plot")
+        self.init_chart_widgets(self.main_window.four_chart_three, "four_chart_three_plot")
+        self.init_chart_widgets(self.main_window.four_chart_four, "four_chart_four_plot")
 
-        self.init_chart_widgets(self.main_window.four_chart_one)
-        self.init_chart_widgets(self.main_window.four_chart_two)
-        self.init_chart_widgets(self.main_window.four_chart_three)
-        self.init_chart_widgets(self.main_window.four_chart_four)
-
-    def init_chart_widgets(self, window: QWidget) -> None:
-        """Initialize chart widgets
-        window 形参：传入需要清空的控件
-        例如，window = self.main_window.graph_widiget_2"""
-        # 窗口需要新建一个布局
+    def init_chart_widgets(self, window: QWidget, object_name: str) -> None:
+        """Initialize chart widgets 并设置objectName"""
         layout_obj = window.layout()
         if layout_obj is None:
-            layout_obj = QVBoxLayout()  # 或者 QHBoxLayout()，根据你的需求
+            layout_obj = QVBoxLayout()
             window.setLayout(layout_obj)
 
-        # 使用自定义ViewBox
         self.single_plot_widget: Any = pg.PlotWidget(viewBox=OnlyXWheelViewBox())
+        self.single_plot_widget.setObjectName(object_name)  # 设置objectName
         self.chart_title: QLabel = QLabel("Data Name will be here")
         self.chart_title.setMaximumHeight(50)
         self.chart_title.setMinimumHeight(50)
@@ -82,6 +78,7 @@ class ChartFunction:
             color : #ffffff;
             '''
         )
+        self.chart_title.setObjectName(f"{object_name}_title")
         layout_nn: QLayout = cast(QLayout, layout_obj)
         layout_nn.addWidget(self.chart_title)
         layout_nn.addWidget(self.single_plot_widget)
@@ -93,7 +90,6 @@ class ChartFunction:
         view_box = plot_item.getViewBox()
         if view_box is not None:
             view_box.setBackgroundColor('#262a2f')
-            # 允许拖动y轴
             view_box.setMouseEnabled(x=True, y=True)
         # 只允许横向缩放
         self.single_plot_widget.setMouseEnabled(x=True, y=False)
@@ -161,15 +157,16 @@ class ChartFunction:
             logger.error(f"Unexpected error: {e}")
             return [], []
 
-    def plot_data(self, data_name: str, color: list[str] = ["#90b6e7"]) -> None:
-        """Plot data to single chart，绘制数据并展示"""
-        self.single_plot_widget.clear()
+    def plot_data(self, data_name: str, color: list[str] = ["#90b6e7"], widget = None) -> None:
+        """Plot data to single chart，绘制数据并展示
+        widget是plot widget, self.single_plot_widget"""
+        widget.clear()
         # 设置轴标签字体
         font = pg.QtGui.QFont()
         font.setPixelSize(12)
         font.setFamilies(["Comfortaa"])
-        self.single_plot_widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
-        self.single_plot_widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
+        widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
+        widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
 
         dates, values = self._get_data_from_database(data_name)
 
@@ -179,33 +176,21 @@ class ChartFunction:
         x_data: List[int] = list(range(len(dates)))
         pen: Any = pg.mkPen(color=color[0], width=2)  # type: ignore[reportUnknownVariableType]
 
-        self.single_plot_widget.plot(
+        widget.plot(
             x=x_data,
             y=values,
             pen=pen,
             name=data_name
-            # symbol='o',
-            # symbolSize=2,
-            # symbolBrush=color[0]
         )
+        axis = widget.getAxis('bottom')
 
-        axis = self.single_plot_widget.getAxis('bottom')
-
-        # 设置X轴刻度
-        ticks: List[tuple[int, str]] = []
+        # # 设置日期轴的刻度
         n = len(dates)
-        if n == 0:
-            ticks = []
-        elif n <= 15:
-            # 数据点很少，全部显示
-            ticks = [(i, dates[i]) for i in range(n)]
-        else:
-            # 数据点较多，自动稀疏显示
-            step = max(1, n // 10)
-            ticks = [(i, dates[i]) for i in range(0, n, step)]
-            # 保证最后一个日期也显示
-            if (n - 1) not in [i for i, _ in ticks]:
-                ticks.append((n - 1, dates[-1]))
+        step = max(1, n // 5)
+        ticks = [(i, dates[i]) for i in range(0, n, step)]
+        # 保证最后一个日期也显示
+        if (n - 1) not in [i for i, _ in ticks]:
+            ticks.append((n - 1, dates[-1]))
         axis.setTicks([ticks])
 
         # 设置坐标轴字体
@@ -213,12 +198,17 @@ class ChartFunction:
         font.setPixelSize(10)
         font.setFamilies(["Comfortaa"])
 
-        self.single_plot_widget.getAxis('left').setTickFont(font)
-        self.single_plot_widget.getAxis('bottom').setTickFont(font)
-        self.single_plot_widget.addLegend()
+        widget.getAxis('left').setTickFont(font)
+        widget.getAxis('bottom').setTickFont(font)
+        widget.addLegend()
 
         # 设置x轴范围只显示数据范围
         if x_data:
-            self.single_plot_widget.setXRange(min(x_data), max(x_data), padding=0)
+            widget.setXRange(min(x_data), max(x_data), padding=0)
         if x_data:
-            self.single_plot_widget.setXRange(min(x_data), max(x_data), padding=0)
+            widget.setXRange(min(x_data), max(x_data), padding=0)
+        # 设置x轴范围只显示数据范围
+        if x_data:
+            widget.setXRange(min(x_data), max(x_data), padding=0)
+        if x_data:
+            widget.setXRange(min(x_data), max(x_data), padding=0)

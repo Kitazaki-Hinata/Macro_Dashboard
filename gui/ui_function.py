@@ -10,6 +10,8 @@ import sqlite3
 import json
 from datetime import datetime
 from typing import Optional, Dict, Any, Protocol
+from gui.chart_function import ChartFunction
+import pyqtgraph as pg
 
 from gui import *
 from concurrent.futures import ThreadPoolExecutor, Future
@@ -659,6 +661,21 @@ class UiFunctions():  # 删除:mainWindow
         existing_data["one_chart_settings"]["second_data"]["color"] = second_color
         existing_data["one_chart_settings"]["third_data"]["color"] = third_color
 
+        # 获取 main_plot_widget 实例（PlotWidget）
+        main_plot_widget = self.main_window.graph_widget_2.findChild(pg.PlotWidget, "main_plot_widget")
+        if main_plot_widget is not None:
+            # 修改: 通过 main_window 访问 chart_functions
+            self.main_window.chart_functions.plot_data(
+                data_name=first_data,
+                color=["#90b6e7"],
+                widget=main_plot_widget
+            )
+        # 修改: 通过 main_window 和 objectName 查找标题标签
+        main_plot_widget_title = self.main_window.graph_widget_2.findChild(QLabel, "main_plot_widget_title")
+        if main_plot_widget_title is not None:
+            main_plot_widget_title.setText(first_data.replace("_", " "))
+
+
         # 写入json
         try:
             with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
@@ -1087,6 +1104,10 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
+
+
+
+
 
 
 
