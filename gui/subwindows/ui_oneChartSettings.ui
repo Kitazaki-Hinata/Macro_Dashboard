@@ -354,6 +354,9 @@ QComboBox:focus {
       </item>
       <item row="1" column="2">
        <widget class="QSpinBox" name="first_time_lag">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="maximum">
          <number>10000</number>
         </property>
