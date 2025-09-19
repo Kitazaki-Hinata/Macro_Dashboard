@@ -173,11 +173,18 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             # best-effort wiring; ignore if widgets not built yet
             pass
+
         # 初始化时尝试从 .env 读取并填充输入框
         try:
             self.settings_api_load()
         except Exception:
             pass
+
+        # 连接四分图联动checkbox
+        # try:
+        #     self.main_window.connect_charts.stateChanged.connect(self._on_connect_charts_changed)
+        # except Exception:
+        #     pass
 
     '''SETTINGS PAGE SLOTS METHODS'''
     def _env_file_path(self) -> str:
@@ -636,40 +643,35 @@ class UiFunctions():  # 删除:mainWindow
         # define variables
         first_data = window.first_data_selection_box.currentText()
         second_data = window.second_data_selection_box.currentText()
-        third_data = window.third_data_selection_box.currentText()
 
         first_lag = window.first_time_lag.value()
         second_lag = window.second_time_lag.value()
-        third_lag = window.third_time_lag.value()
 
         first_color = window.first_color_btn.styleSheet().split(":")[1][1:]
         second_color = window.second_color_btn.styleSheet().split(":")[1][1:]
-        third_color = window.third_color_btn.styleSheet().split(":")[1][1:]
 
         # 调用内部方法打开json文件
         existing_data : Dict[str, Any] = self.get_settings_from_json()
 
         existing_data["one_chart_settings"]["first_data"]["data_name"] = first_data
         existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
-        existing_data["one_chart_settings"]["third_data"]["data_name"] = third_data
 
         existing_data["one_chart_settings"]["first_data"]["time_lags"] = first_lag
         existing_data["one_chart_settings"]["second_data"]["time_lags"] = second_lag
-        existing_data["one_chart_settings"]["third_data"]["time_lags"] = third_lag
 
         existing_data["one_chart_settings"]["first_data"]["color"] = first_color
         existing_data["one_chart_settings"]["second_data"]["color"] = second_color
-        existing_data["one_chart_settings"]["third_data"]["color"] = third_color
 
         # 获取 main_plot_widget 实例（PlotWidget）
         main_plot_widget = self.main_window.graph_widget_2.findChild(pg.PlotWidget, "main_plot_widget")
         if main_plot_widget is not None:
-            # 修改: 通过 main_window 访问 chart_functions
             self.main_window.chart_functions.plot_data(
                 data_name=first_data,
                 color=["#90b6e7"],
                 widget=main_plot_widget
             )
+            # 自动全局自适应显示
+            main_plot_widget.enableAutoRange(axis='xy', enable=True)
         # 修改: 通过 main_window 和 objectName 查找标题标签
         main_plot_widget_title = self.main_window.graph_widget_2.findChild(QLabel, "main_plot_widget_title")
         if main_plot_widget_title is not None:
@@ -696,11 +698,9 @@ class UiFunctions():  # 删除:mainWindow
         original_settings : Dict[str, Any] = self.get_settings_from_json()
         color_one : str = original_settings["one_chart_settings"]["first_data"]["color"]
         color_two : str = original_settings["one_chart_settings"]["second_data"]["color"]
-        color_three : str = original_settings["one_chart_settings"]["third_data"]["color"]
 
         window.first_color_btn.setStyleSheet(f"background: {color_one}")
         window.second_color_btn.setStyleSheet(f"background: {color_two}")
-        window.third_color_btn.setStyleSheet(f"background: {color_three}")
 
         widget.close()
 
@@ -730,6 +730,24 @@ class UiFunctions():  # 删除:mainWindow
         existing_data["four_chart_settings"]["second_data"]["color"] = second_color
         existing_data["four_chart_settings"]["third_data"]["color"] = third_color
         existing_data["four_chart_settings"]["fourth_data"]["color"] = fourth_color
+
+        # 你可以依次处理四个图表
+        four_widgets = [
+            ("first_data", "four_chart_one_plot"),
+            ("second_data", "four_chart_two_plot"),
+            ("third_data", "four_chart_three_plot"),
+            ("fourth_data", "four_chart_four_plot"),
+        ]
+        for data_key, plot_name in four_widgets:
+            data_name = locals()[data_key]
+            plot_widget = getattr(self.main_window, plot_name.replace("_plot", "")).findChild(pg.PlotWidget, plot_name)
+            if plot_widget is not None:
+                self.main_window.chart_functions.plot_data(
+                    data_name=data_name,
+                    color=["#90b6e7"],
+                    widget=plot_widget
+                )
+                plot_widget.enableAutoRange(axis='xy', enable=True)
 
         # 写入json
         try:
@@ -953,6 +971,12 @@ class UiFunctions():  # 删除:mainWindow
 
     def _on_worker_failed(self, msg: str):
         self._append_console(f"Error: {msg}")
+
+    def on_connect_charts_changed(self, state):
+        # state: 0未选中，2选中
+        linked = bool(state)
+        if hasattr(self.main_window, "chart_functions"):
+            self.main_window.chart_functions.link_four_charts(linked)
 
 
 class _ParallelExecutor(QObject):

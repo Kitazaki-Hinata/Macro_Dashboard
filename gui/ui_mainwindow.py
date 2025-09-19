@@ -56,9 +56,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.one_chart_ui.second_color_btn.clicked.connect(
             lambda : self.ui_functions.set_color(self.one_chart_ui.second_color_btn)
         )
-        self.one_chart_ui.third_color_btn.clicked.connect(
-            lambda : self.ui_functions.set_color(self.one_chart_ui.third_color_btn)
-        )
 
         # 实例化FOUR PAGE小窗口
         self.four_chart_settings_window = QWidget()
@@ -82,12 +79,10 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.table_ui = Ui_TableSettingsPanel()
         self.table_ui.setupUi(self.table_settings_window) # type: ignore
 
-
-
-        # 去除系统标题栏（使用 Qt6 命名空间的枚举）
+        # 去除系统标题栏, Qt6 命名空间的枚举
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
 
-        # 初始化按钮样式
+        # 初始化左边栏按钮样式
         self.one_page_btn.setStyleSheet(
             '''
             background : #90b6e7;
@@ -109,7 +104,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.note_btn.clicked.connect(self.left_bar_button_slot)
         self.settings_btn.clicked.connect(self.left_bar_button_slot)
 
-        # 修改：为 header_right_btn_container 添加鼠标事件
+        # 为 header_right_btn_container 添加鼠标事件
         self.header_right_btn_container.installEventFilter(self)
         self.header_text_and_icon.installEventFilter(self)
 
@@ -145,6 +140,9 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.one_set_preference.clicked.connect(lambda: self.ui_functions.open_settings_window(self.one_chart_ui, self.one_chart_settings_window, "one"))
         self.four_settings_button.clicked.connect(lambda: self.ui_functions.open_settings_window(self.four_chart_ui, self.four_chart_settings_window, "four"))
         self.page_table_set_preference.clicked.connect(lambda: self.ui_functions.open_settings_window(self.table_ui, self.table_settings_window, "table"))
+        # 四图表中的联动checkbox
+        self.connect_charts.stateChanged.connect(self.ui_functions.on_connect_charts_changed)
+
 
         '''SETTINGS page btn '''
         self.one_chart_ui.finish_btn.clicked.connect(lambda : self.ui_functions.one_finish_settings(self.one_chart_ui, self.one_chart_settings_window))
@@ -163,7 +161,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.table_ui.cancel_btn.clicked.connect(
             lambda: self.ui_functions.table_close_setting_window(self.table_settings_window)
         )
-
 
 
 

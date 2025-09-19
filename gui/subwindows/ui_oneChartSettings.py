@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_oneChartSettings.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -194,58 +194,10 @@ class Ui_OneChartSettingsPanel(object):
 
         self.gridLayout.addWidget(self.second_color_btn, 2, 3, 1, 1)
 
-        self.first_data_selection_box = QComboBox(self.settings_panel)
-        self.first_data_selection_box.setObjectName(u"first_data_selection_box")
-        self.first_data_selection_box.setMinimumSize(QSize(0, 25))
-        self.first_data_selection_box.setEditable(True)
-        self.first_data_selection_box.setMinimumContentsLength(0)
+        self.widget = QWidget(self.settings_panel)
+        self.widget.setObjectName(u"widget")
 
-        self.gridLayout.addWidget(self.first_data_selection_box, 1, 1, 1, 1)
-
-        self.first_data_title = QLabel(self.settings_panel)
-        self.first_data_title.setObjectName(u"first_data_title")
-        self.first_data_title.setMaximumSize(QSize(120, 16777215))
-
-        self.gridLayout.addWidget(self.first_data_title, 1, 0, 1, 1)
-
-        self.third_data_selection_box = QComboBox(self.settings_panel)
-        self.third_data_selection_box.setObjectName(u"third_data_selection_box")
-        self.third_data_selection_box.setMinimumSize(QSize(0, 25))
-        self.third_data_selection_box.setEditable(True)
-
-        self.gridLayout.addWidget(self.third_data_selection_box, 3, 1, 1, 1)
-
-        self.second_time_lag = QSpinBox(self.settings_panel)
-        self.second_time_lag.setObjectName(u"second_time_lag")
-        self.second_time_lag.setMaximum(10000)
-
-        self.gridLayout.addWidget(self.second_time_lag, 2, 2, 1, 1)
-
-        self.third_data_title = QLabel(self.settings_panel)
-        self.third_data_title.setObjectName(u"third_data_title")
-
-        self.gridLayout.addWidget(self.third_data_title, 3, 0, 1, 1)
-
-        self.data_name_title = QLabel(self.settings_panel)
-        self.data_name_title.setObjectName(u"data_name_title")
-        self.data_name_title.setMaximumSize(QSize(16777215, 40))
-        self.data_name_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout.addWidget(self.data_name_title, 0, 1, 1, 1)
-
-        self.first_color_btn = QPushButton(self.settings_panel)
-        self.first_color_btn.setObjectName(u"first_color_btn")
-        self.first_color_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.first_color_btn.setStyleSheet(u"background : #90b6e7")
-
-        self.gridLayout.addWidget(self.first_color_btn, 1, 3, 1, 1)
-
-        self.time_lag_title = QLabel(self.settings_panel)
-        self.time_lag_title.setObjectName(u"time_lag_title")
-        self.time_lag_title.setMaximumSize(QSize(80, 16777215))
-        self.time_lag_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.gridLayout.addWidget(self.time_lag_title, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.widget, 3, 1, 1, 1)
 
         self.line_color_title = QLabel(self.settings_panel)
         self.line_color_title.setObjectName(u"line_color_title")
@@ -253,20 +205,6 @@ class Ui_OneChartSettingsPanel(object):
         self.line_color_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.line_color_title, 0, 3, 1, 1)
-
-        self.first_time_lag = QSpinBox(self.settings_panel)
-        self.first_time_lag.setObjectName(u"first_time_lag")
-        self.first_time_lag.setEnabled(False)
-        self.first_time_lag.setMaximum(10000)
-
-        self.gridLayout.addWidget(self.first_time_lag, 1, 2, 1, 1)
-
-        self.third_color_btn = QPushButton(self.settings_panel)
-        self.third_color_btn.setObjectName(u"third_color_btn")
-        self.third_color_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.third_color_btn.setStyleSheet(u"background : #F6B7D0")
-
-        self.gridLayout.addWidget(self.third_color_btn, 3, 3, 1, 1)
 
         self.second_data_selection_box = QComboBox(self.settings_panel)
         self.second_data_selection_box.setObjectName(u"second_data_selection_box")
@@ -280,16 +218,53 @@ class Ui_OneChartSettingsPanel(object):
 
         self.gridLayout.addWidget(self.second_data_title, 2, 0, 1, 1)
 
-        self.third_time_lag = QSpinBox(self.settings_panel)
-        self.third_time_lag.setObjectName(u"third_time_lag")
-        self.third_time_lag.setMaximum(10000)
+        self.second_time_lag = QSpinBox(self.settings_panel)
+        self.second_time_lag.setObjectName(u"second_time_lag")
+        self.second_time_lag.setMaximum(10000)
 
-        self.gridLayout.addWidget(self.third_time_lag, 3, 2, 1, 1)
+        self.gridLayout.addWidget(self.second_time_lag, 2, 2, 1, 1)
 
-        self.widget = QWidget(self.settings_panel)
-        self.widget.setObjectName(u"widget")
+        self.first_time_lag = QSpinBox(self.settings_panel)
+        self.first_time_lag.setObjectName(u"first_time_lag")
+        self.first_time_lag.setEnabled(False)
+        self.first_time_lag.setMaximum(10000)
 
-        self.gridLayout.addWidget(self.widget, 4, 1, 1, 1)
+        self.gridLayout.addWidget(self.first_time_lag, 1, 2, 1, 1)
+
+        self.time_lag_title = QLabel(self.settings_panel)
+        self.time_lag_title.setObjectName(u"time_lag_title")
+        self.time_lag_title.setMaximumSize(QSize(80, 16777215))
+        self.time_lag_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout.addWidget(self.time_lag_title, 0, 2, 1, 1)
+
+        self.first_data_selection_box = QComboBox(self.settings_panel)
+        self.first_data_selection_box.setObjectName(u"first_data_selection_box")
+        self.first_data_selection_box.setMinimumSize(QSize(0, 25))
+        self.first_data_selection_box.setEditable(True)
+        self.first_data_selection_box.setMinimumContentsLength(0)
+
+        self.gridLayout.addWidget(self.first_data_selection_box, 1, 1, 1, 1)
+
+        self.first_color_btn = QPushButton(self.settings_panel)
+        self.first_color_btn.setObjectName(u"first_color_btn")
+        self.first_color_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.first_color_btn.setStyleSheet(u"background : #90b6e7")
+
+        self.gridLayout.addWidget(self.first_color_btn, 1, 3, 1, 1)
+
+        self.data_name_title = QLabel(self.settings_panel)
+        self.data_name_title.setObjectName(u"data_name_title")
+        self.data_name_title.setMaximumSize(QSize(16777215, 40))
+        self.data_name_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.gridLayout.addWidget(self.data_name_title, 0, 1, 1, 1)
+
+        self.first_data_title = QLabel(self.settings_panel)
+        self.first_data_title.setObjectName(u"first_data_title")
+        self.first_data_title.setMaximumSize(QSize(120, 16777215))
+
+        self.gridLayout.addWidget(self.first_data_title, 1, 0, 1, 1)
 
 
         self.verticalLayout.addWidget(self.settings_panel)
@@ -359,14 +334,12 @@ class Ui_OneChartSettingsPanel(object):
         OneChartSettingsPanel.setWindowTitle(QCoreApplication.translate("OneChartSettingsPanel", u"Settings", None))
         self.label.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Data Selection and Settings", None))
         self.second_color_btn.setText("")
-        self.first_data_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"First Data (Main)", None))
-        self.third_data_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Third Data", None))
-        self.data_name_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Data Name", None))
-        self.first_color_btn.setText("")
-        self.time_lag_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Time Lags", None))
         self.line_color_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Color", None))
-        self.third_color_btn.setText("")
         self.second_data_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Second Data", None))
+        self.time_lag_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Time Lags", None))
+        self.first_color_btn.setText("")
+        self.data_name_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Data Name", None))
+        self.first_data_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"First Data (Main)", None))
         self.cancel_btn.setText("")
         self.finish_btn.setText("")
     # retranslateUi
