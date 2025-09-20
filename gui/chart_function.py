@@ -9,6 +9,8 @@ import numpy as np
 from typing import Any, Sequence, Tuple, List, Protocol, cast
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QLayout  # 改为 PySide6
 from PySide6.QtCore import Qt
+from pyqtgraph.Point import Point
+import pyqtgraph.functions as fn
 
 
 class MainWindowProtocol(Protocol):
@@ -22,23 +24,29 @@ class MainWindowProtocol(Protocol):
     four_chart_three: QWidget
     four_chart_four: QWidget
 
+
 # 设置日志
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
 class OnlyXWheelViewBox(pg.ViewBox):
+    '''继承pyqtgraph的wheelEvent类，修改滚轮的运作方式'''
+
     def wheelEvent(self, ev, axis=None):
-        # 按住Ctrl键时只缩放y轴
+        # 按住Ctrl键时只缩放y轴，并且方向相反
         if ev.modifiers() == Qt.ControlModifier:
             if ev.delta() != 0:
                 # 加快缩放速度：使用更大的wheelScaleFactor
                 original_factor = self.state['wheelScaleFactor']
-                self.state['wheelScaleFactor'] = 0.4  # 增大缩放因子，加快速度
+                self.state['wheelScaleFactor'] = 0.09  # 加快速度
+
+                # 反转滚轮方向，delta值取反
+                reversed_delta = -ev.delta()
 
                 # 只在y轴方向缩放
                 mask = [False, True]  # x轴禁用，y轴启用
-                s = 1.02 ** (ev.delta() * self.state['wheelScaleFactor'])
+                s = 1.02 ** (reversed_delta * self.state['wheelScaleFactor'])
                 s = [None, s]  # x轴不缩放，y轴缩放
 
                 center = Point(fn.invertQTransform(self.childGroup.transform()).map(ev.pos()))
@@ -53,15 +61,15 @@ class OnlyXWheelViewBox(pg.ViewBox):
                 super().wheelEvent(ev, axis)
             return
 
-        # 普通滚轮：只缩放x轴且加快速度
+        # 普通滚轮：只缩放x轴且加快速度（保持原方向）
         if ev.delta() != 0:
             # 加快缩放速度：使用更大的wheelScaleFactor
             original_factor = self.state['wheelScaleFactor']
-            self.state['wheelScaleFactor'] = 0.4  # 增大缩放因子，加快速度
+            self.state['wheelScaleFactor'] = 0.09  # 加快速度
 
             # 只在x轴方向缩放
             mask = [True, False]  # x轴启用，y轴禁用
-            s = 1.02 ** (ev.delta() * self.state['wheelScaleFactor'])
+            s = 1.02 ** (-ev.delta() * self.state['wheelScaleFactor'])
             s = [s, None]  # x轴缩放，y轴不缩放
 
             center = Point(fn.invertQTransform(self.childGroup.transform()).map(ev.pos()))
@@ -75,36 +83,6 @@ class OnlyXWheelViewBox(pg.ViewBox):
         else:
             super().wheelEvent(ev, axis)
 
-
-class CustomViewBox(pg.ViewBox):
-    # ViewBox类来处理鼠标移动事件
-    def __init__(self, *args, **kwds):
-        super().__init__(*args, **kwds)
-        self.setMouseMode(self.PanMode)
-        
-    def mouseDragEvent(self, ev, axis=None):
-        if ev.button() == Qt.LeftButton:
-            # 直接调用父类处理，实现平移
-            super().mouseDragEvent(ev, axis=axis)
-        else:
-            super().mouseDragEvent(ev, axis=axis)
-
-    def wheelEvent(self, ev, axis=None):
-        # 只缩放x轴
-        if ev.modifiers() == Qt.ControlModifier:
-            # 支持Ctrl+滚轮缩放y轴（可选）
-            super().wheelEvent(ev, axis=axis)
-            return
-        # 横向缩放
-        if ev.delta() != 0:
-            scale = 1.02 ** (ev.delta() / 120)
-            self.scaleBy((1/scale, 1))
-            ev.accept()
-        else:
-            super().wheelEvent(ev, axis=axis)
-
-###########################################
-# 主类ChartFunction
 
 class ChartFunction:
     def __init__(self, main_window: MainWindowProtocol) -> None:
@@ -131,12 +109,7 @@ class ChartFunction:
             layout_obj = QVBoxLayout()
             window.setLayout(layout_obj)
 
-        # --- 修改: 主图用 OnlyXWheelViewBox，四分图用 CustomViewBox ---
-        if object_name == "main_plot_widget":
-            self.single_plot_widget: Any = pg.PlotWidget(viewBox=OnlyXWheelViewBox())
-        else:
-            self.single_plot_widget: Any = pg.PlotWidget(viewBox=CustomViewBox())
-        # --- end ---
+        self.single_plot_widget: Any = pg.PlotWidget(viewBox=OnlyXWheelViewBox())
 
         self.single_plot_widget.setObjectName(object_name)  # 设置objectName
         self.chart_title: QLabel = QLabel("Data Name will be here")
@@ -145,10 +118,11 @@ class ChartFunction:
         self.chart_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.chart_title.setStyleSheet(
             '''
-            font-family : "Comfortaa", "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
+            font-family : "Comfortaa";
             font-weight : Normal;
             font-size : 16px;
             color : #ffffff;
+            margin-top : 3px; 
             '''
         )
         self.chart_title.setObjectName(f"{object_name}_title")
@@ -175,7 +149,10 @@ class ChartFunction:
         font.setFamilies(["Comfortaa"])
         self.single_plot_widget.getAxis('left').setTickFont(font)
         self.single_plot_widget.getAxis('bottom').setTickFont(font)
-        self.single_plot_widget.addLegend()
+
+        # 只有单图表界面设立legend
+        if object_name == "main_plot_widget":
+            self.single_plot_widget.addLegend()
         
         # 保存对标题标签的引用，以便后续访问
         if object_name == "main_plot_widget":
@@ -469,9 +446,9 @@ class ChartFunction:
             for w in widgets[1:]:
                 vb = w.getViewBox()
                 vb.setXLink(master_vb)
-                vb.setYLink(master_vb)
+                # vb.setYLink(master_vb)  # 不再同步y轴
             for w in widgets:
-                w.enableAutoRange(axis='xy', enable=True)
+                w.enableAutoRange(axis='x', enable=True)  # 只对x轴自适应
 
             def sync_crosshair(pos):
                 for w in widgets:
@@ -531,12 +508,14 @@ class ChartFunction:
 
             self._four_charts_range_conn = []
             def sync_range(*args, **kwargs):
-                target_range = master_vb.viewRange()
-                for w in widgets[1:]:
-                    vb = w.getViewBox()
-                    vb.blockSignals(True)
-                    vb.setRange(xRange=target_range[0], yRange=target_range[1], padding=0)
-                    vb.blockSignals(False)
+                # target_range = master_vb.viewRange()
+                # for w in widgets[1:]:
+                #     vb = w.getViewBox()
+                #     vb.blockSignals(True)
+                #     vb.setRange(xRange=target_range[0], yRange=target_range[1], padding=0)
+                #     vb.blockSignals(False)
+                # 不需要手动 setRange，ViewBox 链接后会自动同步范围，避免递归
+                pass
             conn = master_vb.sigRangeChanged.connect(sync_range)
             self._four_charts_range_conn.append(conn)
             self._four_charts_linked = True

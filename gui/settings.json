@@ -1,7 +1,7 @@
 {
   "one_chart_settings": {
     "first_data": {
-      "data_name": "Volatility_Index",
+      "data_name": "AA_90days_Financial_Paper_Rate",
       "time_lags": 0,
       "color": "#90b6e7"
     },
@@ -17,20 +17,20 @@
       "color": "#90b6e7"
     },
     "second_data": {
-      "data_name": "Nominal_GDP",
+      "data_name": "AA_90days_Financial_Paper_Rate",
       "color": "#90b6e7"
     },
     "third_data": {
-      "data_name": "ECI_Manufacture",
+      "data_name": "Long_Term_Unemployment",
       "color": "#90b6e7"
     },
     "fourth_data": {
-      "data_name": "CPI_Seasonally_Adjusted",
+      "data_name": "Volatility_Index",
       "color": "#90b6e7"
     }
   },
   "table_settings": {
     "table_name": ""
   },
-  "recent_update_time": "2025-09-18 12:42:12"
+  "recent_update_time": "2025-09-20 18:04:00"
 }

@@ -71,7 +71,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             lambda: self.ui_functions.set_color(self.four_chart_ui.third_color_btn)
         )
         self.four_chart_ui.fourth_color_btn.clicked.connect(
-            lambda: self.ui_functions.set_color(self.four_chart_ui.third_color_btn)
+            lambda: self.ui_functions.set_color(self.four_chart_ui.fourth_color_btn)
         )
 
         # 实例化TABLE PAGE小窗口

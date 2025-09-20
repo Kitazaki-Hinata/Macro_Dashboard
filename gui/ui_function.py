@@ -242,7 +242,7 @@ class UiFunctions():  # 删除:mainWindow
             logging.error(f"Failed to create .env file at path: {path}, since {e}")
 
     def clear_logs(self):
-        # 1) 清空 GUI 控件中的日志内容
+        #  清空 GUI 控件中的日志console内容
         try:
             if hasattr(self.main_window, 'console_area') and self.main_window.console_area is not None:
                 # QTextEdit 支持 clear()
@@ -250,24 +250,25 @@ class UiFunctions():  # 删除:mainWindow
         except Exception as e:
             logging.error(f"Failed to clear console text area: {e}")
 
-        # 2) 清空日志文件
-        try:
-            path = os.path.abspath(os.path.dirname(__file__))
-            file_name_list = [
-                "debug_worker.log",
-                "error_gui.log",
-                "error_worker.log",
-                "info_gui.log",
-                "info_worker.log",
-                "warning_worker.log"
-            ]
-            for name in file_name_list:
-                path_file = os.path.join(path, "..", "logs", name)
-                with open(path_file, 'w', encoding='utf-8'):
-                    # 直接截断文件
-                    pass
-        except Exception as e:
-            logging.error(f"Failed to truncate log file: {e}")
+        # 清空日志文件
+        path = os.path.abspath(os.path.dirname(__file__))
+        logs_dir = os.path.join(path, "..", "logs")
+
+        # 确保logs目录存在
+        if os.path.exists(logs_dir) and os.path.isdir(logs_dir):
+            # 遍历logs目录下的所有文件并删除
+            for filename in os.listdir(logs_dir):
+                try:
+                    file_path = os.path.join(logs_dir, filename)
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                        logging.info(f"Deleted log file: {filename}")
+                except Exception as e:
+                    logging.error(f"Failed to truncate log file: {e}")
+                    continue
+        else:
+            logging.warning(f"Logs directory does not exist: {logs_dir}")
+
 
         # 3) 在控制台区提示已清空（这条新消息会显示在空白后，便于确认操作成功）
         try:
@@ -572,6 +573,7 @@ class UiFunctions():  # 删除:mainWindow
     '''ONE CHART PAGE SLOTS METHODS'''
     def open_settings_window(self, ui: Any, window: QWidget, name: str):
         # 先添加下拉框里面的所有选项
+        # name 形参用于区分调用此槽方法的是哪个按钮
         combo_box_name: list[str] = self._get_sqlite_col_name()
 
         if name == "one" or name == "four":
@@ -598,7 +600,6 @@ class UiFunctions():  # 删除:mainWindow
                 existing_data: Dict[str, Any] = self.get_settings_from_json()
                 ui.first_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["first_data"]["data_name"])
                 ui.second_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["second_data"]["data_name"])
-                ui.third_data_selection_box.setCurrentText(existing_data["one_chart_settings"]["third_data"]["data_name"])
             except:
                 pass
 
@@ -667,12 +668,14 @@ class UiFunctions():  # 删除:mainWindow
         if main_plot_widget is not None:
             self.main_window.chart_functions.plot_data(
                 data_name=first_data,
-                color=["#90b6e7"],
+                color=[first_color],   # 这里必须是一个list
                 widget=main_plot_widget
             )
-            # 自动全局自适应显示
+
+            # 全局自适应缩放图表大小
             main_plot_widget.enableAutoRange(axis='xy', enable=True)
-        # 修改: 通过 main_window 和 objectName 查找标题标签
+
+        # 通过 main_window 和 objectName 查找标题标签
         main_plot_widget_title = self.main_window.graph_widget_2.findChild(QLabel, "main_plot_widget_title")
         if main_plot_widget_title is not None:
             main_plot_widget_title.setText(first_data.replace("_", " "))
@@ -685,8 +688,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception as e:
             logging.error(f"Error writing settings file: {e}")
         
-        # 关闭窗口
-        # 同步更新单图页面的标题标签
+        # 关闭窗口同步更新单图页面的标题标签
         try:
             self.main_window.title_label_2.setText(first_data.replace("_", " "))
         except Exception:
@@ -731,23 +733,38 @@ class UiFunctions():  # 删除:mainWindow
         existing_data["four_chart_settings"]["third_data"]["color"] = third_color
         existing_data["four_chart_settings"]["fourth_data"]["color"] = fourth_color
 
-        # 你可以依次处理四个图表
+        # 依次处理四个图表，四个内容是，图表号，控件名称，数据名称，颜色
+        # 然后for循环遍历四个list，进行图表输出以及图表名称修改
         four_widgets = [
-            ("first_data", "four_chart_one_plot"),
-            ("second_data", "four_chart_two_plot"),
-            ("third_data", "four_chart_three_plot"),
-            ("fourth_data", "four_chart_four_plot"),
+            ["first_data", "four_chart_one_plot", first_data, first_color],
+            ["second_data", "four_chart_two_plot", second_data, second_color],
+            ["third_data", "four_chart_three_plot", third_data, third_color],
+            ["fourth_data", "four_chart_four_plot", fourth_data, fourth_color],
         ]
-        for data_key, plot_name in four_widgets:
-            data_name = locals()[data_key]
-            plot_widget = getattr(self.main_window, plot_name.replace("_plot", "")).findChild(pg.PlotWidget, plot_name)
+        for widget_list in four_widgets:
+            index_name = widget_list[0]
+            plot_widget_name = widget_list[1]
+            data_name = widget_list[2]
+            color_name = widget_list[3]
+
+            # plot graphs
+            plot_widget = getattr(self.main_window, plot_widget_name.replace("_plot", "")).findChild(pg.PlotWidget, plot_widget_name)
             if plot_widget is not None:
                 self.main_window.chart_functions.plot_data(
                     data_name=data_name,
-                    color=["#90b6e7"],
+                    color=[color_name],
                     widget=plot_widget
                 )
                 plot_widget.enableAutoRange(axis='xy', enable=True)
+
+            # change title of the chart 修改图表标签
+            main_plot_widget_title = getattr(
+                self.main_window, plot_widget_name.replace("_plot", "")
+            ).findChild(
+                QLabel, plot_widget_name.replace("_plot", "_plot_title")
+            )
+            if main_plot_widget_title is not None:
+                main_plot_widget_title.setText(data_name.replace("_", " "))  # 修正：用各自的data_name
 
         # 写入json
         try:
