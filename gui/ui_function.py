@@ -296,7 +296,7 @@ class UiFunctions():  # 删除:mainWindow
                 )
                 self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
                 return
-        if note_name == "note_instructions_btn":
+        if note_name == "note_instructions_btn" or note_name == "User_instructions":
             self.main_window.note_status_bar.setText("Name Conflict, change a name")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
@@ -390,7 +390,7 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
 
-        if note_name == "note_instructions_btn" or note_name == "User_instructions":
+        if note_name == "note_instructions_btn" or note_name == "User_instructions" or note_name == "User_Instructions":
             self.main_window.note_status_bar.setText("Name Conflict, change a name")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return

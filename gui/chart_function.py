@@ -26,20 +26,54 @@ class MainWindowProtocol(Protocol):
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
+
 class OnlyXWheelViewBox(pg.ViewBox):
-    def wheelEvent(self, ev):
-        # 只缩放x轴
+    def wheelEvent(self, ev, axis=None):
+        # 按住Ctrl键时只缩放y轴
         if ev.modifiers() == Qt.ControlModifier:
-            # 支持Ctrl+滚轮缩放y轴（可选）
-            super().wheelEvent(ev)
+            if ev.delta() != 0:
+                # 加快缩放速度：使用更大的wheelScaleFactor
+                original_factor = self.state['wheelScaleFactor']
+                self.state['wheelScaleFactor'] = 0.4  # 增大缩放因子，加快速度
+
+                # 只在y轴方向缩放
+                mask = [False, True]  # x轴禁用，y轴启用
+                s = 1.02 ** (ev.delta() * self.state['wheelScaleFactor'])
+                s = [None, s]  # x轴不缩放，y轴缩放
+
+                center = Point(fn.invertQTransform(self.childGroup.transform()).map(ev.pos()))
+                self._resetTarget()
+                self.scaleBy(s, center)
+                ev.accept()
+                self.sigRangeChangedManually.emit(mask)
+
+                # 恢复原始缩放因子
+                self.state['wheelScaleFactor'] = original_factor
+            else:
+                super().wheelEvent(ev, axis)
             return
-        # 横向缩放
+
+        # 普通滚轮：只缩放x轴且加快速度
         if ev.delta() != 0:
-            scale = 1.02 ** (ev.delta() / 120)
-            self.scaleBy((1/scale, 1))
+            # 加快缩放速度：使用更大的wheelScaleFactor
+            original_factor = self.state['wheelScaleFactor']
+            self.state['wheelScaleFactor'] = 0.4  # 增大缩放因子，加快速度
+
+            # 只在x轴方向缩放
+            mask = [True, False]  # x轴启用，y轴禁用
+            s = 1.02 ** (ev.delta() * self.state['wheelScaleFactor'])
+            s = [s, None]  # x轴缩放，y轴不缩放
+
+            center = Point(fn.invertQTransform(self.childGroup.transform()).map(ev.pos()))
+            self._resetTarget()
+            self.scaleBy(s, center)
             ev.accept()
+            self.sigRangeChangedManually.emit(mask)
+
+            # 恢复原始缩放因子
+            self.state['wheelScaleFactor'] = original_factor
         else:
-            super().wheelEvent(ev)
+            super().wheelEvent(ev, axis)
 
 
 class CustomViewBox(pg.ViewBox):
@@ -97,8 +131,12 @@ class ChartFunction:
             layout_obj = QVBoxLayout()
             window.setLayout(layout_obj)
 
-        # 使用自定义的ViewBox
-        self.single_plot_widget: Any = pg.PlotWidget(viewBox=CustomViewBox())
+        # --- 修改: 主图用 OnlyXWheelViewBox，四分图用 CustomViewBox ---
+        if object_name == "main_plot_widget":
+            self.single_plot_widget: Any = pg.PlotWidget(viewBox=OnlyXWheelViewBox())
+        else:
+            self.single_plot_widget: Any = pg.PlotWidget(viewBox=CustomViewBox())
+        # --- end ---
 
         self.single_plot_widget.setObjectName(object_name)  # 设置objectName
         self.chart_title: QLabel = QLabel("Data Name will be here")
@@ -208,38 +246,37 @@ class ChartFunction:
             x_val = mouse_point.x()
             y_val = mouse_point.y()
             
-            # 更新十字线位置
-            v_line.setPos(x_val)
-            h_line.setPos(y_val)
-            
             # 获取当前图表中的所有曲线
             items = plot_item.listDataItems()
+            nearest_y_for_hline = None
             if items:
-                # 准备显示的数据文本
                 data_texts = []
                 for item in items:
                     if hasattr(item, 'getData') and item.getData() is not None:
                         x_data, y_data = item.getData()
                         if x_data is not None and y_data is not None and len(x_data) > 0:
-                            # 找到最接近的x值索引
                             distances = np.abs(np.array(x_data) - x_val)
                             if len(distances) > 0:
                                 min_index = np.argmin(distances)
                                 if min_index < len(x_data) and min_index < len(y_data):
                                     nearest_x = x_data[min_index]
                                     nearest_y = y_data[min_index]
-
-                                    # 获取曲线名称（如果有的话）
+                                    # 只用第一个数据系列的y作为h_line位置
+                                    if nearest_y_for_hline is None:
+                                        nearest_y_for_hline = nearest_y
                                     name = getattr(item, 'opts', {}).get('name', 'Data')
                                     data_texts.append(f"Date : {nearest_x}\n{name} : {nearest_y:.2f}")
-                
                 # 如果有数据，则更新标签文本
                 if data_texts:
-                    # 将所有数据项连接成多行文本
                     label_text = "\n".join(data_texts)
                     label.setText(label_text)
-                    label.setPos(x_val, y_val)
-            
+                    label.setPos(x_val, nearest_y_for_hline if nearest_y_for_hline is not None else y_val)
+            # 更新十字线位置
+            v_line.setPos(x_val)
+            if nearest_y_for_hline is not None:
+                h_line.setPos(nearest_y_for_hline)
+            else:
+                h_line.setPos(y_val)
             # 显示十字线和标签
             v_line.show()
             h_line.show()
@@ -446,9 +483,9 @@ class ChartFunction:
                         object_name = w.objectName()
                         v_line, h_line = self.crosshairs[object_name]
                         label = self.labels[object_name]
-                        v_line.setPos(x_val)
-                        h_line.setPos(y_val)
+                        # --- begin: 只让h_line跟随最近数据点 ---
                         items = plot_item.listDataItems()
+                        nearest_y_for_hline = None
                         data_texts = []
                         for item in items:
                             if hasattr(item, 'getData') and item.getData() is not None:
@@ -460,12 +497,19 @@ class ChartFunction:
                                         if min_index < len(x_data) and min_index < len(y_data):
                                             nearest_x = x_data[min_index]
                                             nearest_y = y_data[min_index]
+                                            if nearest_y_for_hline is None:
+                                                nearest_y_for_hline = nearest_y
                                             name = getattr(item, 'opts', {}).get('name', 'Data')
                                             data_texts.append(f"Date : {nearest_x}\n{name} : {nearest_y:.2f}")
+                        v_line.setPos(x_val)
+                        if nearest_y_for_hline is not None:
+                            h_line.setPos(nearest_y_for_hline)
+                        else:
+                            h_line.setPos(y_val)
                         if data_texts:
                             label_text = "\n".join(data_texts)
                             label.setText(label_text)
-                            label.setPos(x_val, y_val)
+                            label.setPos(x_val, nearest_y_for_hline if nearest_y_for_hline is not None else y_val)
                         v_line.show()
                         h_line.show()
                         label.show()
