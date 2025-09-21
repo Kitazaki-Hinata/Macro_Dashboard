@@ -42,7 +42,7 @@ if __name__ == "__main__":
         window.show()
         app.exec()
     finally:
-        # 确保进程退出前停止日志监听，优雅关闭文件句柄
+        # 确保进程退出前停止日志监听，关闭文件句柄
         stop_logging()
 
     # --- 以下为测试下载的参考示例（保留注释即可） ---
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     #
     # request_year: int = 2020
     # fred_downloader = DownloaderFactory.create_downloader(
-    #     source = "yf",
+    #     source = "fred",
     #     json_data = json_data,
     #     request_year = request_year
     # )

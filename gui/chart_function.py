@@ -14,8 +14,9 @@ import pyqtgraph.functions as fn
 
 
 class MainWindowProtocol(Protocol):
-    """协议类，声明 ChartFunction 需要用到的主窗口属性
-    将这些属性约束为 QWidget，有助于 Pylance 推断 .layout()/setLayout()/addWidget 等成员类型。
+    """
+    协议类，声明 ChartFunction 需要用到的主窗口属性
+    将这些属性约束为 QWidget，有助于 Pylance   推断 .layout()/setLayout()/addWidget 等成员类型。
     """
 
     graph_widget_2: QWidget

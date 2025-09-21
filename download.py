@@ -519,7 +519,7 @@ class DatabaseConverter:
         # 串行化整个写入过程，防止 Time_Series 全表替换时的竞态
         with DB_WRITE_LOCK:
             t_all = time.perf_counter()
-            self._create_ts_sheet(start_date = start_date)
+            self._create_ts_sheet(start_date = start_date)    # 调用内部方法，先看创建ts表
             cursor = self.cursor
             try:
                 logger.info("write_into_db start: data=%s, is_time_series=%s, shape=%s", data_name, is_time_series, tuple(df.shape))
@@ -537,6 +537,34 @@ class DatabaseConverter:
                         df_after_modify_time = df_after_modify_time.copy()
                         df_after_modify_time['date'] = pd.to_datetime(df_after_modify_time['date'], errors='coerce').dt.strftime('%Y-%m-%d')
                         df_after_modify_time = df_after_modify_time.dropna(subset=['date']).drop_duplicates(subset=['date'], keep='last')
+
+                        # 填充所有的null值
+                        # 这里先取出数据最后一个日期
+                        date_today = date.today()
+                        # end_date = end_date.strftime('%Y-%m-%d')
+                        all_dates = pd.date_range(start=start_date, end=date_today, freq='D')  # 生成所有的date
+                        # 创建完整日期 DataFrame
+                        df_full = pd.DataFrame({'date': [d.strftime('%Y-%m-%d') for d in all_dates]})
+                        # 合并原始数据
+                        df_full = df_full.merge(df_after_modify_time, on='date', how='left')
+
+                        # 找到第一个非空值
+                        first_valid_idx = df_full[data_name].first_valid_index()
+                        first_valid_value = df_full.loc[first_valid_idx, data_name]
+
+                        # 如果 start_date 到第一个有效值之间有 NaN，就用第一个有效值填充
+                        if pd.isna(df_full.loc[0, data_name]):
+                            df_full.loc[:first_valid_idx, data_name] = first_valid_value
+
+                        # 前向填充空值
+                        df_full[data_name] = df_full[data_name].ffill()
+
+
+                        # 填写最后的数据
+
+                        # 转换数据类型
+                        df_full['date'] = df_full['date'].astype(str)
+
                         try:
                             cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {data_name} DOUBLE")
                             self.conn.commit()
@@ -545,7 +573,7 @@ class DatabaseConverter:
                             pass
 
                         df_db = pd.read_sql("SELECT * FROM Time_Series", self.conn)  # 只读取日期列
-                        result_db = df_db.merge(df_after_modify_time, on="date", how="left")
+                        result_db = df_db.merge(df_full, on="date", how="left")   # 这里修改
 
                         for col in df_after_modify_time.columns:
                             if col == 'date':
@@ -590,6 +618,7 @@ class DatabaseConverter:
 
             except Exception as e:
                 logger.error(f"FAILED to write into database, in method write_into_db, since {e}")
+                print(f"error {e}")
                 return
 
 
