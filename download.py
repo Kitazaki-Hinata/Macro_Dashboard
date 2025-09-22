@@ -36,6 +36,8 @@ import requests
 import debug.mock_api as mock_api
 import pandas as pd
 import yfinance as yf
+from bs4 import BeautifulSoup
+from bs4.element import Tag
 import queue
 from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
@@ -1043,502 +1045,141 @@ class BLSDownloader(DataDownloader):
 
 
 class TEDownloader(DataDownloader):
-    """TradingEconomics 下载器（自动化 + 缓存）。
-
-    特性：
-    - Selenium 自动化访问指标页面，优先点击 5Y 范围并切换柱状图
-    - 若 5Y 点击失败则回退到当前可见范围，仍可通过两柱反推线性比例得到历史数据
-    - 内置内存与磁盘缓存（TTL 可通过 `TE_CACHE_TTL_SECONDS` 控制）
-    - 支持可视化/无头模式（`TE_SHOW_BROWSER`/`TE_FORCE_HEADLESS`/`TE_HEADLESS`）
-    - 小规模驱动池用于并发抓取，降低频繁创建/销毁开销
-    """
     url : str = "https://tradingeconomics.com/united-states/"
-    # 将固定 sleep 降低，更多依赖显式等待；必要时仍有微小 pause
-    time_pause : float = 0.2
-    time_wait : int = 10  # 最大等待秒数（用于显式等待）
+    time_pause : float = random.uniform(1, 1.3)  # wait, prevent be identified as a bot
+    time_wait : int = 10  # wait for a response
 
-    @staticmethod
-    def _build_chrome_options(headless: bool) -> Options:
-        """构建 Chrome 启动参数。
-
-        Args:
-            headless: 是否无头
-
-        Returns:
-            Selenium Chrome Options 实例。
-        """
-        options = Options()
-        if headless:
-            options.add_argument("--headless=new")
-        # 更快的页面加载策略：DOMContentLoaded 即返回
-        try:
-            options.page_load_strategy = 'eager'
-        except Exception:
-            pass
-        # 禁用图片加载，减少资源
-        options.add_experimental_option(
-            'prefs',
-            {
-                'profile.managed_default_content_settings.images': 2,
-            }
-        )
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-default-browser-check")
-        options.add_argument("--no-first-run")
-        return options
-
-    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key : str, request_year : int, *, headless: bool = False):
+    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key : str, request_year : int):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.start_year: int  = request_year
         self.start_date: str = str(request_year) + "-01-01"
-        options = TEDownloader._build_chrome_options(headless)
+        options = Options()
+        options.add_argument("--disable-blink-features=AutomationControlled")
         self.driver = webdriver.Chrome(options=options)
-        try:
-            self.driver.maximize_window()
-        except Exception:
-            pass
-        try:
-            self.driver.set_page_load_timeout(25)
-        except Exception:
-            pass
-        self._headless = headless
-        self._popups_dismissed = False
-        # 请求级缓存：内存 + 本地 CSV（短期复用）
-        self._mem_cache: Dict[str, Tuple[float, pd.DataFrame]] = {}
-        # 允许通过环境变量开关缓存（默认禁用，以满足“取消下载缓存”需求）
-        try:
-            disable_cache_env = os.environ.get('TE_DISABLE_CACHE', 'true').strip().lower()
-            self._cache_disabled = disable_cache_env in ('1', 'true', 'yes', 'on')
-        except Exception:
-            self._cache_disabled = True
-        logger.info("TE caching %s", "DISABLED" if self._cache_disabled else "ENABLED")
-        try:
-            self._cache_ttl_seconds = int(os.environ.get('TE_CACHE_TTL_SECONDS', '600'))
-        except Exception:
-            self._cache_ttl_seconds = 600
-        try:
-            self._cache_dir = os.path.join(os.path.dirname(__file__), 'cache', 'te')
-        except Exception:
-            self._cache_dir = os.path.join(os.getcwd(), 'cache', 'te')
-        try:
-            os.makedirs(self._cache_dir, exist_ok=True)
-        except Exception:
-            pass
-        logger.info("TE WebDriver initialized (headless=%s)", self._headless)
-
-    def _cache_path(self, data_name: str) -> str:
-        """根据指标名生成磁盘缓存路径（安全化文件名）。"""
-        safe = re.sub(r"[^a-zA-Z0-9_\-]", "_", data_name)
-        return os.path.join(self._cache_dir, f"{safe}.csv")
-
-    def _cache_read(self, data_name: str) -> Optional[pd.DataFrame]:
-        """读取缓存：优先内存，其次磁盘；命中则返回副本。"""
-        if getattr(self, "_cache_disabled", True):
-            return None
-        now = time.time()
-        # 内存缓存优先
-        mem = self._mem_cache.get(data_name)
-        if mem is not None:
-            ts, df = mem
-            if now - ts <= self._cache_ttl_seconds:
-                logger.info("TE cache hit (memory) for %s", data_name)
-                return df.copy()
-        # 本地缓存次之
-        path = self._cache_path(data_name)
-        try:
-            if os.path.exists(path):
-                mtime = os.path.getmtime(path)
-                if now - mtime <= self._cache_ttl_seconds:
-                    df = pd.read_csv(path)
-                    logger.info("TE cache hit (disk) for %s", data_name)
-                    # 回填内存缓存
-                    self._mem_cache[data_name] = (now, df)
-                    return df
-        except Exception as e:
-            logger.warning("TE cache read failed for %s: %s", data_name, e)
-        return None
-
-    def _cache_write(self, data_name: str, df: pd.DataFrame) -> None:
-        """写入缓存：同时更新内存与磁盘。"""
-        if getattr(self, "_cache_disabled", True):
-            return
-        try:
-            self._mem_cache[data_name] = (time.time(), df.copy())
-            path = self._cache_path(data_name)
-            df.to_csv(path, index=False)
-        except Exception as e:
-            logger.warning("TE cache write failed for %s: %s", data_name, e)
-
-    def _get_config_by_name(self, data_name: str) -> Optional[Dict[str, Any]]:
-        """在 JSON 配置中按 name 查找对应项（若存在）。"""
-        for _, cfg in self.json_dict.items():
-            try:
-                if cfg.get('name') == data_name:
-                    return cfg
-            except Exception:
-                continue
-        return None
-
-    def _resolve_locators(self, kind: str, data_name: str, defaults: List[Tuple[str, str]]) -> List[Tuple[Any, str]]:
-        """解析定位器集合，支持配置覆盖与默认兜底。
-
-        Args:
-            kind: 定位器类别（例如 'fiveY' / 'chartTypeButton' / 'barButton'）
-            data_name: 指标名称
-            defaults: 默认定位器列表（('xpath'|'css'|By, selector)）
-
-        Returns:
-            统一为 (By, selector) 的列表。
-        """
-        # 支持在 json 配置里为某个指标覆写定位器：
-        # { "locators": { "fiveY": ["xpath://div...", "css:#dateSpansDiv a:nth-child(3)"] } }
-        cfg = self._get_config_by_name(data_name) or {}
-        loc_cfg = (cfg.get('locators') or {}).get(kind)
-        locs: List[Tuple[Any, str]] = []
-        def parse_one(spec: str) -> Tuple[Any, str]:
-            s = spec.strip()
-            if s.lower().startswith('css:'):
-                return (By.CSS_SELECTOR, s[4:])
-            if s.lower().startswith('xpath:'):
-                return (By.XPATH, s[6:])
-            # 默认按 XPATH 处理
-            return (By.XPATH, s)
-        if isinstance(loc_cfg, list) and loc_cfg:
-            for s in loc_cfg:
-                try:
-                    by, sel = parse_one(str(s))
-                    locs.append((by, sel))
-                except Exception:
-                    continue
-        # 追加默认候选，保证兜底
-        for kind_by, kind_sel in defaults:
-            # 默认 defaults 为字符串标记的定位器类型
-            by = By.CSS_SELECTOR if str(kind_by).lower() == 'css' else By.XPATH
-            locs.append((by, kind_sel))
-        return locs
+        self.driver.maximize_window()
 
     def _calc_function(self, x1: float, x2: float, y1: float, y2: float) -> Tuple[float, float]:
-        """解二元一次方程（根据两点求线性映射）。
-
-        给定 (x1->y1) 与 (x2->y2)，求 y = kx + b 的 (k, b)。
-        """
+        """解二元一次方程，用于计算数据 used for data calculation"""
         gradient = np.round((y1 - y2)/(x1-x2), 3)
         intercept = np.round((y1 - gradient*x1), 3)
         # 确保返回内置 float，避免类型检查告警
         return float(gradient), float(intercept)
 
     def _get_data_from_trading_economics_month(self, data_name: str) -> Optional[pd.DataFrame]:
-        """抓取并解析 TE 月度数据（柱状图反推）。
-
-        流程：
-        1. 打开指标页面，优先尝试点击 5Y
-        2. 切换为柱状图（必要时）
-        3. 从统计面板读取当前/上期/日期，并采集柱子高度
-        4. 使用最后两根柱与两期值反推线性比例，套用到所有柱得到数值序列
-        5. 构造与柱数等长的月份序列，得到 DataFrame(date,value)
-
-        Notes:
-        - 若 5Y 点击失败，回退为当前可见范围
-        - 至少需要 2 根柱才能反推线性比例
-        """
+        """提取月度数据的代码，季度数据需要单独写
+        主要流程：访问页面，点击5y按钮，点击bar按钮，提取table数字，提取bar长度，反向计算数据"""
 
         url = self.url + data_name.replace("_", "-")
-        t0 = time.perf_counter()
         self.driver.get(url)
-        logger.info("TE open page %s (%.3fs)", url, time.perf_counter() - t0)
-        # 等到日期区块或图表容器出现，避免固定 sleep
-        try:
-            WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                EC.presence_of_element_located((By.ID, 'chart'))
-            )
-        except Exception:
-            pass
-        # Try cache first（请求级缓存）
-        cached = self._cache_read(data_name)
-        if cached is not None and not cached.empty:
-            return cached
-        # Try dismissing cookie/terms popups if present（仅首次会做，后续跳过）
-        self._dismiss_te_popups(data_name)
+        time.sleep(TEDownloader.time_pause)
 
         # click "5y" button
-        # Try various strategies to click 5Y；若失败则回退为使用当前可见范围的数据
-        clicked_5y = self._click_5y(data_name)
-        if not clicked_5y:
-            logger.warning(f"{data_name} FAILED TO CLICK 5y button, fallback to current visible range")
-
-        # 检查是否已是柱状图；若不是再切换，避免多余步骤
-        def _wait_bars(timeout: int = 8) -> List[Any]:
-            try:
-                return WebDriverWait(self.driver, timeout).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'svg rect.highcharts-point'))
-                )
-            except Exception:
-                return []
-
-        bars = _wait_bars(timeout=4)
-        if not bars:
-            try:
-                # 支持自适应定位器
-                type_locs = self._resolve_locators('chartTypeButton', data_name, defaults=[('xpath', '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/button')])
-                clicked = False
-                for by, sel in type_locs:
-                    try:
-                        chart_type_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                            EC.element_to_be_clickable((by, sel))
-                        )
-                        self.driver.execute_script("arguments[0].click();", chart_type_button)
-                        clicked = True
-                        break
-                    except Exception:
-                        continue
-                if not clicked:
-                    raise Exception("chart type button not found")
-                time.sleep(TEDownloader.time_pause)
-                try:
-                    bar_locs = self._resolve_locators('barButton', data_name, defaults=[('xpath', '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/div/div[1]/button')])
-                    clicked_bar = False
-                    for by, sel in bar_locs:
-                        try:
-                            chart_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                                EC.element_to_be_clickable((by, sel))
-                            )
-                            self.driver.execute_script("arguments[0].click();", chart_button)
-                            clicked_bar = True
-                            break
-                        except Exception:
-                            continue
-                    if not clicked_bar:
-                        raise Exception("bar chart button not found")
-                    bars = _wait_bars(timeout=8)
-                    if not bars:
-                        logger.error(f"{data_name} NO BARS after switching chart type")
-                        return None
-                except Exception as e:
-                    logger.error(f"{data_name} FAILED TO CLICK 'bar chart type' button, {e}")
-                    return None
-            except Exception as e:
-                logger.error(f"{data_name} FAILED TO CLICK 'chart type' button, {e}")
-                return None
-
-        # 读取统计面板中的“当前/上期/日期”三要素
         try:
-            # 多定位器兜底，面板区域在 #panelData 内常见
-            row = None
-            row_selectors = [
-                (By.CSS_SELECTOR, '#panelData .datatable-row'),
-                (By.CSS_SELECTOR, '#panelData table tbody tr'),
-                (By.XPATH, '//*[@id="panelData"]//tr[contains(@class, "datatable-row") or position()=1]')
-            ]
-            for by, sel in row_selectors:
-                try:
-                    row = WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                        EC.presence_of_element_located((by, sel))
-                    )
-                    break
-                except Exception:
-                    continue
-            if row is None:
-                raise Exception("panel row not found")
+            five_year_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
+                EC.element_to_be_clickable((By.XPATH, '//*[@id="dateSpansDiv"]/a[3]'))
+            )
+            self.driver.execute_script("arguments[0].click();", five_year_button)
+            time.sleep(TEDownloader.time_pause)
+        except Exception as e:
+            logging.error(f"{data_name} FAILED TO CLICK 5y button, {e}")
+            return None
 
-            tds = row.find_elements(By.TAG_NAME, 'td')
-            if len(tds) >= 5:
-                current_num = float(tds[1].text.strip())
-                previous_num = float(tds[2].text.strip())
-                current_data_date = str(tds[4].text.replace(" ", "_"))
+        # click bar chart
+        try:
+            chart_type_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
+                EC.element_to_be_clickable((By.XPATH, '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/button'))
+            )
+            self.driver.execute_script("arguments[0].click();", chart_type_button)
+            time.sleep(TEDownloader.time_pause)
+            try:
+                chart_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
+                    EC.element_to_be_clickable((By.XPATH, '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/div/div[1]/button'))
+                )
+                self.driver.execute_script("arguments[0].click();", chart_button)
+                time.sleep(TEDownloader.time_wait)
+            except Exception as e:
+                logging.error(f"{data_name} FAILED TO CLICK 'bar chart type' button, {e}")
+                return None
+        except Exception as e:
+            logging.error(f"{data_name} FAILED TO CLICK 'chart type' button, {e}")
+            return None
+
+        # extract table data
+        try:
+            original_html = self.driver.page_source
+            soup = BeautifulSoup(original_html, "lxml")
+            row = soup.find("tr", class_="datatable-row")
+            if isinstance(row, Tag):
+                tds = row.find_all("td")
+                if len(tds) >= 2:
+                    current_num = float(tds[1].text.strip())    # list num，列表中的current数字
+                    previous_num = float(tds[2].text.strip())    # list num，上一期数据
+                    current_data_date = str(tds[4].text.replace(" ", "_"))  # 最新数据的日期
+                else:
+                    raise Exception(f"{data_name}, tds tag's length haven't reach 2, during html convert stage")
             else:
-                raise Exception("datatable-row tds < 5")
+                raise Exception(f"{data_name}, HAVEN'T FOUND ROWS during html convert stage")
 
-            # 提取柱状图高度，至少需要两个点用于反推线性关系
-            rects = self.driver.find_elements(By.CSS_SELECTOR, 'svg rect.highcharts-point')
+            # extract bar height value for actual data
+            rects = soup.find_all("rect", class_="highcharts-point")
+            # extract bar height value for actual data
             heights: List[float] = []
             for rect in rects:
-                try:
-                    h = rect.get_attribute('height')
+                if isinstance(rect, Tag):
+                    h = rect.get("height")
                     if h is not None:
-                        heights.append(float(str(h)))
-                except Exception:
-                    continue
-            if len(heights) < 2:
-                raise Exception("not enough bars to derive scale (need >=2)")
+                        try:
+                            heights.append(float(str(h)))
+                        except Exception:
+                            continue
 
-            # 线性关系：以最后两个柱对应当前/上期数值来求解
-            gradient, intercept = self._calc_function(heights[-1], heights[-2], current_num, previous_num)
-            data_list: List[float] = []
+            # 利用两个数据计算数据与bar高度的线性关系，y是结果，x是高度
+            gradient, intercept = self._calc_function(heights[-1], heights[-2], current_num, previous_num,)
+            data_list = []   # store final data value
             for num in heights:
-                data_list.append(intercept + gradient * num)
+                final_data = intercept + gradient * num
+                data_list.append(final_data)
 
-            # 构造与柱子数量等长的月份序列（从最早到最新）
+            # construct a DATE mapping
             month_map = {
                 "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4,
                 "May": 5, "Jun": 6, "Jul": 7, "Aug": 8,
                 "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
             }
             month_abbr, year_str = current_data_date.split("_")
-            end_date = datetime(int(year_str), month_map[month_abbr], 1)
-            months_len = len(heights)
+            month_int: int = month_map[month_abbr]
+            year_int: int = int(year_str)
+            end_date = datetime(year_int, month_int, 1)
             months_list = [
                 (end_date - relativedelta(months=i)).strftime("%b_%Y")
-                for i in reversed(range(months_len))
+                for i in reversed(range(61))  # 包含Mar_2020 ~ Mar_2025
             ]
-
             df = pd.DataFrame(data={"date": months_list, "value": data_list})
-            logger.info("TE extracted %s rows=%d", data_name, len(df))
-            self._cache_write(data_name, df)
             return df
         except Exception as e:
-            logger.error(f"{data_name} FAILED TO EXTRACT data from html, but successfully get data from website, {e}")
+            logging.error(f"{data_name} FAILED TO EXTRACT data from html, but successfully get data from website, {e}")
             return None
 
-    def _dismiss_te_popups(self, data_name: str) -> None:
-        """尽最大努力关闭 cookie/条款弹窗，减少点击被拦截的概率。"""
-        selectors = [
-            (By.XPATH, '//button[contains(@class, "accept")]'),
-            (By.XPATH, '//button[contains(., "Accept")]'),
-            (By.XPATH, '//*[@id="onetrust-accept-btn-handler"]'),  # OneTrust common id
-            (By.CSS_SELECTOR, 'button[aria-label="dismiss"], button[aria-label="close"]'),
-        ]
-        for by, sel in selectors:
-            try:
-                el = WebDriverWait(self.driver, 3).until(EC.element_to_be_clickable((by, sel)))
-                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
-                time.sleep(0.15)
-                self.driver.execute_script("arguments[0].click();", el)
-                time.sleep(0.15)
-            except Exception:
-                continue
-
-    def _click_5y(self, data_name: str) -> bool:
-        """尝试点击 5Y 按钮（多定位器 + 一次二次尝试）。"""
-        locators = [
-            (By.XPATH, '//*[@id="dateSpansDiv"]/a[3]'),
-            (By.XPATH, '//div[@id="dateSpansDiv"]//a[contains(., "5y") or contains(., "5Y")]'),
-            (By.XPATH, '//a[contains(@href, "5y")]'),
-            (By.CSS_SELECTOR, '#dateSpansDiv a:nth-child(3)')
-        ]
-        for _ in range(2):
-            for by, sel in locators:
-                try:
-                    btn = WebDriverWait(self.driver, TEDownloader.time_wait).until(EC.element_to_be_clickable((by, sel)))
-                    self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", btn)
-                    time.sleep(0.1)
-                    self.driver.execute_script("arguments[0].click();", btn)
-                    time.sleep(TEDownloader.time_pause)
-                    return True
-                except (TimeoutException, ElementClickInterceptedException, StaleElementReferenceException, NoSuchElementException):
-                    # Try next locator
-                    continue
-                except Exception:
-                    continue
-            # Retry once after dismissing popups again
-            self._dismiss_te_popups(data_name)
-            time.sleep(0.2)
-        return False
-
     def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
-        """批量抓取并写入 TE 数据。
-
-        - 单任务模式复用单个 driver；并发模式下使用小型驱动池
-        - 若 `return_csv=True` 会在 `csv/<name>/` 下导出对应文件
-        """
-        # 并发策略：优先使用小规模驱动池，减少频繁创建/销毁开销；每个任务独占一个临时 driver 实例
+        # 说明: 由于 Selenium WebDriver 复用同一 self.driver，不适合多线程并行。
+        # 如需并行，需要为每个任务创建独立 driver，成本较高，这里保持顺序执行。
         df_dict: Dict[str, pd.DataFrame] = {}
-        items = list(self.json_dict.items())
-        if not items:
-            return df_dict if return_csv else None
-
-        # 构建驱动池（仅在并发时启用）
-        pool: Optional["queue.Queue[webdriver.Chrome]"] = None
-        pool_size = 0
-        load_dotenv()
-        env_te_workers = os.environ.get('TE_WORKERS')
-        env_te_pool = os.environ.get('TE_POOL_SIZE')
-        resolved_workers = max_workers or (int(env_te_workers) if env_te_workers and env_te_workers.isdigit() else 1)
-        if resolved_workers > 1:
-            pool_size = max(1, min(int(env_te_pool) if env_te_pool and env_te_pool.isdigit() else resolved_workers, 3))  # 控制池大小，避免过多实例
-            pool = queue.Queue(maxsize=pool_size)
-            for _ in range(pool_size):
-                opts = TEDownloader._build_chrome_options(self._headless)
-                drv = webdriver.Chrome(options=opts)
-                try:
-                    drv.maximize_window()
-                except Exception:
-                    pass
-                try:
-                    drv.set_page_load_timeout(25)
-                except Exception:
-                    pass
-                pool.put(drv)
-
-        def run_single(data_name: str) -> Optional[pd.DataFrame]:
-            # 单任务可复用主 driver；并发时创建局部 driver
-            if (max_workers or 1) > 1:
-                assert pool is not None
-                drv = pool.get()
-                try:
-                    original = self.driver
-                    self.driver = drv
-                    try:
-                        return self._get_data_from_trading_economics_month(data_name=data_name)
-                    finally:
-                        self.driver = original
-                finally:
-                    pool.put(drv)
-            else:
-                return self._get_data_from_trading_economics_month(data_name=data_name)
-
-        workers = resolved_workers
-        if workers > 1:
-            logger.info("TE submitting %d tasks (workers=%d, headless=%s)", len(items), workers, self._headless)
-            from concurrent.futures import ThreadPoolExecutor, as_completed
-            with ThreadPoolExecutor(max_workers=workers) as ex:
-                fut_map = {ex.submit(run_single, cfg["name"]): tn for tn, cfg in items}
-                for fut in as_completed(fut_map):
-                    tn = fut_map[fut]
-                    try:
-                        df = fut.result()
-                        if df is None:
-                            logger.error("TE FAILED TO EXTRACT %s", tn)
-                            continue
-                        converter = DatabaseConverter()
-                        converter.write_into_db(
-                            df=df,
-                            data_name=self.json_dict[tn]["name"],
-                            start_date=self.start_date,
-                            is_time_series=True,
-                            is_pct_data=self.json_dict[tn]["needs_pct"]
-                        )
-                        df_dict[tn] = df
-                    except Exception as e:
-                        logger.error("TE future for %s raised: %s", tn, e)
-        else:
-            for tn, cfg in items:
-                data_name = cfg["name"]
-                df = run_single(data_name)
-                if df is None:
-                    logger.error(f"FAILED TO EXTRACT {tn}, check PREVIOUS loggings")
-                    continue
-                converter = DatabaseConverter()
-                converter.write_into_db(
-                    df=df,
-                    data_name=cfg["name"],
-                    start_date=self.start_date,
-                    is_time_series=True,
-                    is_pct_data=cfg["needs_pct"]
-                )
-                df_dict[tn] = df
-
-        # 释放驱动池资源
-        if pool is not None:
-            try:
-                while not pool.empty():
-                    drv = pool.get_nowait()
-                    try:
-                        drv.quit()
-                    except Exception:
-                        pass
-            except Exception:
-                pass
+        for table_name, table_config in self.json_dict.items():
+            data_name = table_config["name"]
+            df = self._get_data_from_trading_economics_month(data_name = data_name)
+            if df is None:
+                logging.error(f"FAILED TO EXTRACT {table_name}, check PREVIOUS loggings")
+                continue
+            converter = DatabaseConverter()
+            converter.write_into_db(
+                df=df,
+                data_name=table_config["name"],
+                start_date=self.start_date,
+                is_time_series=True,
+                is_pct_data=table_config["needs_pct"]
+            )
+            df_dict[table_name] = df
+            continue
 
         if return_csv:
             for name, df in df_dict.items():
@@ -1614,30 +1255,7 @@ class DownloaderFactory:
             logging.error("INVALID SOURCE in downloader factory :" + source)
             return None
 
-        if source == 'te':
-            # 允许通过环境变量控制是否显示浏览器窗口：
-            # - TE_HEADLESS=false 则显示窗口；true 则无头
-            # - TE_SHOW_BROWSER=true/1 优先强制显示窗口
-            # - TE_FORCE_HEADLESS=true/1 优先强制无头
-            # 缺省改为 False（显示窗口），便于可视化调试；如需无头，请在环境中设置 TE_HEADLESS=true
-            show_browser = os.environ.get('TE_SHOW_BROWSER', '').strip().lower() in ('1', 'true', 'yes')
-            force_headless = os.environ.get('TE_FORCE_HEADLESS', '').strip().lower() in ('1', 'true', 'yes')
-            headless_env = os.environ.get('TE_HEADLESS', 'false').strip().lower()
-            headless = headless_env in ('1', 'true', 'yes')
-            if show_browser:
-                headless = False
-            if force_headless:
-                headless = True
-            logger.info(
-                "TE headless resolved: %s (TE_HEADLESS=%s, TE_SHOW_BROWSER=%s, TE_FORCE_HEADLESS=%s)",
-                headless, headless_env, show_browser, force_headless
-            )
-            return downloader_classes[source](
-                json_dict=cfg,
-                api_key=api_key,
-                request_year=request_year,
-                headless=headless
-            )
+        # 直接实例化，不再处理headless/可视化相关逻辑
         return downloader_classes[source](
             json_dict=cfg,
             api_key=api_key,

@@ -372,6 +372,7 @@ class ChartFunction:
         widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
         widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
 
+        # 只绘制一条数据，不再循环多条
         dates, values = self._get_data_from_database(data_name)
 
         # 同步更新标题

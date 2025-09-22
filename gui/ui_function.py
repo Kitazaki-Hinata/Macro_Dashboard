@@ -666,12 +666,45 @@ class UiFunctions():  # 删除:mainWindow
         # 获取 main_plot_widget 实例（PlotWidget）
         main_plot_widget = self.main_window.graph_widget_2.findChild(pg.PlotWidget, "main_plot_widget")
         if main_plot_widget is not None:
+            # 先绘制第一个数据（会清空图表）
             self.main_window.chart_functions.plot_data(
                 data_name=first_data,
                 color=[first_color],   # 这里必须是一个list
                 widget=main_plot_widget
             )
-
+            # 再绘制第二个数据（直接添加，不清空）
+            dates, values = self.main_window.chart_functions._get_data_from_database(second_data)
+            x_data = list(range(len(dates)))
+            pen = pg.mkPen(color=second_color, width=2)
+            
+            # 创建第二个Y轴用于显示第二个数据
+            right_axis = pg.ViewBox()
+            main_plot_widget.scene().addItem(right_axis)
+            main_plot_widget.getAxis('right').linkToView(right_axis)
+            right_axis.setXLink(main_plot_widget)
+            
+            # 设置右侧Y轴的显示
+            main_plot_widget.showAxis('right')
+            main_plot_widget.getAxis('right').setLabel(second_data, color=second_color)
+            
+            # 同步两个Y轴的视图
+            def update_views():
+                right_axis.setGeometry(main_plot_widget.plotItem.vb.sceneBoundingRect())
+                right_axis.linkedViewChanged(main_plot_widget.plotItem.vb, right_axis.XAxis)
+            
+            update_views()
+            main_plot_widget.plotItem.vb.sigResized.connect(update_views)
+            
+            # 绘制第二个数据到右侧Y轴
+            right_axis.addItem(pg.PlotCurveItem(x=x_data, y=values, pen=pen, name=second_data))
+            
+            # 重新设置x轴刻度，保证日期显示正确
+            n = len(dates)
+            step = max(1, n // 5)
+            ticks = [(i, dates[i]) for i in range(0, n, step)]
+            if (n - 1) not in [i for i, _ in ticks] and n > 0:
+                ticks.append((n - 1, dates[-1]))
+            main_plot_widget.getAxis('bottom').setTicks([ticks])
             # 全局自适应缩放图表大小
             main_plot_widget.enableAutoRange(axis='xy', enable=True)
 
@@ -816,8 +849,10 @@ class UiFunctions():  # 删除:mainWindow
 
     '''GENERAL SETTINGS SLOTS METHODS'''
     def set_color(self, widget: Any):
-        color = QColorDialog.getColor()
-        widget.setStyleSheet(f"background: {color.name()}")
+        current_color = widget.styleSheet().split(":")[1][1:]   # 当前的颜色
+        color = QColorDialog.getColor(current_color)
+        if color.isValid():
+            widget.setStyleSheet(f"background: {color.name()}")
 
     def _get_sqlite_col_name(self)-> list[str]:
         '''获取sqlite列名称'''
@@ -1145,6 +1180,7 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
+
 
 
 

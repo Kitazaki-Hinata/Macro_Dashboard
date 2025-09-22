@@ -1,12 +1,12 @@
 {
   "one_chart_settings": {
     "first_data": {
-      "data_name": "Unemployment_Rate",
+      "data_name": "Personal_Saving_Rate",
       "time_lags": 0,
       "color": "#90b6e7"
     },
     "second_data": {
-      "data_name": "Part_Time_Job_Population",
+      "data_name": "JOLTS_job_openings",
       "time_lags": 0,
       "color": "#EE5C88"
     }
@@ -21,16 +21,16 @@
       "color": "#90b6e7"
     },
     "third_data": {
-      "data_name": "Michigan_Consumer_Sentiment",
+      "data_name": "leading_economic_index",
       "color": "#90b6e7"
     },
     "fourth_data": {
-      "data_name": "10Y_2Y_Bond_Yield_Spread",
+      "data_name": "nfib_business_optimism_index",
       "color": "#90b6e7"
     }
   },
   "table_settings": {
     "table_name": ""
   },
-  "recent_update_time": "2025-09-22 03:42:36"
+  "recent_update_time": "2025-09-22 23:01:57"
 }
