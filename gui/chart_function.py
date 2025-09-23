@@ -322,7 +322,8 @@ class ChartFunction:
 
     def plot_data(self, data_name: str, color: list[str] = ["#90b6e7"], widget = None) -> None:
         """Plot data to single chart，绘制数据并展示
-        widget是plot widget, self.single_plot_widget"""
+        widget是plot widget, self.single_plot_widget
+        axis_label 是是否需要写x轴label，默认false，第一个图需要true"""
         # 保存当前十字线和标签的引用
         plot_item = widget.getPlotItem()
         view_box = plot_item.getViewBox()
@@ -341,11 +342,18 @@ class ChartFunction:
         label_pos = label.pos()
         label_text = label.toHtml()
         
-        # 清除图表内容但保留十字线和标签
+        # 清除主 viewbox 的内容但保留十字线和标签，不清理右侧 viewbox
+        plot_item = widget.getPlotItem()
+        # 只移除主 viewbox 的曲线
         for item in plot_item.items:
             if item not in [v_line, h_line, label]:
                 plot_item.removeItem(item)
-                
+        # 如果有右侧 viewbox，清空其曲线
+        if hasattr(widget, "_right_viewbox") and widget._right_viewbox is not None:
+            right_vb = widget._right_viewbox
+            for item in list(right_vb.addedItems):
+                right_vb.removeItem(item)
+        
         # 重新添加十字线和标签以确保它们在最上层
         plot_item.addItem(v_line, ignoreBounds=True)
         plot_item.addItem(h_line, ignoreBounds=True)
@@ -390,7 +398,6 @@ class ChartFunction:
         )
         axis = widget.getAxis('bottom')
 
-        # # 设置日期轴的刻度
         n = len(dates)
         step = max(1, n // 5)
         ticks = [(i, dates[i]) for i in range(0, n, step)]
@@ -411,6 +418,7 @@ class ChartFunction:
         # 设置x轴范围只显示数据范围
         if x_data:
             widget.setXRange(min(x_data), max(x_data), padding=0)
+
 
     def link_four_charts(self, linked: bool):
         """联动或取消联动四个四分图的ViewBox，并同步十字线和自适应缩放、拖拽缩放"""

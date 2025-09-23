@@ -667,46 +667,60 @@ class UiFunctions():  # 删除:mainWindow
         main_plot_widget = self.main_window.graph_widget_2.findChild(pg.PlotWidget, "main_plot_widget")
         if main_plot_widget is not None:
             # 先绘制第一个数据（会清空图表）
+            main_plot_widget.clear()
             self.main_window.chart_functions.plot_data(
                 data_name=first_data,
                 color=[first_color],   # 这里必须是一个list
                 widget=main_plot_widget
             )
-            # 再绘制第二个数据（直接添加，不清空）
+
+
+
+
+            # 第二个数据
             dates, values = self.main_window.chart_functions._get_data_from_database(second_data)
             x_data = list(range(len(dates)))
             pen = pg.mkPen(color=second_color, width=2)
-            
-            # 创建第二个Y轴用于显示第二个数据
-            right_axis = pg.ViewBox()
-            main_plot_widget.scene().addItem(right_axis)
-            main_plot_widget.getAxis('right').linkToView(right_axis)
-            right_axis.setXLink(main_plot_widget)
-            
-            # 设置右侧Y轴的显示
+            float_values : list[float] = []
+            for i in values:
+                float_values.append(float(i))
+
+            # 获取plotItem
+            plot_item = main_plot_widget.getPlotItem()
+
+            # 创建右侧ViewBox
+            right_viewbox = pg.ViewBox()
+            plot_item.scene().addItem(right_viewbox)  # 添加到场景
+
+            # 链接右侧轴
             main_plot_widget.showAxis('right')
-            main_plot_widget.getAxis('right').setLabel(second_data, color=second_color)
-            
-            # 同步两个Y轴的视图
+            right_axis = main_plot_widget.getAxis('right')
+            right_axis.linkToView(right_viewbox)
+            right_axis.setLabel(second_data, color=second_color)
+
+            # 设置X轴链接
+            right_viewbox.setXLink(plot_item.vb)
+
+        # 同步视图
             def update_views():
-                right_axis.setGeometry(main_plot_widget.plotItem.vb.sceneBoundingRect())
-                right_axis.linkedViewChanged(main_plot_widget.plotItem.vb, right_axis.XAxis)
-            
+                right_viewbox.setGeometry(plot_item.vb.sceneBoundingRect())
+                right_viewbox.linkedViewChanged(plot_item.vb, right_viewbox.XAxis)
+
             update_views()
-            main_plot_widget.plotItem.vb.sigResized.connect(update_views)
-            
-            # 绘制第二个数据到右侧Y轴
-            right_axis.addItem(pg.PlotCurveItem(x=x_data, y=values, pen=pen, name=second_data))
-            
-            # 重新设置x轴刻度，保证日期显示正确
-            n = len(dates)
-            step = max(1, n // 5)
-            ticks = [(i, dates[i]) for i in range(0, n, step)]
-            if (n - 1) not in [i for i, _ in ticks] and n > 0:
-                ticks.append((n - 1, dates[-1]))
-            main_plot_widget.getAxis('bottom').setTicks([ticks])
-            # 全局自适应缩放图表大小
-            main_plot_widget.enableAutoRange(axis='xy', enable=True)
+            plot_item.vb.sigResized.connect(update_views)
+
+            # 添加第二个曲线到右侧ViewBox
+            second_curve = pg.PlotCurveItem(x=x_data, y=float_values, pen=pen)
+            right_viewbox.addItem(second_curve)
+
+            # 自动调整范围
+            right_viewbox.enableAutoRange(axis=pg.ViewBox.YAxis)
+
+
+
+
+
+
 
         # 通过 main_window 和 objectName 查找标题标签
         main_plot_widget_title = self.main_window.graph_widget_2.findChild(QLabel, "main_plot_widget_title")
