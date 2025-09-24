@@ -227,7 +227,6 @@ class ChartFunction:
             
             # 获取当前图表中的所有曲线
             items = plot_item.listDataItems()
-            item.d
             nearest_y_for_hline = None
             if items:
                 data_texts = []
@@ -457,9 +456,6 @@ class ChartFunction:
         font.setFamilies(["Comfortaa"])
         widget.getAxis('right').setTickFont(font)
         dates, values = self._get_data_from_database(data_name)
-        if hasattr(self, 'main_plot_widget_title') and widget.objectName() == "main_plot_widget":
-            self.main_plot_widget_title.setText(str(data_name))
-
         x_data: List[int] = list(range(len(dates)))
         pen: Any = pg.mkPen(color=color[0], width=2)
         widget.plot(
