@@ -668,7 +668,7 @@ class UiFunctions():  # 删除:mainWindow
         if main_plot_widget is not None:
             # 先绘制第一个数据（会清空图表）
             main_plot_widget.clear()
-            self.main_window.chart_functions.plot_data(
+            x_data = self.main_window.chart_functions.plot_data(
                 data_name=first_data,
                 color=[first_color],   # 这里必须是一个list
                 widget=main_plot_widget
@@ -679,7 +679,6 @@ class UiFunctions():  # 删除:mainWindow
 
             # 第二个数据
             dates, values = self.main_window.chart_functions._get_data_from_database(second_data)
-            x_data = list(range(len(dates)))
             pen = pg.mkPen(color=second_color, width=2)
             float_values : list[float] = []
             for i in values:
@@ -689,12 +688,16 @@ class UiFunctions():  # 删除:mainWindow
             plot_item = main_plot_widget.getPlotItem()
 
             # 创建右侧ViewBox
+            font = pg.QtGui.QFont()
+            font.setPixelSize(12)
+            font.setFamilies(["Comfortaa"])
             right_viewbox = pg.ViewBox()
             plot_item.scene().addItem(right_viewbox)  # 添加到场景
 
             # 链接右侧轴
             main_plot_widget.showAxis('right')
             right_axis = main_plot_widget.getAxis('right')
+            right_axis.setTickFont(font)
             right_axis.linkToView(right_viewbox)
             right_axis.setLabel(second_data, color=second_color)
 
@@ -710,7 +713,8 @@ class UiFunctions():  # 删除:mainWindow
             plot_item.vb.sigResized.connect(update_views)
 
             # 添加第二个曲线到右侧ViewBox
-            second_curve = pg.PlotCurveItem(x=x_data, y=float_values, pen=pen)
+            second_curve = pg.PlotCurveItem()
+            second_curve.setData(x=x_data, y=float_values, pen=pen)
             right_viewbox.addItem(second_curve)
 
             # 自动调整范围
@@ -734,7 +738,7 @@ class UiFunctions():  # 删除:mainWindow
                 json.dump(existing_data, f, indent=2, ensure_ascii=False)
         except Exception as e:
             logging.error(f"Error writing settings file: {e}")
-        
+
         # 关闭窗口同步更新单图页面的标题标签
         try:
             self.main_window.title_label_2.setText(first_data.replace("_", " "))
@@ -1194,6 +1198,8 @@ class _ParallelExecutor(QObject):
                 self.progress.emit(f"{src} failed with code {code}.")
         except Exception as e:
             self.failed.emit(str(e))
+
+
 
 
 

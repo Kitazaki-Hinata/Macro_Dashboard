@@ -418,6 +418,7 @@ class ChartFunction:
         # 设置x轴范围只显示数据范围
         if x_data:
             widget.setXRange(min(x_data), max(x_data), padding=0)
+        return x_data
 
 
     def link_four_charts(self, linked: bool):
