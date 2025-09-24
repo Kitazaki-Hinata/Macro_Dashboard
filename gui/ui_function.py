@@ -662,7 +662,7 @@ class UiFunctions():  # 删除:mainWindow
 
         existing_data["one_chart_settings"]["first_data"]["color"] = first_color
         existing_data["one_chart_settings"]["second_data"]["color"] = second_color
-
+        
         # 获取 main_plot_widget 实例（PlotWidget）
         main_plot_widget = self.main_window.graph_widget_2.findChild(pg.PlotWidget, "main_plot_widget")
         if main_plot_widget is not None:
@@ -673,17 +673,13 @@ class UiFunctions():  # 删除:mainWindow
                 color=[first_color],   # 这里必须是一个list
                 widget=main_plot_widget
             )
-
-
-
-
+            
+          
+            
+            
             # 第二个数据
             dates, values = self.main_window.chart_functions._get_data_from_database(second_data)
             pen = pg.mkPen(color=second_color, width=2)
-            float_values : list[float] = []
-            for i in values:
-                float_values.append(float(i))
-
             # 获取plotItem
             plot_item = main_plot_widget.getPlotItem()
 
@@ -714,13 +710,15 @@ class UiFunctions():  # 删除:mainWindow
 
             # 添加第二个曲线到右侧ViewBox
             second_curve = pg.PlotCurveItem()
-            second_curve.setData(x=x_data, y=float_values, pen=pen)
+            flash_date_buff = []
+            for i in range(len(values)):
+                flash_date_buff.append(i)
+            second_curve.setData(x=flash_date_buff, y=values, pen=pen)
             right_viewbox.addItem(second_curve)
-
+            #self.main_window.chart_functions.plot_data_right(data_name=second_data, color=[second_color], widget=main_plot_widget)
             # 自动调整范围
             right_viewbox.enableAutoRange(axis=pg.ViewBox.YAxis)
-
-
+            
 
 
 

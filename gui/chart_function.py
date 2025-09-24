@@ -1,6 +1,7 @@
 '''从数据库中读取数据并以图标的方式展示'''
 
 # Pylance/pyright 在 pyqtgraph 上缺少类型存根；在此处局部忽略
+from turtle import clear
 import pyqtgraph as pg  # type: ignore[reportMissingTypeStubs]
 import os
 import sqlite3
@@ -226,6 +227,7 @@ class ChartFunction:
             
             # 获取当前图表中的所有曲线
             items = plot_item.listDataItems()
+            item.d
             nearest_y_for_hline = None
             if items:
                 data_texts = []
@@ -320,7 +322,7 @@ class ChartFunction:
             logger.error(f"Unexpected error: {e}")
             return [], []
 
-    def plot_data(self, data_name: str, color: list[str] = ["#90b6e7"], widget = None) -> None:
+    def plot_data(self, data_name: str, color: list[str] = ["#90b6e7"], widget = None, clear_line = True) -> None:
         """Plot data to single chart，绘制数据并展示
         widget是plot widget, self.single_plot_widget
         axis_label 是是否需要写x轴label，默认false，第一个图需要true"""
@@ -345,14 +347,15 @@ class ChartFunction:
         # 清除主 viewbox 的内容但保留十字线和标签，不清理右侧 viewbox
         plot_item = widget.getPlotItem()
         # 只移除主 viewbox 的曲线
-        for item in plot_item.items:
-            if item not in [v_line, h_line, label]:
-                plot_item.removeItem(item)
+        if clear_line :
+            for item in plot_item.items:
+                if item not in [v_line, h_line, label]:
+                    plot_item.removeItem(item)
         # 如果有右侧 viewbox，清空其曲线
-        if hasattr(widget, "_right_viewbox") and widget._right_viewbox is not None:
-            right_vb = widget._right_viewbox
-            for item in list(right_vb.addedItems):
-                right_vb.removeItem(item)
+            if hasattr(widget, "_right_viewbox") and widget._right_viewbox is not None:
+                right_vb = widget._right_viewbox
+                for item in list(right_vb.addedItems):
+                    right_vb.removeItem(item)
         
         # 重新添加十字线和标签以确保它们在最上层
         plot_item.addItem(v_line, ignoreBounds=True)
@@ -419,6 +422,52 @@ class ChartFunction:
         if x_data:
             widget.setXRange(min(x_data), max(x_data), padding=0)
         return x_data
+
+    def plot_data_right(self, data_name: str, color: list[str] = ["#90b6e7"], widget = None, clear_line = True):
+        plot_item = widget.getPlotItem()
+        view_box = plot_item.getViewBox()
+        object_name = widget.objectName()
+        v_line, h_line = self.crosshairs[object_name]
+        label = self.labels[object_name]
+        v_line_visible = v_line.isVisible()
+        h_line_visible = h_line.isVisible()
+        label_visible = label.isVisible()
+        label_pos = label.pos()
+        label_text = label.toHtml()
+        plot_item = widget.getPlotItem()
+        plot_item.addItem(v_line, ignoreBounds=True)
+        plot_item.addItem(h_line, ignoreBounds=True)
+        plot_item.addItem(label, ignoreBounds=True)
+        if v_line_visible: v_line.show()
+        else: v_line.hide()
+            
+        if h_line_visible: h_line.show()
+        else: h_line.hide()
+            
+        if label_visible:
+            label.show()
+            label.setHtml(label_text)
+            label.setPos(label_pos)
+        else:
+            label.hide()
+        
+        widget.setLabel('right', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
+        font = pg.QtGui.QFont()
+        font.setPixelSize(10)
+        font.setFamilies(["Comfortaa"])
+        widget.getAxis('right').setTickFont(font)
+        dates, values = self._get_data_from_database(data_name)
+        if hasattr(self, 'main_plot_widget_title') and widget.objectName() == "main_plot_widget":
+            self.main_plot_widget_title.setText(str(data_name))
+
+        x_data: List[int] = list(range(len(dates)))
+        pen: Any = pg.mkPen(color=color[0], width=2)
+        widget.plot(
+            x=x_data,
+            y=values,
+            pen=pen,
+            name=data_name
+        )
 
 
     def link_four_charts(self, linked: bool):
