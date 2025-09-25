@@ -12,7 +12,7 @@
 8. 软件启动的时候自动读取json里面的内容然后更新
 9. four chart里面数据有错开，数量都一致
 10. 数据里面最后一日的日期有重叠
-11. one chart第二數據的y軸座標鎖定位置錯邊  
+11. no show second line data on preview labeled
 
 **extra function waitlist :**
 

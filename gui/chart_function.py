@@ -422,50 +422,6 @@ class ChartFunction:
             widget.setXRange(min(x_data), max(x_data), padding=0)
         return x_data
 
-    def plot_data_right(self, data_name: str, color: list[str] = ["#90b6e7"], widget = None, clear_line = True):
-        plot_item = widget.getPlotItem()
-        view_box = plot_item.getViewBox()
-        object_name = widget.objectName()
-        v_line, h_line = self.crosshairs[object_name]
-        label = self.labels[object_name]
-        v_line_visible = v_line.isVisible()
-        h_line_visible = h_line.isVisible()
-        label_visible = label.isVisible()
-        label_pos = label.pos()
-        label_text = label.toHtml()
-        plot_item = widget.getPlotItem()
-        plot_item.addItem(v_line, ignoreBounds=True)
-        plot_item.addItem(h_line, ignoreBounds=True)
-        plot_item.addItem(label, ignoreBounds=True)
-        if v_line_visible: v_line.show()
-        else: v_line.hide()
-            
-        if h_line_visible: h_line.show()
-        else: h_line.hide()
-            
-        if label_visible:
-            label.show()
-            label.setHtml(label_text)
-            label.setPos(label_pos)
-        else:
-            label.hide()
-        
-        widget.setLabel('right', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
-        font = pg.QtGui.QFont()
-        font.setPixelSize(10)
-        font.setFamilies(["Comfortaa"])
-        widget.getAxis('right').setTickFont(font)
-        dates, values = self._get_data_from_database(data_name)
-        x_data: List[int] = list(range(len(dates)))
-        pen: Any = pg.mkPen(color=color[0], width=2)
-        widget.plot(
-            x=x_data,
-            y=values,
-            pen=pen,
-            name=data_name
-        )
-
-
     def link_four_charts(self, linked: bool):
         """联动或取消联动四个四分图的ViewBox，并同步十字线和自适应缩放、拖拽缩放"""
         widgets = [

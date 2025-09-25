@@ -715,7 +715,8 @@ class UiFunctions():  # 删除:mainWindow
                 flash_date_buff.append(i)
             second_curve.setData(x=flash_date_buff, y=values, pen=pen)
             right_viewbox.addItem(second_curve)
-            self.main_window.chart_functions.plot_data_right(data_name=second_data, color=[second_color], widget=main_plot_widget)
+            right_viewbox.setZValue(10)
+            #main_plot_widget.plot(x=flash_date_buff, y=values, pen=pen)
             # 自动调整范围
             right_viewbox.enableAutoRange(axis=pg.ViewBox.YAxis)
             
