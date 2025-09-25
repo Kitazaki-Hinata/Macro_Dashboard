@@ -4,10 +4,9 @@
 <h2 align="center">Macro Dashboard</h2>
   <p align="center">A free macro data visualization software.</p>
 
-***
 
 <p align="center">
-    English | <a href="../README.md">简体中文</a>
+    English | <a href="https://github.com/Kitazaki-Hinata/Macro_Dashboard/tree/dev?tab=readme-ov-file">简体中文</a>
 </p>
 
 > Author: Kitazaki Hinata
@@ -22,7 +21,6 @@
 
 **<p style="color:red"> - The information provided by this program does not constitute any investment advice.</p>**
 
-***
 
 ### 1. Project Description
 
@@ -30,7 +28,6 @@ The purpose of this project is to conveniently aggregate different macroeconomic
 This project uses scripts to obtain macroeconomic data, downloads the data to a local database (data.db) file, and generates integrated charts.
 The available data for download will be continuously updated.
 
-***
 
 ### 2. Preparation and Usage Instructions (Incl. env config, API key acquisition)
 
@@ -67,7 +64,6 @@ If data has not been downloaded, select the start year (the earliest year curren
 
 After the download is complete, click the buttons on the left sidebar to navigate to the desired interface. Set the data you want to display in the top left corner and click confirm.
 
-***
 
 ### 3. Data Overview
 View the current list of available data

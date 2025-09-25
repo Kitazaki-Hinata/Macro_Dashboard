@@ -4,10 +4,9 @@
 <h2 align="center">Macro Dashboard</h2>
   <p align="center">轻量级宏观工作台 | A free macro data visualization software.</p>
 
-***
 
 <p align="center">
-    简体中文 | <a href="docs/README_en.md">English</a>
+    简体中文 | <a href="https://github.com/Kitazaki-Hinata/Macro_Dashboard/blob/dev/doc/README_en.md">English</a>
 </p>
 
 > Version: v0.9.00_beta
@@ -25,9 +24,6 @@
 **<p style="color:red"> - 本程序所提供的信息不构成任何投资建议。</p>**
 
 
-
-***
-
 ### 一、项目说明
 
 创建这个项目的目的是方便汇集不同宏观数据方便进行比较（频繁的打开各种不同网页抓取数据太过于麻烦）。
@@ -36,7 +32,6 @@
 
 **注意：强烈建议使用代理 IP 下载数据！境内使用需要开启VPN。弹出的浏览器窗口需保持打开状态，不要对其进行任何操作！不要快速重复下载数据，会触发 API 上限，或触发 IP 封禁。**
 
-***
 
 ### 二、准备工作与使用方法（包括配置环境，API key 获取）
 
@@ -73,7 +68,6 @@ bls = "YOUR-API-KEY-000000"
 - 如果没有下载数据，选择开始年份（目前支持的最早年份是 2020年），勾选同意须知后点击下载按钮下载数据。
 - 等待下载完成后，点击左边栏的按钮跳转到想要的界面，在左上角设置想要展示的数据，点击确定。
 
-***
 
 ### 三、数据总览
 
@@ -150,7 +144,6 @@ bls = "YOUR-API-KEY-000000"
  </details>
 
 
-***
 
 ### 四、开源许可、程序架构与接口说明、其他信息
 
