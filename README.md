@@ -1,35 +1,14 @@
 <p align="center">
-
+  <img src="doc/readme/chart.png" alt="Chart Example">
+</p>
 <h2 align="center">Macro Dashboard</h2>
   <p align="center">轻量级宏观工作台 | A free macro data visualization software.</p>
 
 ***
 
 <p align="center">
-    简体中文 | <a href="docs/README_zh.md">English</a>
+    简体中文 | <a href="docs/README_en.md">English</a>
 </p>
-
-**debug waitlist :**
-
-1. all选项框与数据单选框没有设置不能同时选中
-2. One_chart导入db里面的列名以及限制输入框只能输入列名
-3. one chart无法添加第二个数据，且无法修改字体
-4. YFinance数据在统一下载的时候下载不了
-5. 多个数据并行下载会出现抢占db写入权限的现象
-6. 再多次重新设置图表的时候，后面的数据会错位
-7. 鼠标十字无法识别日期
-8. 软件启动的时候自动读取json里面的内容然后更新
-9. four chart里面数据有错开，数量都一致
-10. 数据里面最后一日的日期有重叠
-11. no show second line data on preview labeled
-
-**extra function waitlist :**
-
-1. 设置图表网格的透明度&颜色
-3. reset设置框内的内容，包括颜色，数据名称
-2. 偷彭博文章 
-3. 设立一个使用说明页面
-4. 储存上次设置好的线条样式
 
 > Version: v0.9.00_beta
 
@@ -37,35 +16,35 @@
 > 
 > Special thanks to : SeaStar, yuyoux7
 
+**<p style="color:red"> - 本程序仅用于学习和学术研究，请遵守目标网站使用条款。</p>**
+
+**<p style="color:red"> - 图表数据仅供分析参考，实际数据请以官方数据源为准。</p>**
+
+**<p style="color:red"> - 使用者应自行承担使用程序的任何风险，作者不对任何使用程序所造成的后果负责。</p>**
+
+**<p style="color:red"> - 本程序所提供的信息不构成任何投资建议。</p>**
 
 
-**本程序仅用于学习和学术研究，请遵守目标网站使用条款。**
-
-**图表数据仅供分析参考，实际数据请以官方数据源为准。**
-
-**使用者应自行承担使用程序的任何风险，作者不对任何使用程序所造成的后果负责。**
-
-**本程序所提供的信息不构成任何投资建议。**
 
 ***
 
-## 一、项目说明
+### 一、项目说明
 
 创建这个项目的目的是方便汇集不同宏观数据方便进行比较（频繁的打开各种不同网页抓取数据太过于麻烦）。
 此项目使用脚本获取宏观经济数据，并将数据下载至本地数据库（data.db）文件当中，然后生成集成式的图表。
 可下载的数据会陆续更新。
 
-注意：强烈建议使用代理 IP 下载数据！弹出的浏览器窗口需保持打开状态，不要对其进行任何操作！不要快速重复下载数据，会触发 API 上限，或触发 IP 封禁。
+**注意：强烈建议使用代理 IP 下载数据！境内使用需要开启VPN。弹出的浏览器窗口需保持打开状态，不要对其进行任何操作！不要快速重复下载数据，会触发 API 上限，或触发 IP 封禁。**
 
 ***
 
-## 二、准备工作与使用方法（包括配置环境，API key 获取）
+### 二、准备工作与使用方法（包括配置环境，API key 获取）
 
-### 1. 配置 Python 环境
+#### 1. 配置 Python 环境
 
 - Python 解释器：3.12
 
-### 2. 安装依赖
+#### 2. 安装依赖
 
 ```powershell
 # Windows PowerShell
@@ -73,7 +52,7 @@ pip install uv
 uv sync
 ```
 
-### 3. 获取 API key
+#### 3. 获取 API key
 
 请访问以下地址获取免费API key：
 
@@ -81,9 +60,9 @@ uv sync
 - FRED St. Louis: <https://fredaccount.stlouisfed.org/apikeys>
 - BLS: <https://data.bls.gov/registrationEngine/>
 
-### 4. 使用方法
+#### 4. 使用方法
 
-- 打开软件，点击“设置”按钮，在API KEY栏中依次填写，或者在项目根目录新建文件「.env」，按以下方式写入 API key：
+- 打开软件，点击左边栏最下方“设置”按钮，在API KEY栏中依次填写，或者在项目根目录新建文件「.env」，按以下方式写入 API key：
 
 ```ini
 bea = "XXXXXX-YOUR-API-KEY"
@@ -91,19 +70,16 @@ fred = "YOURAPIKEY-123456"
 bls = "YOUR-API-KEY-000000"
 ```
 
-- 也可以复制仓库根目录下的 `.env.example` 为 `.env`，并按注释修改。
-
-- 保存「.env」后打开入口文件
-- 如果没有下载数据，选择开始年份（最早 2020），并下载数据
-- 等待下载完成后，设置图表样式和想要展示的数据
+- 如果没有下载数据，选择开始年份（目前支持的最早年份是 2020年），勾选同意须知后点击下载按钮下载数据。
+- 等待下载完成后，点击左边栏的按钮跳转到想要的界面，在左上角设置想要展示的数据，点击确定。
 
 ***
 
-## 三、数据总览
+### 三、数据总览
 
-[查看完整数据清单](doc/data_available.html)
+[查看当前已有的数据清单](doc/data_available.html)
 
-### 部分数据源
+#### 部分数据源
 
 - Yahoo Finance API
 - BEA API
@@ -112,14 +88,7 @@ bls = "YOUR-API-KEY-000000"
 - TradingEconomics
 - 其他来源的数据
 
-### 建议的并发与抓取参数
-
-- Yahoo Finance：建议 `YF_WORKERS=1`，避免被限流
-- BLS：`BLS_WORKERS=2`，`BLS_POST_TIMEOUT=120`（秒）
-- TradingEconomics：调试期可 `TE_SHOW_BROWSER=true` 以显示浏览器；生产环境可 `TE_FORCE_HEADLESS=true` 无界面运行。
-- TradingEconomics 缓存：默认禁用（`TE_DISABLE_CACHE=true`）。如需开启缓存，请设置 `TE_DISABLE_CACHE=false` 并可配合 `TE_CACHE_TTL_SECONDS=900` 减少重复抓取。
-
-### 正在更新的数据源
+#### 正在更新的数据源
 
 <!-- markdownlint-disable MD033 -->
 <details>
@@ -179,17 +148,43 @@ bls = "YOUR-API-KEY-000000"
 - 标普500同比与基钦周期
 
  </details>
-<!-- markdownlint-enable MD033 -->
+
 
 ***
 
-## 四、开源许可、程序架构与接口说明、其他信息
+### 四、开源许可、程序架构与接口说明、其他信息
 
 开源许可：MIT-Non-Commercial license（参见根目录 LICENSE 文件）
 
 数据处理程序架构与接口说明：[点击访问 md 文件](doc/structure.md)
 
 BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
+
+
+### 五、待完成事项
+<details>
+    <summary>点击展开事项</summary>
+
+**debug waitlist :**
+- all选项框与数据单选框没有设置不能同时选中
+- One_chart导入db里面的列名以及限制输入框只能输入列名
+- YFinance数据在统一下载的时候下载不了
+- 多个数据并行下载会出现抢占db写入权限的现象
+- 再多次重新设置图表的时候，后面的数据会错位
+- 鼠标十字无法识别日期
+- 软件启动的时候自动读取json里面的内容然后更新
+- four chart里面数据有错开，数量都一致
+- 数据里面最后一日的日期有重叠
+- no show second line data on preview labeled
+    
+**extra function waitlist :**
+- 设置图表网格的透明度&颜色
+- reset设置框内的内容，包括颜色，数据名称
+- 偷彭博文章
+- 设立一个使用说明页面
+- 储存上次设置好的线条样式
+
+</details>
 
 
 
