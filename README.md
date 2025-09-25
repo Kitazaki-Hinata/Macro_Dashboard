@@ -1,6 +1,4 @@
-<p align="center">  
-
-
+<p align="center">
 
 <h2 align="center">Macro Dashboard</h2>
   <p align="center">轻量级宏观工作台 | A free macro data visualization software.</p>
@@ -33,13 +31,13 @@
 3. 设立一个使用说明页面
 4. 储存上次设置好的线条样式
 
-> Version: v1.0.0
+> Version: v0.9.00_beta
 
-> Author: Kitazaki Hinata, SeaStar
->
-> Recent Updates:
->
-> 1. 解决一些bug
+> Author: Kitazaki Hinata
+> 
+> Special thanks to : SeaStar, yuyoux7
+
+
 
 **本程序仅用于学习和学术研究，请遵守目标网站使用条款。**
 
