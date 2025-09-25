@@ -668,14 +668,12 @@ class UiFunctions():  # 删除:mainWindow
         if main_plot_widget is not None:
             # 先绘制第一个数据（会清空图表）
             main_plot_widget.clear()
-            x_data = self.main_window.chart_functions.plot_data(
+            self.main_window.chart_functions.plot_data(
                 data_name=first_data,
                 color=[first_color],   # 这里必须是一个list
                 widget=main_plot_widget
             )
-            
-          
-            
+
             
             # 第二个数据
             dates, values = self.main_window.chart_functions._get_data_from_database(second_data)

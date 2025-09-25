@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -1121,7 +1121,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 116, 54))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 224, 554))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -2290,7 +2290,7 @@ class Ui_MainWindow(object):
         self.status_label.setText(QCoreApplication.translate("MainWindow", u"Status will be displayed here", None))
         self.other_group_box.setTitle("")
         self.other_option_text.setText(QCoreApplication.translate("MainWindow", u"About & Terms", None))
-        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 1.0.0</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
+        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 0.9.00_beta</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
         self.image_label.setText("")
         self.textEdit.setDocumentTitle("")
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -2306,7 +2306,7 @@ class Ui_MainWindow(object):
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">The source code is open and available under the MIT-Non Commercial (MIT-NC) License terms.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">Some UI elements (SVG and PNG icons, components) are sourced from [FAWZIUIUX]\uff1afawziuiux.com/#Home.  All rights belong to the original author.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI"
-                        "'; font-size:9pt;\">Special thanks to : SeaStar</span></p></body></html>", None))
+                        "'; font-size:9pt;\">Special thanks to : SeaStar, yuyoux7</span></p></body></html>", None))
         self.read_and_agree_check.setText(QCoreApplication.translate("MainWindow", u"I have read and agree to the Terms and Conditions.", None))
         self.download_data_box.setTitle("")
         self.download_text.setText(QCoreApplication.translate("MainWindow", u"Select data resources and download data", None))

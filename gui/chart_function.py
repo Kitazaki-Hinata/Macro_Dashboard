@@ -420,7 +420,6 @@ class ChartFunction:
         # 设置x轴范围只显示数据范围
         if x_data:
             widget.setXRange(min(x_data), max(x_data), padding=0)
-        return x_data
 
     def link_four_charts(self, linked: bool):
         """联动或取消联动四个四分图的ViewBox，并同步十字线和自适应缩放、拖拽缩放"""
@@ -435,7 +434,6 @@ class ChartFunction:
             return
 
         # 解绑所有鼠标事件和范围同步
-        # --- 修改开始 ---
         if hasattr(self, "_four_charts_mouse_conn") and self._four_charts_mouse_conn:
             for w, slot in self._four_charts_mouse_conn:
                 try:
@@ -472,7 +470,6 @@ class ChartFunction:
                         object_name = w.objectName()
                         v_line, h_line = self.crosshairs[object_name]
                         label = self.labels[object_name]
-                        # --- begin: 只让h_line跟随最近数据点 ---
                         items = plot_item.listDataItems()
                         nearest_y_for_hline = None
                         data_texts = []
@@ -509,14 +506,13 @@ class ChartFunction:
                         v_line.hide()
                         h_line.hide()
                         label.hide()
-            # --- 修改开始 ---
+
             self._four_charts_mouse_conn = []
             for w in widgets:
                 # 保存 slot 以便后续 disconnect
                 slot = sync_crosshair
                 w.scene().sigMouseMoved.connect(slot)
                 self._four_charts_mouse_conn.append((w, slot))
-            # --- 修改结束 ---
 
             self._four_charts_range_conn = []
             def sync_range(*args, **kwargs):
