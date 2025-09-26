@@ -167,8 +167,9 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - 鼠标十字无法识别日期
 - 软件启动的时候自动读取json里面的内容然后更新
 - four chart里面数据有错开，数量都一致
-- 数据里面最后一日的日期有重叠
 - no show second line data on preview labeled
+- 更换数据的时候，第二个数据无法清除
+- one chart里面的右坐标轴字体没法缩小
     
 **extra function waitlist :**
 - 设置图表网格的透明度&颜色
