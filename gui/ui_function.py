@@ -581,8 +581,9 @@ class UiFunctions():  # 删除:mainWindow
             try:
                 ui.first_data_selection_box.clear()
                 ui.second_data_selection_box.clear()
-                ui.third_data_selection_box.clear()
-                ui.fourth_data_selection_box.clear()
+                if name != "one":
+                    ui.third_data_selection_box.clear()
+                    ui.fourth_data_selection_box.clear()
             except Exception:   # 如果没有控件，就pass
                 pass
 
@@ -590,8 +591,9 @@ class UiFunctions():  # 删除:mainWindow
             try:
                 ui.first_data_selection_box.addItems(combo_box_name)
                 ui.second_data_selection_box.addItems(combo_box_name)
-                ui.third_data_selection_box.addItems(combo_box_name)
-                ui.fourth_data_selection_box.addItems(combo_box_name)
+                if name != "one":
+                    ui.third_data_selection_box.addItems(combo_box_name)
+                    ui.fourth_data_selection_box.addItems(combo_box_name)
             except Exception:   # 如果没有控件，就pass
                 pass
 
@@ -655,7 +657,8 @@ class UiFunctions():  # 删除:mainWindow
         existing_data : Dict[str, Any] = self.get_settings_from_json()
 
         existing_data["one_chart_settings"]["first_data"]["data_name"] = first_data
-        existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
+        if second_data is not str() :
+            existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
 
         existing_data["one_chart_settings"]["first_data"]["time_lags"] = first_lag
         existing_data["one_chart_settings"]["second_data"]["time_lags"] = second_lag
@@ -674,49 +677,48 @@ class UiFunctions():  # 删除:mainWindow
                 widget=main_plot_widget
             )
 
-            
-            # 第二个数据
-            dates, values = self.main_window.chart_functions._get_data_from_database(second_data)
-            pen = pg.mkPen(color=second_color, width=2)
-            # 获取plotItem
-            plot_item = main_plot_widget.getPlotItem()
+            if second_data is not str() :
+                # 第二个数据
+                dates, values = self.main_window.chart_functions._get_data_from_database(second_data)
+                pen = pg.mkPen(color=second_color, width=2)
+                # 获取plotItem
+                plot_item = main_plot_widget.getPlotItem()
 
-            # 创建右侧ViewBox
-            font = pg.QtGui.QFont()
-            font.setPixelSize(12)
-            font.setFamilies(["Comfortaa"])
-            right_viewbox = pg.ViewBox()
-            plot_item.scene().addItem(right_viewbox)  # 添加到场景
+                # 创建右侧ViewBox
+                font = pg.QtGui.QFont()
+                font.setPixelSize(12)
+                font.setFamilies(["Comfortaa"])
+                right_viewbox = pg.ViewBox()
+                plot_item.scene().addItem(right_viewbox)  # 添加到场景
 
-            # 链接右侧轴
-            main_plot_widget.showAxis('right')
-            right_axis = main_plot_widget.getAxis('right')
-            right_axis.setTickFont(font)
-            right_axis.linkToView(right_viewbox)
-            right_axis.setLabel(second_data, color=second_color)
+                # 链接右侧轴
+                main_plot_widget.showAxis('right')
+                right_axis = main_plot_widget.getAxis('right')
+                right_axis.setTickFont(font)
+                right_axis.linkToView(right_viewbox)
+                right_axis.setLabel(second_data, color=second_color)
 
-            # 设置X轴链接
-            right_viewbox.setXLink(plot_item.vb)
+                # 设置X轴链接
+                right_viewbox.setXLink(plot_item.vb)
 
-        # 同步视图
-            def update_views():
-                right_viewbox.setGeometry(plot_item.vb.sceneBoundingRect())
-                right_viewbox.linkedViewChanged(plot_item.vb, right_viewbox.XAxis)
+            # 同步视图
+                def update_views():
+                    right_viewbox.setGeometry(plot_item.vb.sceneBoundingRect())
+                    right_viewbox.linkedViewChanged(plot_item.vb, right_viewbox.XAxis)
 
-            update_views()
-            plot_item.vb.sigResized.connect(update_views)
+                update_views()
+                plot_item.vb.sigResized.connect(update_views)
 
-            # 添加第二个曲线到右侧ViewBox
-            second_curve = pg.PlotCurveItem()
-            flash_date_buff = []
-            for i in range(len(values)):
-                flash_date_buff.append(i)
-            second_curve.setData(x=flash_date_buff, y=values, pen=pen)
-            right_viewbox.addItem(second_curve)
-            right_viewbox.setZValue(10)
-            #main_plot_widget.plot(x=flash_date_buff, y=values, pen=pen)
-            # 自动调整范围
-            right_viewbox.enableAutoRange(axis=pg.ViewBox.YAxis)
+                # 添加第二个曲线到右侧ViewBox
+                second_curve = pg.PlotCurveItem()
+                flash_date_buff = []
+                for i in range(len(values)):
+                    flash_date_buff.append(i)
+                second_curve.setData(x=flash_date_buff, y=values, pen=pen)
+                right_viewbox.addItem(second_curve)
+                right_viewbox.setZValue(10)
+                # 自动调整范围
+                right_viewbox.enableAutoRange(axis=pg.ViewBox.YAxis)
             
 
 
