@@ -355,7 +355,12 @@ class ChartFunction:
                 right_vb = widget._right_viewbox
                 for item in list(right_vb.addedItems):
                     right_vb.removeItem(item)
-        
+            else:
+                err = open("./logs/table_error.txt", 'w')
+                if not hasattr(widget, "_right_viewbox"):
+                    err.write("no catch right viewbox tag\n") # hasattr(widget, "_right_viewbox") this "_right_viewbox" tag not get
+                err.close()
+
         # 重新添加十字线和标签以确保它们在最上层
         plot_item.addItem(v_line, ignoreBounds=True)
         plot_item.addItem(h_line, ignoreBounds=True)
