@@ -9,9 +9,7 @@
     English | <a href="https://github.com/Kitazaki-Hinata/Macro_Dashboard/tree/dev?tab=readme-ov-file">简体中文</a>
 </p>
 
-> Author: Kitazaki Hinata
->
-> Special thanks to: SeaStar, yuyoux7
+> Author: Kitazaki Hinata, SeaStar, yuyoux7
 
 **<p style="color:red"> - This program is for learning and academic research purposes ONLY. Please comply with the terms of use of the target websites.</p>**
 

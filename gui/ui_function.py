@@ -1181,6 +1181,146 @@ class UiFunctions():  # 删除:mainWindow
             return []
 
 
+    def _append_console(self, text: str):
+        try:
+            self.main_window.console_area.append(text)
+        except Exception:
+            pass
+        try:
+            logging.getLogger(__name__).info(text)
+        except Exception:
+            pass
+
+    def _load_request_json(self) -> Optional[Dict[str, Any]]:
+        try:
+            req_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "request_id.json")
+            with open(os.path.abspath(req_path), "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logging.error(f"Failed to load request_id.json: {e}")
+            self._append_console(f"Failed to load request_id.json: {e}")
+            return None
+
+    def start_download(self):
+        if not self.main_window.read_and_agree_check.isChecked():
+            self._append_console("PLEASE READ AND AGREE TO THE TERMS AND CONDITIONS !!!")
+            return
+        if self._dl_thread is not None or self._parallel_exec is not None:
+            self._append_console("Download already running.")
+            return
+        json_data = self._load_request_json()
+        if not isinstance(json_data, dict):
+            return
+
+        start_year = int(self.main_window.int_year_spinbox.value())
+        sources: list[str]
+        download_all_bool = False
+        if bool(self.main_window.download_for_all_check.isChecked()):
+            sources = ["bea", "yf", "fred", "bls", "te"]
+            download_all_bool = True
+        else:
+            sources = []
+            for name in ("bea", "yf", "fred", "bls", "te"):
+                w = getattr(self.main_window, name, None)
+                try:
+                    if w is not None and bool(w.isChecked()):
+                        sources.append(name)
+                except Exception:
+                    pass
+            if not sources:
+                self._append_console("No source selected.")
+                return
+
+        parallel = False
+        max_threads = 1
+        try:
+            parallel = bool(self.main_window.parallel_download_check.isChecked())
+            max_threads = int(self.main_window.max_threads_spin.value())
+        except Exception:
+            pass
+
+        if parallel:
+            self._append_console(f"Start parallel download ({len(sources)} sources, threads={max_threads}) from year {start_year}...")
+            # 使用标准的 Qt 线程模式处理并行下载
+            self._worker = _DownloadWorker(
+                json_data=json_data,
+                start_year=start_year,
+                download_all=download_all_bool,
+                selected_sources=sources,
+                main_window=self.main_window
+            )
+            self._dl_thread = QThread()
+            self._worker.moveToThread(self._dl_thread)
+            self._dl_thread.started.connect(self._worker.run)
+            self._worker.progress.connect(self._append_console)
+            self._worker.failed.connect(self._on_worker_failed)
+            self._worker.finished.connect(self._cleanup_thread)
+            self._dl_thread.start()
+        else:
+            self._append_console(f"Start download from year {start_year}...")
+            self._worker = _DownloadWorker(
+                json_data=json_data,
+                start_year=start_year,
+                download_all=True if sources and len(sources) == 5 else False,
+                selected_sources=sources,
+                main_window = self.main_window
+            )
+            self._dl_thread = QThread()
+            self._worker.moveToThread(self._dl_thread)
+            self._dl_thread.started.connect(self._worker.run)
+            self._worker.progress.connect(self._append_console)
+            self._worker.failed.connect(self._on_worker_failed)
+            self._worker.finished.connect(self._cleanup_thread)
+            self._dl_thread.start()
+
+        self.main_window.download_btn.setEnabled(False)
+        self.main_window.cancel_btn.setEnabled(True)
+
+    def _cleanup_thread(self):
+        try:
+            if self._dl_thread:
+                self._dl_thread.quit()
+                self._dl_thread.wait()
+            self._parallel_exec = None
+        finally:
+            date_today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self._dl_thread = None
+            self._worker = None
+            self.main_window.download_btn.setEnabled(True)
+            self.main_window.cancel_btn.setEnabled(False)
+            self._append_console("ALL TASKS COMPLETE !!! (∠・ω< )⌒★")
+
+            existing_data: Dict[str, Any] = self.get_settings_from_json()
+            existing_data["recent_update_time"] = date_today
+
+            self.main_window.table_update_label.setText(f"Recent Update Time : {date_today}")
+            self.main_window.update_label_2.setText(f"Recent Update Time : {date_today}")
+            self.main_window.four_update_label.setText(f"Recent Update Time : {date_today}")
+            try:
+                with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
+                    json.dump(existing_data, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                logging.error(f"Error writing settings file: {e}")
+
+    def cancel_download(self):
+        did = False
+        if self._worker is not None:
+            self._worker.cancel()
+            did = True
+        if self._parallel_exec is not None:
+            self._parallel_exec.cancel()
+            did = True
+        if did:
+            self._append_console("Cancelling...")
+        else:
+            self._append_console("No running task to cancel.")
+
+    def _on_worker_failed(self, msg: str):
+        self._append_console(f"Error: {msg}")
+
+
+
+
 
 
 

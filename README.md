@@ -11,9 +11,7 @@
 
 > Version: v0.9.00_beta
 
-> Author: Kitazaki Hinata
-> 
-> Special thanks to : SeaStar, yuyoux7
+> Author: Kitazaki Hinata, SeaStar, yuyoux7
 
 **<p style="color:red"> - 本程序仅用于学习和学术研究，请遵守目标网站使用条款。</p>**
 
@@ -159,24 +157,24 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
     <summary>点击展开事项</summary>
 
 **debug waitlist :**
+- **重要：下载数据的多线程逻辑会导致程序崩溃**
 - all选项框与数据单选框没有设置不能同时选中
 - One_chart导入db里面的列名以及限制输入框只能输入列名
-- YFinance数据在统一下载的时候下载不了
-- 多个数据并行下载会出现抢占db写入权限的现象
 - 再多次重新设置图表的时候，后面的数据会错位
-- 鼠标十字无法识别日期
 - 软件启动的时候自动读取json里面的内容然后更新
 - four chart里面数据有错开，数量都一致
 - no show second line data on preview labeled
-- 更换数据的时候，第二个数据无法清除
 - one chart里面的右坐标轴字体没法缩小
     
 **extra function waitlist :**
+- 新板块：彭博文章
+- 新板块：美债期限结构
+- 启动界面
 - 设置图表网格的透明度&颜色
 - reset设置框内的内容，包括颜色，数据名称
-- 偷彭博文章
 - 设立一个使用说明页面
 - 储存上次设置好的线条样式
+
 
 </details>
 
