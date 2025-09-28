@@ -11,26 +11,59 @@
 
 import json
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+from pathlib import Path
 from PySide6.QtWidgets import QApplication
 from gui.ui_mainwindow import mainWindow
 from download import DownloaderFactory  # type: ignore  # 示例引用，避免静态检查器误报未使用
 from logging_config import start_logging, stop_logging
 
-def read_json() -> Dict[str, Any]:
-    """读取 `request_id.json` 并返回其内容。
+SMART_QUOTES_MAP = {
+    '\u201c': '"', '\u201d': '"',  # 左/右双引号
+    '\u2018': "'", '\u2019': "'",  # 左/右单引号
+    '\u2013': '-',  '\u2014': '-',   # 短/长破折号
+    '\u00a0': ' ',                    # 不换行空格
+}
 
-    Returns:
-        dict: JSON 的顶层字典；若读取失败返回空字典。
+def _normalize_smart_chars(text: str) -> str:
+    for k, v in SMART_QUOTES_MAP.items():
+        if k in text:
+            text = text.replace(k, v)
+    return text
+
+def _load_json_raw(path: Path) -> Optional[Dict[str, Any]]:
+    """底层读取函数：多编码尝试 + 智能字符清洗。"""
+    if not path.exists():
+        logging.error("read_json ERROR: file not found: %s", path)
+        return None
+    raw = path.read_bytes()
+    tried_encodings = ['utf-8', 'utf-8-sig', 'cp1252', 'gbk']  # cp1252 兼容 0x93, 最后尝试 gbk 以便日志更友好
+    last_err: Optional[Exception] = None
+    for enc in tried_encodings:
+        try:
+            text = raw.decode(enc)
+            if enc != 'utf-8':
+                logging.warning("read_json: decoded with fallback encoding=%s", enc)
+            text = _normalize_smart_chars(text)
+            return json.loads(text)
+        except Exception as e:  # noqa: BLE001
+            last_err = e
+            continue
+    logging.error("read_json FAILED: all encodings tried %s, last_err=%s", tried_encodings, last_err)
+    return None
+
+def read_json() -> Dict[str, Any]:
+    """读取 `request_id.json`，带编码回退与智能字符清洗。
+
+    读取顺序：utf-8 -> utf-8-sig -> cp1252 -> gbk；并替换 Word/网页复制的智能引号。
+    失败时返回空字典，并记录日志。
     """
-    try:
-        with open("request_id.json", "r", encoding="utf-8") as file:
-            data_identity: Dict[str, Any] = json.load(file)
-            logging.info( "read_json Successfully load json file")
-        return data_identity
-    except:
-        logging.error("read_json, ERROR: FAILED to LOAD json file")
-    return {}
+    path = Path("request_id.json")
+    data = _load_json_raw(path)
+    if data is None:
+        return {}
+    logging.info("read_json loaded file=%s keys=%s", path, list(data.keys())[:6])
+    return data
 
 
 if __name__ == "__main__":

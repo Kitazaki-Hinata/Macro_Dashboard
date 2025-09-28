@@ -467,32 +467,108 @@ class DatabaseConverter:
                 return cursor
             else:
                 logger.info("Time_Series table already exists, continue")
-                cursor.execute("SELECT MAX(date) FROM Time_Series")
-                max_date_str = cursor.fetchone()[0]
+                # 同时获取最小 / 最大日期
+                cursor.execute("SELECT MIN(date), MAX(date) FROM Time_Series")
+                row = cursor.fetchone()
+                min_date_str, max_date_str = (row if row else (None, None))
+                start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
                 if not max_date_str:
-                    # 表存在但没有行的极端情况：初始化最小日期
-                    max_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                    max_date = start_date_obj
                 else:
                     max_date = datetime.strptime(max_date_str, '%Y-%m-%d').date()
+                if not min_date_str:
+                    min_date = start_date_obj
+                else:
+                    min_date = datetime.strptime(min_date_str, '%Y-%m-%d').date()
 
-                # 计算需要添加的日期
+                # 情况一：需要向前补历史日期（用户重新请求了更早年份）
+                if start_date_obj < min_date:
+                    t0_back = time.perf_counter()
+                    dates_to_prepend: List[date] = []
+                    d = min_date - timedelta(days=1)
+                    while d >= start_date_obj:
+                        dates_to_prepend.append(d)
+                        d -= timedelta(days=1)
+                    # 倒序生成的，需要反转后按时间顺序插入
+                    for d in reversed(dates_to_prepend):
+                        cursor.execute("INSERT OR IGNORE INTO Time_Series (date) VALUES (?)", (d.strftime('%Y-%m-%d'),))
+                    self.conn.commit()
+                    logger.info("Time_Series table prepended %d earlier date rows (%.3fs)", len(dates_to_prepend), time.perf_counter() - t0_back)
+
+                # 情况二：需要向后追加到今天
                 current_date = datetime.now().date()
                 if current_date > max_date:
-                    t0 = time.perf_counter()
+                    t0_fwd = time.perf_counter()
                     dates_to_add: List[date] = []
                     while current_date > max_date:
                         dates_to_add.append(current_date)
                         current_date -= timedelta(days=1)
-                    # 插入数据
                     for d in dates_to_add:
-                        cursor.execute("INSERT INTO Time_Series (date) VALUES (?)", (d.strftime('%Y-%m-%d'),))
+                        cursor.execute("INSERT OR IGNORE INTO Time_Series (date) VALUES (?)", (d.strftime('%Y-%m-%d'),))
                     self.conn.commit()
-                    logger.info("Time_Series table appended %d date rows (%.3fs)", len(dates_to_add), time.perf_counter() - t0)
+                    logger.info("Time_Series table appended %d future date rows (%.3fs)", len(dates_to_add), time.perf_counter() - t0_fwd)
                 return cursor
 
         except sqlite3.Error as e:
             logging.error(f"FAILED to create Time_Series table, since {e}")
             return cursor
+
+    def _ensure_ts_primary_key(self) -> None:
+        """确保 Time_Series.date 为 PRIMARY KEY。
+
+        由于历史实现使用 to_sql(if_exists='replace') 可能丢失主键，这里在每次写入前修复：
+        - 检查 PRAGMA table_info 是否存在 pk=1 的 date 列
+        - 若不存在则重建表：
+            1. 读取所有列信息与数据
+            2. 创建临时新表 (date TEXT PRIMARY KEY,...)
+            3. 拷贝数据并去重（保留最后一条同 date 记录）
+            4. 原表改名备份 -> 删除 -> 新表改名
+        """
+        cursor = self.cursor
+        try:
+            cursor.execute("PRAGMA table_info('Time_Series')")
+            cols_info = cursor.fetchall()
+            if not cols_info:
+                # 表还未创建，交由 _create_ts_sheet 处理
+                return
+            # cols_info: (cid,name,type,notnull,dflt_value,pk)
+            has_pk = any(row[1] == 'date' and row[5] == 1 for row in cols_info)
+            if has_pk:
+                return
+            logger.warning("Time_Series missing PRIMARY KEY on 'date' – rebuilding to restore constraint")
+            # 收集现有列
+            existing_cols: List[str] = [row[1] for row in cols_info]
+            if 'date' not in existing_cols:
+                logger.error("Time_Series table unexpectedly lacks 'date' column, skip pk repair")
+                return
+            # 生成列类型（保留原类型，缺省使用 REAL）
+            col_type_map: Dict[str, str] = {row[1]: (row[2] or 'REAL') for row in cols_info}
+            # date 列强制 TEXT 作为主键（SQLite DATE 实际也是 TEXT/NUMERIC，使用 TEXT 保守）
+            create_cols_def: List[str] = ["date TEXT PRIMARY KEY"]
+            data_cols: List[str] = [c for c in existing_cols if c != 'date']
+            for c in data_cols:
+                t = col_type_map.get(c, 'REAL')
+                # 规避潜在非法类型
+                if not re.fullmatch(r"[A-Za-z0-9_]+", t):
+                    t = 'REAL'
+                create_cols_def.append(f"{c} {t}")
+            create_sql = f"CREATE TABLE Time_Series_new ({', '.join(create_cols_def)})"
+            cursor.execute(create_sql)
+            # 去重策略：按 date 排序后取最后一条（假设后写入为最新）
+            select_cols = ', '.join(existing_cols)
+            insert_cols = ', '.join(existing_cols)
+            cursor.execute(
+                f"INSERT OR REPLACE INTO Time_Series_new ({insert_cols}) "
+                f"SELECT {select_cols} FROM Time_Series t WHERE date IS NOT NULL GROUP BY date"
+            )
+            cursor.execute("ALTER TABLE Time_Series RENAME TO Time_Series_backup")
+            cursor.execute("ALTER TABLE Time_Series_new RENAME TO Time_Series")
+            cursor.execute("DROP TABLE IF EXISTS Time_Series_backup")
+            self.conn.commit()
+            logger.info("Time_Series primary key restored; columns=%s", ['date'] + data_cols)
+        except Exception as e:
+            logger.error("Failed to ensure PRIMARY KEY on Time_Series: %s", e)
+            self.conn.rollback()
 
     def write_into_db(
             self,
@@ -500,7 +576,9 @@ class DatabaseConverter:
             data_name: str,
             start_date : str,
             is_time_series: bool = False,
-            is_pct_data: bool = False
+        is_pct_data: bool = False,
+        overwrite_existing: bool = True,
+        only_fill_null: bool = False
     ):
         """将数据写入 SQLite。
 
@@ -522,98 +600,136 @@ class DatabaseConverter:
         with DB_WRITE_LOCK:
             t_all = time.perf_counter()
             self._create_ts_sheet(start_date = start_date)    # 调用内部方法，先看创建ts表
+            # 修复（若需要）主键
+            self._ensure_ts_primary_key()
             cursor = self.cursor
             try:
                 logger.info("write_into_db start: data=%s, is_time_series=%s, shape=%s", data_name, is_time_series, tuple(df.shape))
                 if df.empty:
                     logger.error(f"{data_name} is empty, FAILED INSERT, locate in write_into_db")
                 else:
-                    if is_time_series:  # check whether Time_Series table exists
+                    if is_time_series:  # 时间序列进入增量模式
                         t0 = time.perf_counter()
-                        df_after_modify_time: pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
-                        logger.debug("%s after format: columns=%s, shape=%s", data_name, list(df_after_modify_time.columns), tuple(df_after_modify_time.shape))
-                        if df_after_modify_time.empty or 'date' not in df_after_modify_time.columns:
-                            logger.error(f"{data_name} reformat produced empty/invalid dataframe, skip writing")
+                        df_fmt: pd.DataFrame = DatabaseConverter._format_converter(df, data_name, is_pct_data)
+                        logger.debug("%s after format: columns=%s, shape=%s", data_name, list(df_fmt.columns), tuple(df_fmt.shape))
+                        if df_fmt.empty or 'date' not in df_fmt.columns:
+                            logger.error("%s reformat produced empty/invalid dataframe, skip writing", data_name)
                             return
-                        # 标准化和去重
-                        df_after_modify_time = df_after_modify_time.copy()
-                        df_after_modify_time['date'] = pd.to_datetime(df_after_modify_time['date'], errors='coerce').dt.strftime('%Y-%m-%d')
-                        df_after_modify_time = df_after_modify_time.dropna(subset=['date']).drop_duplicates(subset=['date'], keep='last')
+                        df_fmt = df_fmt.copy()
+                        df_fmt['date'] = pd.to_datetime(df_fmt['date'], errors='coerce')
+                        df_fmt = df_fmt.dropna(subset=['date']).drop_duplicates(subset=['date'], keep='last')
+                        df_fmt['date'] = df_fmt['date'].dt.strftime('%Y-%m-%d')
 
-                        # 填充所有的null值
-                        # 这里先取出数据最后一个日期
-                        date_today = date.today()
-                        # end_date = end_date.strftime('%Y-%m-%d')
-                        all_dates = pd.date_range(start=start_date, end=date_today, freq='D')  # 生成所有的date
-                        # 创建完整日期 DataFrame
+                        # 生成完整日期并前向填充（保持你原有的补全逻辑）
+                        all_dates = pd.date_range(start=start_date, end=date.today(), freq='D')
                         df_full = pd.DataFrame({'date': [d.strftime('%Y-%m-%d') for d in all_dates]})
-                        # 合并原始数据
-                        df_full = df_full.merge(df_after_modify_time, on='date', how='left')
-
-                        # 找到第一个非空值
-                        first_valid_idx = df_full[data_name].first_valid_index()
-                        first_valid_value = df_full.loc[first_valid_idx, data_name]
-
-                        # 如果 start_date 到第一个有效值之间有 NaN，就用第一个有效值填充
-                        if pd.isna(df_full.loc[0, data_name]):
-                            df_full.loc[:first_valid_idx, data_name] = first_valid_value
-
-                        # 前向填充空值
+                        df_full = df_full.merge(df_fmt, on='date', how='left')
+                        if df_full[data_name].notna().any():
+                            mask = df_full[data_name].notna().to_numpy(dtype=bool, copy=False)
+                            first_valid_pos = int(np.flatnonzero(mask)[0])
+                            if pd.isna(df_full.iloc[0][data_name]):
+                                first_valid_value = df_full.iloc[first_valid_pos][data_name]
+                                df_full.loc[df_full.index[:first_valid_pos + 1], data_name] = first_valid_value
                         df_full[data_name] = df_full[data_name].ffill()
 
-
-                        # 填写最后的数据
-
-                        # 转换数据类型
-                        df_full['date'] = df_full['date'].astype(str)
-
+                        # 列名安全
+                        if not re.fullmatch(r"[A-Za-z0-9_]+", data_name):
+                            logger.error("Invalid column name '%s', abort writing", data_name)
+                            return
+                        # 若列不存在则添加
                         try:
-                            cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {data_name} DOUBLE")
-                            self.conn.commit()
+                            cursor.execute(f"ALTER TABLE Time_Series ADD COLUMN {data_name} REAL")
                             logger.debug("added column '%s' to Time_Series", data_name)
-                        except Exception:
+                        except sqlite3.Error:
                             pass
 
-                        df_db = pd.read_sql("SELECT * FROM Time_Series", self.conn)  # 只读取日期列
-                        result_db = df_db.merge(df_full, on="date", how="left")   # 这里修改
+                        # 读取现有列值（控制覆盖策略）
+                        existing_map: Dict[str, Optional[float]] = {}
+                        if (not overwrite_existing) or only_fill_null:
+                            try:
+                                cursor.execute(f"SELECT date, {data_name} FROM Time_Series")
+                                for d, val in cursor.fetchall():
+                                    existing_map[str(d)] = val
+                            except sqlite3.Error:
+                                pass
 
-                        for col in df_after_modify_time.columns:
-                            if col == 'date':
-                                continue  # 跳过日期列
-                            if f"{col}_x" in result_db.columns and f"{col}_y" in result_db.columns:
-                                # 使用combine_first: y列优先，没有y时用x
-                                result_db[col] = result_db[f"{col}_y"].combine_first(result_db[f"{col}_x"])
-                                # 删除临时列
-                                result_db.drop([f"{col}_x", f"{col}_y"], axis=1, inplace=True)
-
+                        update_rows: List[Tuple[float, str]] = []
+                        for date_str, v in df_full[['date', data_name]].itertuples(index=False, name=None):
+                            if pd.isna(v):
+                                continue
+                            ds = str(date_str)
+                            if only_fill_null:
+                                if ds in existing_map and existing_map[ds] is not None:
+                                    continue
+                            elif not overwrite_existing:
+                                if ds in existing_map and existing_map[ds] is not None:
+                                    continue
+                            update_rows.append((float(v), ds))
                         t_sql = time.perf_counter()
-                        result_db.to_sql(
-                            name="Time_Series",  # 同一张表或新表
-                            con=self.conn,
-                            if_exists="replace",
-                            index=False
-                        )
-
+                        if update_rows:
+                            cursor.executemany(
+                                f"UPDATE Time_Series SET {data_name}=? WHERE date=?",
+                                update_rows
+                            )
                         self.conn.commit()
-                        logger.info("write_into_db(Time_Series/%s): wrote %d rows (format %.3fs + to_sql %.3fs, total %.3fs)",
-                                    data_name, len(result_db), (t_sql - t0), (time.perf_counter() - t_sql), (time.perf_counter() - t0))
-
-                        # 找到date列的索引位置，选择date列及后面的一列
-                        df_after_modify_time = df_after_modify_time.iloc[:, -2:]
-                        logger.debug("%s returns last 2 cols shape=%s", data_name, tuple(df_after_modify_time.shape))
+                        logger.info(
+                            "write_into_db(Time_Series/%s)[incremental mode=%s fill_null=%s]: updated %d rows (format %.3fs + update %.3fs, total %.3fs)",
+                            data_name,
+                            'overwrite' if overwrite_existing else 'no_overwrite',
+                            only_fill_null,
+                            len(update_rows),
+                            (time.perf_counter() - t0),
+                            (time.perf_counter() - t_sql),
+                            (time.perf_counter() - t0)
+                        )
+                        rtn_df = df_full[['date', data_name]].copy()
+                        logger.debug("%s returns 2 cols shape=%s", data_name, tuple(rtn_df.shape))
                         logger.info("write_into_db finished: data=%s (%.3fs)", data_name, time.perf_counter() - t_all)
-                        return df_after_modify_time
+                        return rtn_df
                     else:
-                        # 其他数据则直接生成新sheet存入database当中
-                        t_sql = time.perf_counter()
-                        df.to_sql(
-                            name=data_name,
-                            con=self.conn,
-                            if_exists='replace',  # if sheet exist, then replace
-                            index=False
-                        )
-                        self.conn.commit()
-                        logger.info("write_into_db(sheet=%s): wrote %d rows (to_sql %.3fs)", data_name, len(df), time.perf_counter() - t_sql)
+                        # 非时间序列表：避免 replace，改为 UPSERT / APPEND 去重
+                        cols = list(df.columns)
+                        has_date = 'date' in cols
+                        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (data_name,))
+                        exists = cursor.fetchone() is not None
+                        if not exists:
+                            df.to_sql(data_name, self.conn, if_exists='fail', index=False)
+                            self.conn.commit()
+                            logger.info("write_into_db(sheet=%s): created table rows=%d", data_name, len(df))
+                        else:
+                            if has_date:
+                                cursor.execute(f"PRAGMA table_info('{data_name}')")
+                                info = cursor.fetchall()
+                                has_pk = any(r[1]=='date' and r[5]==1 for r in info)
+                                if not has_pk:
+                                    # 重建表以加主键
+                                    tmp_cols = [r[1] for r in info]
+                                    cursor.execute(f"ALTER TABLE {data_name} RENAME TO {data_name}_backup")
+                                    col_defs = ["date TEXT PRIMARY KEY"] + [f"{c} REAL" for c in tmp_cols if c!='date']
+                                    cursor.execute(f"CREATE TABLE {data_name} ({', '.join(col_defs)})")
+                                    cols_sel = ','.join(tmp_cols)
+                                    cursor.execute(f"INSERT OR REPLACE INTO {data_name} ({cols_sel}) SELECT {cols_sel} FROM {data_name}_backup")
+                                    cursor.execute(f"DROP TABLE {data_name}_backup")
+                                    self.conn.commit()
+                                # 规范日期
+                                if df['date'].dtype != object:
+                                    try:
+                                        df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.strftime('%Y-%m-%d')
+                                    except Exception:
+                                        pass
+                                insert_cols = ','.join(cols)
+                                placeholders = ','.join(['?']*len(cols))
+                                rows = [tuple(x if (not (isinstance(x, float) and np.isnan(x))) else None for x in r) for r in df.itertuples(index=False, name=None)]
+                                cursor.executemany(
+                                    f"INSERT OR REPLACE INTO {data_name} ({insert_cols}) VALUES ({placeholders})",
+                                    rows
+                                )
+                                self.conn.commit()
+                                logger.info("write_into_db(sheet=%s): upserted %d rows", data_name, len(rows))
+                            else:
+                                df.to_sql(data_name, self.conn, if_exists='append', index=False)
+                                self.conn.commit()
+                                logger.warning("write_into_db(sheet=%s): appended %d rows (no date pk)", data_name, len(df))
                         logger.info("write_into_db finished: data=%s (%.3fs)", data_name, time.perf_counter() - t_all)
                         self.conn.close()
                         return df
