@@ -6,7 +6,7 @@
             "color": "#90b6e7"
         },
         "second_data": {
-            "data_name": "Price_Index_GDP",
+            "data_name": "Michigan_Consumer_Sentiment",
             "time_lags": 0,
             "color": "#EE5C88"
         }

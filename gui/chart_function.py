@@ -143,6 +143,8 @@ class ChartFunction:
         self._last_hover_log_ts = 0.0
         self._label_axis_tag = True
         self._show_empty_hint = True
+        self._tooltip_follow_mouse = True   # 悬浮框跟随鼠标
+        self._tooltip_edge_padding_ratio = 0.04  # 与上下边界的最小间距比例
 
         # 保存四个四分图的plotwidget引用
         self.four_plot_widgets = {}
@@ -552,7 +554,9 @@ class ChartFunction:
         html_lines = []
         first_idx_used = None
 
-        nearest_y_for_hline = None
+        # 记录用于十字线水平线的“最接近鼠标”曲线点（按主 viewbox 坐标系下 y 与鼠标 y 的差值）
+        nearest_y_for_hline = None  # 保持旧变量名兼容后面逻辑
+        best_dist = None
         for item in items:
             if not hasattr(item, 'getData'):
                 continue
@@ -573,8 +577,24 @@ class ChartFunction:
                 continue
             nearest_x = x_data[min_index]
             nearest_y = y_data[min_index]
-            if nearest_y_for_hline is None:
-                nearest_y_for_hline = nearest_y
+            # 将右轴曲线的 y 映射到主轴坐标，便于统一比较
+            candidate_y_main = nearest_y
+            try:
+                if right_vb is not None and item in right_items:
+                    # 使用 pyqtgraph ViewBox 的 mapViewToView 实现坐标转换
+                    candidate_point = right_vb.mapViewToView(plot_item.vb, pg.Point(nearest_x, nearest_y))  # type: ignore
+                    candidate_y_main = float(candidate_point.y())
+            except Exception:
+                pass
+            # 计算与鼠标 y 的距离（主轴坐标系）
+            try:
+                dist = abs(candidate_y_main - y_val)
+                if best_dist is None or dist < best_dist:
+                    best_dist = dist
+                    nearest_y_for_hline = candidate_y_main
+            except Exception:
+                if nearest_y_for_hline is None:
+                    nearest_y_for_hline = candidate_y_main
             if first_idx_used is None:
                 first_idx_used = min_index
                 idx_candidate = nearest_x
@@ -640,10 +660,30 @@ class ChartFunction:
         # 十字线水平线对齐第一条曲线最近点（更易读），若失败则用鼠标 y
         if nearest_y_for_hline is not None:
             h_line.setPos(nearest_y_for_hline)
-            label.setPos(x_val, nearest_y_for_hline)
         else:
             h_line.setPos(y_val)
-            label.setPos(x_val, y_val)
+
+        # 悬浮框位置策略
+        if getattr(self, '_tooltip_follow_mouse', False):
+            # 直接跟随鼠标坐标（数据坐标系），并做上下边界保护
+            try:
+                y_for_label = y_val
+                # 边界范围
+                yrange = plot_item.vb.viewRange()[1]
+                y_min, y_max = yrange[0], yrange[1]
+                span = max(1e-9, y_max - y_min)
+                pad = span * getattr(self, '_tooltip_edge_padding_ratio', 0.04)
+                if y_for_label > y_max - pad:
+                    y_for_label = y_max - pad
+                elif y_for_label < y_min + pad:
+                    y_for_label = y_min + pad
+                label.setPos(x_val, y_for_label)
+            except Exception:
+                # 回退原逻辑
+                label.setPos(x_val, h_line.value())
+        else:
+            # 保留原来：对齐第一条曲线的 y
+            label.setPos(x_val, h_line.value())
         v_line.show(); h_line.show(); label.show()
 
     # --------------------------------- 辅助：日期格式化 ---------------------------------
