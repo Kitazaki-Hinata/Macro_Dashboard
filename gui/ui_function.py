@@ -4,7 +4,6 @@
 '''
 
 import os
-import sys
 import logging
 import sqlite3
 import json
@@ -63,6 +62,11 @@ class _MainWindowProto(Protocol):
     note_label_notes: Any
     # Download controls
     download_csv_check: Any
+    chart_functions : Any
+    four_chart_one: Any
+    four_chart_two: Any
+    four_chart_three: Any
+    four_chart_four: Any
 
 
 class _DownloadWorker(QObject):
@@ -181,12 +185,6 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
-        # 连接四分图联动checkbox
-        # try:
-        #     self.main_window.connect_charts.stateChanged.connect(self._on_connect_charts_changed)
-        # except Exception:
-        #     pass
-
     # ===================== Settings JSON 结构保护 =====================
     def _ensure_settings_structure(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """确保 settings.json 的基础结构存在，防止 KeyError。
@@ -226,14 +224,9 @@ class UiFunctions():  # 删除:mainWindow
           * X 轴联动（共用缩放/平移）
           * 十字线同步（可选，若 chart_functions 具备内部封装则调用其方法）
         """
-        try:
-            from PySide6.QtCore import Qt  # 延迟导入，防循环
-        except Exception:
-            class _QtStub:  # 兜底常量
-                Checked = 2
-            Qt = _QtStub()  # type: ignore
 
-        link = (state == Qt.Checked)
+
+        link = (state == 2)
         # 优先尝试调用 chart_functions 已存在的封装方法（如果后来添加了）
         try:
             if hasattr(self.main_window, 'chart_functions') and hasattr(self.main_window.chart_functions, 'toggle_four_charts_link'):

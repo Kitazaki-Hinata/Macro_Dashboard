@@ -159,6 +159,7 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 **debug waitlist :**
 - **重要：下载数据的多线程逻辑会导致程序崩溃**
 - **重要：点击下载数据后，取消也会导致程序崩溃**
+- **新bug：four chart 无法连接，应该是设置legend导致的**
 - One_chart导入db里面的列名以及限制输入框只能输入列名
 - 再多次重新设置图表的时候，后面的数据会错位
 - 软件启动的时候自动读取json里面的内容然后更新
@@ -169,7 +170,6 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 **extra function waitlist :**
 - 新板块：彭博文章
 - 新板块：美债期限结构
-- 启动界面
 - 设置图表网格的透明度&颜色
 - reset设置框内的内容，包括颜色，数据名称
 - 设立一个使用说明页面

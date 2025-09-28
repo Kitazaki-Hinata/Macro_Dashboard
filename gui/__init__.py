@@ -11,9 +11,11 @@ from .chart_function import ChartFunction
 from gui.subwindows.ui_oneChartSettings import Ui_OneChartSettingsPanel
 from gui.subwindows.ui_fourChartSettings import Ui_FourChartSettingsPanel
 from gui.subwindows.ui_tableSettings import Ui_TableSettingsPanel
+from gui.subwindows.ui_prestart import Ui_Prestart_ui
 
 
 __all__ = [
+    "QApplication",
     "QWidget",
     "QMainWindow",
     "QPushButton",
@@ -46,5 +48,6 @@ __all__ = [
     "Ui_OneChartSettingsPanel",
     "Ui_FourChartSettingsPanel",
     "Ui_TableSettingsPanel",
+    "Ui_Prestart_ui",
     "ChartFunction"
 ]
