@@ -35,13 +35,13 @@ class _MainWindowProto(Protocol):
     fred: Any
     bls: Any
     te: Any
-    # fw : Any
-    # dfm : Any
-    # em : Any
-    # fs : Any
-    # cin : Any
-    # ism : Any
-    # nyf : Any
+    fw : Any
+    dfm : Any
+    em : Any
+    fs : Any
+    cin : Any
+    ism : Any
+    nyf : Any
     # parallel controls
     parallel_download_check: Any
     max_threads_spin: Any
@@ -219,7 +219,7 @@ class UiFunctions():  # 删除:mainWindow
             pass
         return data
 
-    # ===================== FOUR CHART LINK TOGGLE =====================
+    # ===================== CHART LINK TOGGLE =====================
     def on_connect_charts_changed(self, state):
         """主窗口复选框回调：勾选 -> 四图联动；取消 -> 取消联动。
         仅做健壮性最小实现：
@@ -349,6 +349,39 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.status_label.setText("FAILED to save API key, see log file")
             self.main_window.status_label.setStyleSheet("color: #fa88aa")
             logging.error(f"Failed to create .env file at path: {path}, since {e}")
+
+    def download_all_checkbox_settings(self):
+        checkbox_list = [
+            self.main_window.bea,
+            self.main_window.yf,
+            self.main_window.fred,
+            self.main_window.bls,
+            self.main_window.te,
+            self.main_window.cin,
+            self.main_window.dfm,
+            self.main_window.em,
+            self.main_window.fs,
+            self.main_window.fw,
+            self.main_window.ism,
+            self.main_window.nyf
+        ]
+        if bool(self.main_window.download_for_all_check.isChecked()):
+            # 设置checkbox的逻辑
+            for checkbox in checkbox_list:
+                try:
+                    checkbox.setChecked(False)
+                    checkbox.setEnabled(False)
+                except Exception:
+                    pass
+
+        else:
+            for checkbox in checkbox_list:
+                try:
+                    checkbox.setEnabled(True)
+                    checkbox.setChecked(True)
+                except Exception:
+                    pass
+
 
     def clear_logs(self):
         #  清空 GUI 控件中的日志console内容
@@ -1218,6 +1251,7 @@ class UiFunctions():  # 删除:mainWindow
         if bool(self.main_window.download_for_all_check.isChecked()):
             sources = ["bea", "yf", "fred", "bls", "te"]
             download_all_bool = True
+
         else:
             sources = []
             for name in ("bea", "yf", "fred", "bls", "te"):

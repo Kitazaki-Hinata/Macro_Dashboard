@@ -125,6 +125,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.api_save_btn.clicked.connect(self.ui_functions.settings_api_save)
         # 重置日志文件按钮
         self.clear_log_btn.clicked.connect(self.ui_functions.clear_logs)
+        self.download_for_all_check.stateChanged.connect(self.ui_functions.download_all_checkbox_settings)
 
         '''Notes Editor page btn '''
         self.note_add_btn.clicked.connect(self.ui_functions.note_add_extra_page)
