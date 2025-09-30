@@ -1266,6 +1266,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
+       
         if parallel:
             self._append_console(f"Start parallel download ({len(sources)} sources, threads={max_threads}) from year {start_year}...")
             # 使用标准的 Qt 线程模式处理并行下载
@@ -1283,6 +1284,7 @@ class UiFunctions():  # 删除:mainWindow
             self._worker.failed.connect(self._on_worker_failed)
             self._worker.finished.connect(self._cleanup_thread)
             self._dl_thread.start()
+            self._dl_thread.quit()
         else:
             self._append_console(f"Start download from year {start_year}...")
             self._worker = _DownloadWorker(
@@ -1299,19 +1301,15 @@ class UiFunctions():  # 删除:mainWindow
             self._worker.failed.connect(self._on_worker_failed)
             self._worker.finished.connect(self._cleanup_thread)
             self._dl_thread.start()
-
+            self._dl_thread.quit()
         self.main_window.download_btn.setEnabled(False)
         self.main_window.cancel_btn.setEnabled(True)
-
+        
     def _cleanup_thread(self):
         try:
-            if self._dl_thread:
-                self._dl_thread.quit()
-                self._dl_thread.wait()
             self._parallel_exec = None
         finally:
             date_today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            self._dl_thread = None
             self._worker = None
             self.main_window.download_btn.setEnabled(True)
             self.main_window.cancel_btn.setEnabled(False)
