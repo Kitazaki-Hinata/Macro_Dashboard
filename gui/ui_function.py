@@ -3,6 +3,8 @@
 动画等函数在gui_animation文件中
 '''
 
+# pyright: reportUnknownParameterType=false, reportUnknownArgumentType=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportMissingTypeStubs=false
+
 import os
 import logging
 import sqlite3
@@ -11,6 +13,9 @@ import math
 from datetime import datetime
 from typing import Optional, Dict, Any, Protocol
 import pyqtgraph as pg
+from PySide6.QtCore import QTimer
+
+from downloaders.common import CancellationToken, CancelledError
 
 from gui import *
 
@@ -81,15 +86,17 @@ class _DownloadWorker(QObject):
         self._is_cancelled = False
         self._selected_sources = selected_sources or []
         self.main_window = main_window
+        self._cancel_token = CancellationToken()
 
     def cancel(self):
         self._is_cancelled = True
+        self._cancel_token.cancel()
 
     def run(self):
         try:
             # 延迟导入后端工厂，避免缺少第三方依赖导致 UI 启动失败
             try:
-                from download import DownloaderFactory  # type: ignore
+                from downloaders import DownloaderFactory  # type: ignore
                 _backend_available = True
             except Exception as e:  # ModuleNotFoundError 等
                 DownloaderFactory = None  # type: ignore
@@ -147,10 +154,14 @@ class _DownloadWorker(QObject):
                     # 优先判断 download_csv_check 是否被选中
                     if self.main_window and hasattr(self.main_window, "download_csv_check") and self.main_window.download_csv_check.isChecked():
                         self.progress.emit(f"Exporting {src} data to CSV...")
-                        downloader.to_db(return_csv=True)
+                        downloader.to_db(return_csv=True, cancel_token=self._cancel_token)
                     else:
-                        downloader.to_db(return_csv=False)
+                        downloader.to_db(return_csv=False, cancel_token=self._cancel_token)
                     self.progress.emit(f"{src} done.")
+                except CancelledError:
+                    self._is_cancelled = True
+                    self.progress.emit(f"{src} cancelled.")
+                    break
                 except Exception as e:
                     self.progress.emit(f"{src} failed: {e}")
                     continue
@@ -168,6 +179,7 @@ class UiFunctions():  # 删除:mainWindow
         self._worker: Optional[_DownloadWorker] = None
         # parallel executor refs
         self._parallel_exec = None
+        self._cleanup_pending = False
         # wire buttons
         try:
             self.main_window.download_btn.clicked.connect(self.start_download)
@@ -1281,7 +1293,7 @@ class UiFunctions():  # 删除:mainWindow
             self._dl_thread.started.connect(self._worker.run)
             self._worker.progress.connect(self._append_console)
             self._worker.failed.connect(self._on_worker_failed)
-            self._worker.finished.connect(self._cleanup_thread)
+            self._worker.finished.connect(self._schedule_cleanup)
             self._dl_thread.start()
         else:
             self._append_console(f"Start download from year {start_year}...")
@@ -1297,12 +1309,23 @@ class UiFunctions():  # 删除:mainWindow
             self._dl_thread.started.connect(self._worker.run)
             self._worker.progress.connect(self._append_console)
             self._worker.failed.connect(self._on_worker_failed)
-            self._worker.finished.connect(self._cleanup_thread)
+            self._worker.finished.connect(self._schedule_cleanup)
             self._dl_thread.start()
         self.main_window.download_btn.setEnabled(False)
         self.main_window.cancel_btn.setEnabled(True)
         
+    def _schedule_cleanup(self) -> None:
+        if self._cleanup_pending:
+            return
+        self._cleanup_pending = True
+        try:
+            QTimer.singleShot(0, self._cleanup_thread)
+        except Exception as e:
+            logging.error(f"Failed to schedule download cleanup: {e}")
+            self._cleanup_thread()
+
     def _cleanup_thread(self):
+        self._cleanup_pending = False
         self._parallel_exec = None
         thread = self._dl_thread
         worker = self._worker
@@ -1310,23 +1333,58 @@ class UiFunctions():  # 删除:mainWindow
 
         if worker is not None:
             try:
-                worker.finished.disconnect(self._cleanup_thread)
+                worker.finished.disconnect(self._schedule_cleanup)
+            except Exception:
+                pass
+            try:
+                worker.deleteLater()
             except Exception:
                 pass
         if thread is not None:
-            try:
+            cleanup_done = False
+
+            def finalize_thread() -> None:
+                nonlocal cleanup_done
+                if cleanup_done:
+                    return
                 if thread.isRunning():
-                    thread.quit()
-                    if not thread.wait(5000):
+                    QTimer.singleShot(50, finalize_thread)
+                    return
+                cleanup_done = True
+                try:
+                    thread.finished.disconnect(finalize_thread)  # type: ignore[arg-type]
+                except Exception:
+                    pass
+                try:
+                    thread.deleteLater()
+                except Exception:
+                    pass
+
+            if thread.isRunning():
+                try:
+                    thread.requestInterruption()
+                except Exception:
+                    pass
+                thread.quit()
+                try:
+                    thread.finished.connect(finalize_thread)
+                except Exception:
+                    pass
+
+                def force_terminate() -> None:
+                    if cleanup_done:
+                        return
+                    if thread.isRunning():
                         logging.warning("Download thread did not exit in time; forcing termination.")
-                        thread.terminate()
-                        thread.wait()
-            except Exception as e:
-                logging.error(f"Failed to stop download thread cleanly: {e}")
-            try:
-                thread.deleteLater()
-            except Exception:
-                pass
+                        try:
+                            thread.terminate()
+                        except Exception as err:
+                            logging.error(f"Failed to terminate download thread: {err}")
+                    finalize_thread()
+
+                QTimer.singleShot(5000, force_terminate)
+            else:
+                finalize_thread()
             self._dl_thread = None
 
         self._worker = None

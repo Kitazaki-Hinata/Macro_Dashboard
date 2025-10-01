@@ -38,6 +38,48 @@ DB_WRITE_LOCK = threading.Lock()
 logger = logging.getLogger(__name__)
 
 
+class CancelledError(RuntimeError):
+	"""Raised when a download operation is cancelled by the caller."""
+
+
+class CancellationToken:
+	"""Thread-safe cancellation flag shared across download tasks."""
+
+	def __init__(self) -> None:
+		self._event = threading.Event()
+
+	def cancel(self) -> None:
+		self._event.set()
+
+	def cancelled(self) -> bool:
+		return self._event.is_set()
+
+	def raise_if_cancelled(self) -> None:
+		if self._event.is_set():
+			raise CancelledError("operation cancelled")
+
+
+def _sleep_with_cancel(delay: Optional[float], cancel_token: Optional[CancellationToken]) -> None:
+	"""Sleep for *delay* seconds while remaining responsive to cancellation."""
+
+	if delay is None:
+		return
+	remaining = float(delay)
+	if remaining <= 0:
+		return
+	if cancel_token is None:
+		time.sleep(remaining)
+		return
+	deadline = time.monotonic() + remaining
+	while True:
+		if cancel_token.cancelled():
+			raise CancelledError("operation cancelled during backoff")
+		remaining = deadline - time.monotonic()
+		if remaining <= 0:
+			return
+		time.sleep(min(0.1, remaining))
+
+
 def _exponential_backoff_delays(max_attempts: int, base: float = 0.5, factor: float = 2.0, jitter: float = 0.25) -> List[float]:
 	"""生成指数退避延时序列（带抖动）。"""
 
@@ -49,12 +91,14 @@ def _exponential_backoff_delays(max_attempts: int, base: float = 0.5, factor: fl
 	return delays
 
 
-def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4) -> requests.Response:
+def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4, cancel_token: Optional[CancellationToken] = None) -> requests.Response:
 	"""带重试的 HTTP GET。"""
 
 	delays = _exponential_backoff_delays(max_attempts)
 	last_exc: Optional[Exception] = None
 	for i, delay in enumerate(delays, start=1):
+		if cancel_token is not None:
+			cancel_token.raise_if_cancelled()
 		try:
 			t0 = time.perf_counter()
 			resp = requests.get(url, params=params, headers=headers, timeout=timeout)
@@ -70,16 +114,23 @@ def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, he
 			last_exc = e
 			logger.warning("HTTP GET %s attempt=%d failed: %s", url, i, e)
 		if i < max_attempts:
-			time.sleep(delay)
+			try:
+				_sleep_with_cancel(delay, cancel_token)
+			except CancelledError:
+				raise
+	if cancel_token is not None:
+		cancel_token.raise_if_cancelled()
 	raise Exception(f"GET {url} failed after {max_attempts} attempts: {last_exc}")
 
 
-def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4, delay_seconds: Optional[float] = None) -> requests.Response:
+def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, headers: Optional[Dict[str, str]] = None, timeout: float = 30.0, max_attempts: int = 4, delay_seconds: Optional[float] = None, cancel_token: Optional[CancellationToken] = None) -> requests.Response:
 	"""带重试的 HTTP POST（支持固定间隔或指数退避）。"""
 
 	delays = [delay_seconds] * max_attempts if delay_seconds is not None else _exponential_backoff_delays(max_attempts)
 	last_exc: Optional[Exception] = None
 	for i, delay in enumerate(delays, start=1):
+		if cancel_token is not None:
+			cancel_token.raise_if_cancelled()
 		try:
 			t0 = time.perf_counter()
 			resp = requests.post(url, data=data, json=json_data, headers=headers, timeout=timeout)
@@ -97,19 +148,25 @@ def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, h
 		if i < max_attempts:
 			try:
 				logger.info("Retrying POST in %.1fs (attempt %d/%d)", float(delay), i + 1, max_attempts)
-				time.sleep(float(delay))
+				_sleep_with_cancel(delay, cancel_token)
+			except CancelledError:
+				raise
 			except Exception:
 				pass
+	if cancel_token is not None:
+		cancel_token.raise_if_cancelled()
 	raise Exception(f"POST {url} failed after {max_attempts} attempts: {last_exc}")
 
 
-def yf_download_with_retry(symbol: str, *, start: str, end: str, interval: str = "1d", max_attempts: int = 5) -> pd.DataFrame:
+def yf_download_with_retry(symbol: str, *, start: str, end: str, interval: str = "1d", max_attempts: int = 5, cancel_token: Optional[CancellationToken] = None) -> pd.DataFrame:
 	"""yfinance.download 包装器（带指数退避与限流容错）。"""
 
 	delays = _exponential_backoff_delays(max_attempts=max_attempts, base=1.0, factor=2.0, jitter=0.5)
 	last_err: Optional[Exception] = None
 
 	for i, dly in enumerate(delays, start=1):
+		if cancel_token is not None:
+			cancel_token.raise_if_cancelled()
 		try:
 			t0 = time.perf_counter()
 			df = pd.DataFrame(
@@ -132,7 +189,10 @@ def yf_download_with_retry(symbol: str, *, start: str, end: str, interval: str =
 			last_err = e
 			logger.warning("YF GET %s attempt=%d failed: %s", symbol, i, getattr(e, "message", str(e)))
 		if i < max_attempts:
-			time.sleep(dly)
+			try:
+				_sleep_with_cancel(dly, cancel_token)
+			except CancelledError:
+				raise
 	raise Exception(f"yfinance download failed for {symbol} after {max_attempts} attempts: {last_err}")
 
 
@@ -576,5 +636,5 @@ class DataDownloader(ABC):
 	"""下载器抽象基类。"""
 
 	@abstractmethod
-	def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+	def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None, cancel_token: Optional["CancellationToken"] = None) -> Optional[Dict[str, pd.DataFrame]]:
 		raise NotImplementedError

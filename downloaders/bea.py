@@ -1,5 +1,7 @@
 """BEA (Bureau of Economic Analysis) downloader implementation."""
 
+# pyright: reportUnknownMemberType=false, reportUnknownArgumentType=false, reportUnknownVariableType=false
+
 from __future__ import annotations
 
 import logging
@@ -12,7 +14,13 @@ from typing import Any, Dict, Optional, Tuple
 import beaapi
 import pandas as pd
 
-from downloaders.common import CSV_DATA_FOLDER, DatabaseConverter, DataDownloader
+from downloaders.common import (
+    CSV_DATA_FOLDER,
+    CancelledError,
+    CancellationToken,
+    DatabaseConverter,
+    DataDownloader,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +38,25 @@ class BEADownloader(DataDownloader):
         self.time_range: str = ",".join(map(str, range(request_year, BEADownloader.current_year + 1)))
         self.time_range_lag: str = self.time_range[:-5]
 
-    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(
+        self,
+        return_csv: bool = False,
+        max_workers: Optional[int] = None,
+        cancel_token: Optional[CancellationToken] = None,
+    ) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
-            return None
+            return df_dict if return_csv else None
+
+        token = cancel_token
+
+        def _check_cancel() -> None:
+            if token is not None:
+                token.raise_if_cancelled()
 
         def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
+            _check_cancel()
             try:
                 logger.info(
                     "BEA start: table=%s code=%s freq=%s years=%s",
@@ -91,6 +111,7 @@ class BEADownloader(DataDownloader):
                     logging.error("%s is empty, FAILED INSERT, locate in to_db", table_name)
                     return table_name, None
                 converter = DatabaseConverter()
+                _check_cancel()
                 final_result_df = converter.write_into_db(
                     df=df_modified,
                     data_name=table_config["name"],
@@ -98,7 +119,10 @@ class BEADownloader(DataDownloader):
                     is_time_series=True,
                     is_pct_data=table_config["needs_pct"],
                 )
+                _check_cancel()
                 return table_name, final_result_df
+            except CancelledError:
+                raise
             except Exception as e:
                 logger.error("%s FAILED DOWNLOAD/REFORMAT in BEA worker: %s", table_name, e)
                 return table_name, None
@@ -110,23 +134,35 @@ class BEADownloader(DataDownloader):
         logger.info("BEA submitting %d tasks (workers=%d)", len(items), workers)
         with ThreadPoolExecutor(max_workers=workers) as ex:
             future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
-            for fut in as_completed(future_map):
-                tn = future_map[fut]
+            try:
+                for fut in as_completed(future_map):
+                    _check_cancel()
+                    tn = future_map[fut]
+                    try:
+                        name, df = fut.result()
+                        if df is not None:
+                            df_dict[name] = df
+                    except CancelledError:
+                        logger.info("BEA task %s cancelled", tn)
+                        raise
+                    except Exception as e:
+                        logging.error("BEA future for %s raised: %s", tn, e)
+            finally:
+                if token is not None and token.cancelled():
+                    for fut in future_map:
+                        fut.cancel()
+
+        if return_csv and df_dict:
+            _check_cancel()
+            for name, df in df_dict.items():
                 try:
-                    name, df = fut.result()
-                    if df is not None:
-                        df_dict[name] = df
-                    if return_csv:
-                        for name, df in df_dict.items():
-                            try:
-                                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
-                                os.makedirs(data_folder_path, exist_ok=True)
-                                csv_path = os.path.join(data_folder_path, f"{name}.csv")
-                                df.to_csv(csv_path, index=True)
-                                logging.info("%s saved to %s Successfully!", name, csv_path)
-                            except Exception as err:
-                                logging.error("%s FAILED DOWNLOAD CSV in method 'to_csv', since %s", name, err)
-                                continue
-                except Exception as e:
-                    logging.error("BEA future for %s raised: %s", tn, e)
+                    data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                    os.makedirs(data_folder_path, exist_ok=True)
+                    csv_path = os.path.join(data_folder_path, f"{name}.csv")
+                    df.to_csv(csv_path, index=True)
+                    logging.info("%s saved to %s Successfully!", name, csv_path)
+                except Exception as err:
+                    logging.error("%s FAILED DOWNLOAD CSV in method 'to_csv', since %s", name, err)
+                    continue
+
         return df_dict if return_csv else None

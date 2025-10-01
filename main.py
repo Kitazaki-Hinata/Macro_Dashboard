@@ -20,7 +20,7 @@ from pathlib import Path
 from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtCore import QEvent, QObject, QTimer, Qt
 from gui.ui_mainwindow import mainWindow
-from download import DownloaderFactory  # type: ignore  # 示例引用，避免静态检查器误报未使用
+from downloaders import DownloaderFactory  # type: ignore  # 示例引用，避免静态检查器误报未使用
 from logging_config import start_logging, stop_logging
 from gui.ui_prestart_window import Prestart_ui
 

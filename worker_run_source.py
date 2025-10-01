@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import sys
 import json
 from logging_config import start_logging, stop_logging
@@ -36,8 +35,8 @@ def main() -> int:
         return 3
 
     try:
-        # 延迟导入 download 模块
-        from download import DownloaderFactory  # type: ignore
+        # 延迟导入 downloader 工厂，避免运行时缺少依赖导致进程退出
+        from downloaders import DownloaderFactory  # type: ignore
     except Exception as e:
         logging.error(f"Failed to import backend: {e}")
         return 4
