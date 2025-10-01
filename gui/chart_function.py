@@ -869,8 +869,12 @@ class ChartFunction:
         step = max(1, n // 5)
         ticks = [(i, dates[i]) for i in range(0, n, step)]
         # 保证最后一个日期也显示
-        if (n - 1) not in [i for i, _ in ticks]:
-            ticks.append((n - 1, dates[-1]))
+        try:
+            if (n - 1) not in [i for i, _ in ticks]:
+                ticks.append((n - 1, dates[-1]))
+        except:
+            logging.error("Data does not exist")
+            pass
         axis.setTicks([ticks])
 
         # 设置坐标轴字体
