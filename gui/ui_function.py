@@ -10,12 +10,10 @@ import json
 import math
 from datetime import datetime
 from typing import Optional, Dict, Any, Protocol
-from gui.chart_function import ChartFunction
 import pyqtgraph as pg
 
 from gui import *
-from concurrent.futures import ThreadPoolExecutor, Future
-import subprocess
+
 
 from dotenv import dotenv_values
 
@@ -184,6 +182,12 @@ class UiFunctions():  # 删除:mainWindow
             self.settings_api_load()
         except Exception:
             pass
+
+    def set_color(self, widget: Any):
+        current_color = widget.styleSheet().split(":")[1][1:]   # 当前的颜色
+        color = QColorDialog.getColor(current_color)
+        if color.isValid():
+            widget.setStyleSheet(f"background: {color.name()}")
 
     # ===================== Settings JSON 结构保护 =====================
     def _ensure_settings_structure(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -684,6 +688,7 @@ class UiFunctions():  # 删除:mainWindow
         )
         self.main_window.note_label_notes.setStyleSheet("color: #ee5c88; margin-left : 20px")
         self.main_window.save_text.setDisabled(True)
+
     def note_save_file(self, file_name: str):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
@@ -1080,8 +1085,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
-        # 可选：后续若需要在主界面某处显示当前数据名称，可在此处更新标签
-        # 例如: self.main_window.some_label.setText(f"{first_data}{' / '+second_data if second_data.strip() else ''}")
+        self.main_window.title_label_2.setText(first_data)
 
     # ===================== ONE WINDOW 关闭（保持原接口） =====================
     def one_close_setting_window(self, window: Any, widget: QWidget):
@@ -1092,62 +1096,71 @@ class UiFunctions():  # 删除:mainWindow
 
     # ===================== FOUR CHART SETTINGS =====================
     def four_finish_settings(self, window: Any, widget: QWidget):
-        """四图设置确认：为四个子图分别绘制/更新曲线并保存设置。"""
-        existing_data = self.get_settings_from_json()
-        # 读取选择
-        names = [
-            window.first_data_selection_box.currentText(),
-            window.second_data_selection_box.currentText(),
-            window.third_data_selection_box.currentText(),
-            window.fourth_data_selection_box.currentText(),
+        first_data = window.first_data_selection_box.currentText()
+        second_data = window.second_data_selection_box.currentText()
+        third_data = window.third_data_selection_box.currentText()
+        fourth_data = window.fourth_data_selection_box.currentText()
+
+        first_color = window.first_color_btn.styleSheet().split(":")[1][1:]
+        second_color = window.second_color_btn.styleSheet().split(":")[1][1:]
+        third_color = window.third_color_btn.styleSheet().split(":")[1][1:]
+        fourth_color = window.fourth_color_btn.styleSheet().split(":")[1][1:]
+
+        # 调用内部方法打开json文件
+        existing_data: Dict[str, Any] = self.get_settings_from_json()
+
+        existing_data["four_chart_settings"]["first_data"]["data_name"] = first_data
+        existing_data["four_chart_settings"]["second_data"]["data_name"] = second_data
+        existing_data["four_chart_settings"]["third_data"]["data_name"] = third_data
+        existing_data["four_chart_settings"]["fourth_data"]["data_name"] = fourth_data
+
+        existing_data["four_chart_settings"]["first_data"]["color"] = first_color
+        existing_data["four_chart_settings"]["second_data"]["color"] = second_color
+        existing_data["four_chart_settings"]["third_data"]["color"] = third_color
+        existing_data["four_chart_settings"]["fourth_data"]["color"] = fourth_color
+
+        # 依次处理四个图表，四个内容是，图表号，控件名称，数据名称，颜色
+        # 然后for循环遍历四个list，进行图表输出以及图表名称修改
+        four_widgets = [
+            ["first_data", "four_chart_one_plot", first_data, first_color],
+            ["second_data", "four_chart_two_plot", second_data, second_color],
+            ["third_data", "four_chart_three_plot", third_data, third_color],
+            ["fourth_data", "four_chart_four_plot", fourth_data, fourth_color],
         ]
-        colors = []
-        for btn in [window.first_color_btn, window.second_color_btn, window.third_color_btn, window.fourth_color_btn]:
-            try:
-                colors.append(btn.styleSheet().split(":")[1][1:])
-            except Exception:
-                colors.append('#90b6e7')
-        # time lags（若有 spinbox，可拓展；暂用 0）
-        for key, name, color in zip(['first_data','second_data','third_data','fourth_data'], names, colors):
-            try:
-                existing_data['four_chart_settings'][key]['data_name'] = name
-                existing_data['four_chart_settings'][key]['color'] = color
-            except Exception:
-                pass
-        # 更新四个图表
-        mapping = [
-            (self.main_window.four_chart_one, 'four_chart_one_plot', names[0], colors[0]),
-            (self.main_window.four_chart_two, 'four_chart_two_plot', names[1], colors[1]),
-            (self.main_window.four_chart_three, 'four_chart_three_plot', names[2], colors[2]),
-            (self.main_window.four_chart_four, 'four_chart_four_plot', names[3], colors[3]),
-        ]
-        try:
-            for container, obj_name, dname, clr in mapping:
-                w = container.findChild(pg.PlotWidget, obj_name)
-                if w is None:
-                    continue
-                # 清空 legend（四图无多曲线，直接重绘）
-                try:
-                    plot_item = w.getPlotItem()
-                    for it in list(plot_item.items):
-                        plot_item.removeItem(it)
-                except Exception:
-                    pass
-                # 绘制
-                self.main_window.chart_functions.plot_data(dname, [clr], w)
-        except Exception:
-            pass
-        # 保存 JSON
+        for widget_list in four_widgets:
+            index_name = widget_list[0]
+            plot_widget_name = widget_list[1]
+            data_name = widget_list[2]
+            color_name = widget_list[3]
+
+            # plot graphs
+            plot_widget = getattr(self.main_window, plot_widget_name.replace("_plot", "")).findChild(pg.PlotWidget, plot_widget_name)
+            if plot_widget is not None:
+                self.main_window.chart_functions.plot_data(
+                    data_name=data_name,
+                    color=[color_name],
+                    widget=plot_widget
+                )
+                plot_widget.enableAutoRange(axis='xy', enable=True)
+
+            # change title of the chart 修改图表标签
+            main_plot_widget_title = getattr(
+                self.main_window, plot_widget_name.replace("_plot", "")
+            ).findChild(
+                QLabel, plot_widget_name.replace("_plot", "_plot_title")
+            )
+            if main_plot_widget_title is not None:
+                main_plot_widget_title.setText(data_name.replace("_", " "))  # 修正：用各自的data_name
+
+        # 写入json
         try:
             with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
-                json.dump(existing_data, f, ensure_ascii=False, indent=4)
+                json.dump(existing_data, f, indent=2, ensure_ascii=False)
         except Exception as e:
-            logging.error(f"写入 four_chart settings 失败: {e}")
+            logging.error(f"Error writing settings file: {e}")
+
         # 关闭窗口
-        try:
-            widget.close()
-        except Exception:
-            pass
+        widget.close()
 
     def four_close_setting_window(self, window: Any, widget: QWidget):
         try:

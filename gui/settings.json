@@ -1,41 +1,41 @@
 {
-    "one_chart_settings": {
-        "first_data": {
-            "data_name": "10Y_2Y_Bond_Yield_Spread",
-            "time_lags": 0,
-            "color": "#90b6e7"
-        },
-        "second_data": {
-            "data_name": "Continue_Job_Claims",
-            "time_lags": 0,
-            "color": "#EE5C88"
-        }
+  "one_chart_settings": {
+    "first_data": {
+      "data_name": "Nasdaq_Index",
+      "time_lags": 0,
+      "color": "#90b6e7"
     },
-    "four_chart_settings": {
-        "first_data": {
-            "data_name": "Unemployment_Rate",
-            "color": "#90b6e7",
-            "time_lags": 0
-        },
-        "second_data": {
-            "data_name": "Initial_Job_Claims",
-            "color": "#90b6e7",
-            "time_lags": 0
-        },
-        "third_data": {
-            "data_name": "leading_economic_index",
-            "color": "#90b6e7",
-            "time_lags": 0
-        },
-        "fourth_data": {
-            "data_name": "nfib_business_optimism_index",
-            "color": "#90b6e7",
-            "time_lags": 0
-        }
+    "second_data": {
+      "data_name": "SPX_500",
+      "time_lags": 0,
+      "color": "#EE5C88"
+    }
+  },
+  "four_chart_settings": {
+    "first_data": {
+      "data_name": "SPX_500",
+      "color": "#90b6e7",
+      "time_lags": 0
     },
-    "table_settings": {
-        "table_name": "",
-        "columns": []
+    "second_data": {
+      "data_name": "Volatility_Index",
+      "color": "#90b6e7",
+      "time_lags": 0
     },
-    "recent_update_time": "2025-09-28 21:51:12"
+    "third_data": {
+      "data_name": "SPX_500",
+      "color": "#90b6e7",
+      "time_lags": 0
+    },
+    "fourth_data": {
+      "data_name": "Nasdaq_Index",
+      "color": "#90b6e7",
+      "time_lags": 0
+    }
+  },
+  "table_settings": {
+    "table_name": "",
+    "columns": []
+  },
+  "recent_update_time": "2025-09-28 21:51:12"
 }
