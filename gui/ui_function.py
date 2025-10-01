@@ -377,39 +377,25 @@ class UiFunctions():  # 删除:mainWindow
 
 
     def clear_logs(self):
-        #  清空 GUI 控件中的日志console内容
+        """仅清空界面日志窗口，保留磁盘日志文件。"""
+        cleared = False
         try:
-            if hasattr(self.main_window, 'console_area') and self.main_window.console_area is not None:
-                # QTextEdit 支持 clear()
+            if hasattr(self.main_window, "console_area") and self.main_window.console_area is not None:
                 self.main_window.console_area.clear()
+                cleared = True
         except Exception as e:
             logging.error(f"Failed to clear console text area: {e}")
 
-        # 清空日志文件
-        path = os.path.abspath(os.path.dirname(__file__))
-        logs_dir = os.path.join(path, "..", "logs")
+        message = (
+            "Console log window cleared. Log files remain unchanged."
+            if cleared
+            else "Console log window unavailable. Log files remain unchanged."
+        )
+        logging.info(message)
 
-        # 确保logs目录存在
-        if os.path.exists(logs_dir) and os.path.isdir(logs_dir):
-            # 遍历logs目录下的所有文件并删除
-            for filename in os.listdir(logs_dir):
-                try:
-                    file_path = os.path.join(logs_dir, filename)
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-                        logging.info(f"Deleted log file: {filename}")
-                except Exception as e:
-                    logging.error(f"Failed to truncate log file: {e}")
-                    continue
-        else:
-            logging.warning(f"Logs directory does not exist: {logs_dir}")
-
-
-        # 3) 在控制台区提示已清空（这条新消息会显示在空白后，便于确认操作成功）
         try:
-            self._append_console("Log window cleared successfully")
+            self._append_console(message)
         except Exception:
-            # 如果 _append_console 依赖 console_area 已被清空，不再强制写入
             pass
 
     '''NOTE PAGE SLOTS METHODS'''
@@ -1284,7 +1270,6 @@ class UiFunctions():  # 删除:mainWindow
             self._worker.failed.connect(self._on_worker_failed)
             self._worker.finished.connect(self._cleanup_thread)
             self._dl_thread.start()
-            self._dl_thread.quit()
         else:
             self._append_console(f"Start download from year {start_year}...")
             self._worker = _DownloadWorker(
@@ -1301,31 +1286,57 @@ class UiFunctions():  # 删除:mainWindow
             self._worker.failed.connect(self._on_worker_failed)
             self._worker.finished.connect(self._cleanup_thread)
             self._dl_thread.start()
-            self._dl_thread.quit()
         self.main_window.download_btn.setEnabled(False)
         self.main_window.cancel_btn.setEnabled(True)
         
     def _cleanup_thread(self):
-        try:
-            self._parallel_exec = None
-        finally:
-            date_today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            self._worker = None
-            self.main_window.download_btn.setEnabled(True)
-            self.main_window.cancel_btn.setEnabled(False)
+        self._parallel_exec = None
+        thread = self._dl_thread
+        worker = self._worker
+        was_cancelled = bool(getattr(worker, "_is_cancelled", False)) if worker else False
+
+        if worker is not None:
+            try:
+                worker.finished.disconnect(self._cleanup_thread)
+            except Exception:
+                pass
+        if thread is not None:
+            try:
+                if thread.isRunning():
+                    thread.quit()
+                    if not thread.wait(5000):
+                        logging.warning("Download thread did not exit in time; forcing termination.")
+                        thread.terminate()
+                        thread.wait()
+            except Exception as e:
+                logging.error(f"Failed to stop download thread cleanly: {e}")
+            try:
+                thread.deleteLater()
+            except Exception:
+                pass
+            self._dl_thread = None
+
+        self._worker = None
+
+        date_today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.main_window.download_btn.setEnabled(True)
+        self.main_window.cancel_btn.setEnabled(False)
+        if was_cancelled:
+            self._append_console("Download cancelled.")
+        else:
             self._append_console("ALL TASKS COMPLETE !!! (∠・ω< )⌒★")
 
-            existing_data: Dict[str, Any] = self.get_settings_from_json()
-            existing_data["recent_update_time"] = date_today
+        existing_data: Dict[str, Any] = self.get_settings_from_json()
+        existing_data["recent_update_time"] = date_today
 
-            self.main_window.table_update_label.setText(f"Recent Update Time : {date_today}")
-            self.main_window.update_label_2.setText(f"Recent Update Time : {date_today}")
-            self.main_window.four_update_label.setText(f"Recent Update Time : {date_today}")
-            try:
-                with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
-                    json.dump(existing_data, f, indent=2, ensure_ascii=False)
-            except Exception as e:
-                logging.error(f"Error writing settings file: {e}")
+        self.main_window.table_update_label.setText(f"Recent Update Time : {date_today}")
+        self.main_window.update_label_2.setText(f"Recent Update Time : {date_today}")
+        self.main_window.four_update_label.setText(f"Recent Update Time : {date_today}")
+        try:
+            with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
+                json.dump(existing_data, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logging.error(f"Error writing settings file: {e}")
 
     def cancel_download(self):
         did = False

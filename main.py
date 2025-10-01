@@ -11,10 +11,14 @@
 
 import json
 import logging
+import sys
+import threading
+import traceback
+from types import TracebackType
 from typing import Any, Dict, Optional
 from pathlib import Path
-from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtCore import QEvent, QObject, QTimer, Qt
 from gui.ui_mainwindow import mainWindow
 from download import DownloaderFactory  # type: ignore  # 示例引用，避免静态检查器误报未使用
 from logging_config import start_logging, stop_logging
@@ -26,6 +30,77 @@ SMART_QUOTES_MAP = {
     '\u2013': '-',  '\u2014': '-',   # 短/长破折号
     '\u00a0': ' ',                    # 不换行空格
 }
+
+
+def _format_exception(
+    exc_type: type[BaseException],
+    exc_value: BaseException,
+    exc_traceback: Optional[TracebackType],
+) -> str:
+    return ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+
+
+def _show_exception_dialog(summary: str, detail: str) -> None:
+    app = QApplication.instance()
+    if app is None:
+        sys.stderr.write(detail)
+        sys.stderr.flush()
+        return
+
+    def _present() -> None:
+        box = QMessageBox()
+        box.setWindowTitle("未捕获的异常")
+        box.setIcon(QMessageBox.Icon.Critical)
+        box.setText("程序运行中出现未捕获的错误，详细信息已写入日志文件。")
+        box.setInformativeText(summary)
+        box.setDetailedText(detail)
+        box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        box.exec()
+
+    QTimer.singleShot(0, _present)
+
+
+def _handle_uncaught_exception(
+    exc_type: type[BaseException],
+    exc_value: BaseException,
+    exc_traceback: Optional[TracebackType],
+) -> None:
+    if issubclass(exc_type, (KeyboardInterrupt, SystemExit)):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+
+    detail = _format_exception(exc_type, exc_value, exc_traceback)
+    summary = str(exc_value).strip() or exc_type.__name__
+
+    logging.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+    _show_exception_dialog(summary, detail)
+
+
+def _install_global_exception_handlers() -> None:
+    sys.excepthook = _handle_uncaught_exception
+
+    if hasattr(threading, "excepthook"):
+        def _thread_hook(args: threading.ExceptHookArgs) -> None:  # type: ignore[attr-defined]
+            exc_type = args.exc_type or Exception
+            exc_value = args.exc_value or exc_type()
+            _handle_uncaught_exception(exc_type, exc_value, args.exc_traceback)
+
+        threading.excepthook = _thread_hook  # type: ignore[attr-defined]
+
+
+class SafeApplication(QApplication):
+    """安全包装 QApplication，捕获事件循环中的未处理异常。"""
+
+    def notify(self, receiver: QObject, event: QEvent) -> bool:  # type: ignore[override]
+        try:
+            return super().notify(receiver, event)
+        except Exception:  # noqa: BLE001
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            if exc_type is None or exc_value is None:
+                raise
+            _handle_uncaught_exception(exc_type, exc_value, exc_traceback)
+            return False
+
 
 def _normalize_smart_chars(text: str) -> str:
     for k, v in SMART_QUOTES_MAP.items():
@@ -70,13 +145,14 @@ def read_json() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     try:
-        app = QApplication([])
+        _install_global_exception_handlers()
+        app = SafeApplication([])
 
         # 先显示预启动窗口
         prestart_window = Prestart_ui()
         prestart_window.setWindowFlags(
             prestart_window.windowFlags() |
-            Qt.WindowStaysOnTopHint  # 始终置顶 prestart window
+            Qt.WindowType.WindowStaysOnTopHint  # 始终置顶 prestart window
         )
         prestart_window.show()
         app.processEvents()  # 立刻渲染prestart window
