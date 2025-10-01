@@ -25,10 +25,13 @@ from logging_config import start_logging, stop_logging
 from gui.ui_prestart_window import Prestart_ui
 
 SMART_QUOTES_MAP = {
-    '\u201c': '"', '\u201d': '"',  # 左/右双引号
-    '\u2018': "'", '\u2019': "'",  # 左/右单引号
-    '\u2013': '-',  '\u2014': '-',   # 短/长破折号
-    '\u00a0': ' ',                    # 不换行空格
+    "\u201c": '"',
+    "\u201d": '"',  # 左/右双引号
+    "\u2018": "'",
+    "\u2019": "'",  # 左/右单引号
+    "\u2013": "-",
+    "\u2014": "-",  # 短/长破折号
+    "\u00a0": " ",  # 不换行空格
 }
 
 
@@ -37,7 +40,7 @@ def _format_exception(
     exc_value: BaseException,
     exc_traceback: Optional[TracebackType],
 ) -> str:
-    return ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    return "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
 
 
 def _show_exception_dialog(summary: str, detail: str) -> None:
@@ -72,7 +75,9 @@ def _handle_uncaught_exception(
     detail = _format_exception(exc_type, exc_value, exc_traceback)
     summary = str(exc_value).strip() or exc_type.__name__
 
-    logging.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+    logging.critical(
+        "Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback)
+    )
     _show_exception_dialog(summary, detail)
 
 
@@ -80,6 +85,7 @@ def _install_global_exception_handlers() -> None:
     sys.excepthook = _handle_uncaught_exception
 
     if hasattr(threading, "excepthook"):
+
         def _thread_hook(args: threading.ExceptHookArgs) -> None:  # type: ignore[attr-defined]
             exc_type = args.exc_type or Exception
             exc_value = args.exc_value or exc_type()
@@ -108,26 +114,37 @@ def _normalize_smart_chars(text: str) -> str:
             text = text.replace(k, v)
     return text
 
+
 def _load_json_raw(path: Path) -> Optional[Dict[str, Any]]:
     """底层读取函数：多编码尝试 + 智能字符清洗。"""
     if not path.exists():
         logging.error("read_json ERROR: file not found: %s", path)
         return None
     raw = path.read_bytes()
-    tried_encodings = ['utf-8', 'utf-8-sig', 'cp1252', 'gbk']  # cp1252 兼容 0x93, 最后尝试 gbk 以便日志更友好
+    tried_encodings = [
+        "utf-8",
+        "utf-8-sig",
+        "cp1252",
+        "gbk",
+    ]  # cp1252 兼容 0x93, 最后尝试 gbk 以便日志更友好
     last_err: Optional[Exception] = None
     for enc in tried_encodings:
         try:
             text = raw.decode(enc)
-            if enc != 'utf-8':
+            if enc != "utf-8":
                 logging.warning("read_json: decoded with fallback encoding=%s", enc)
             text = _normalize_smart_chars(text)
             return json.loads(text)
         except Exception as e:  # noqa: BLE001
             last_err = e
             continue
-    logging.error("read_json FAILED: all encodings tried %s, last_err=%s", tried_encodings, last_err)
+    logging.error(
+        "read_json FAILED: all encodings tried %s, last_err=%s",
+        tried_encodings,
+        last_err,
+    )
     return None
+
 
 def read_json() -> Dict[str, Any]:
     """读取 `request_id.json`，带编码回退与智能字符清洗。
@@ -151,8 +168,8 @@ if __name__ == "__main__":
         # 先显示预启动窗口
         prestart_window = Prestart_ui()
         prestart_window.setWindowFlags(
-            prestart_window.windowFlags() |
-            Qt.WindowType.WindowStaysOnTopHint  # 始终置顶 prestart window
+            prestart_window.windowFlags()
+            | Qt.WindowType.WindowStaysOnTopHint  # 始终置顶 prestart window
         )
         prestart_window.show()
         app.processEvents()  # 立刻渲染prestart window
@@ -186,14 +203,3 @@ if __name__ == "__main__":
     #     request_year = request_year
     # )
     # fred_downloader.to_db(return_csv = False)
-
-
-
-
-
-
-
-
-
-
-

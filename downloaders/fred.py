@@ -11,7 +11,12 @@ import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 
-from downloaders.common import CSV_DATA_FOLDER, DatabaseConverter, DataDownloader, http_get_with_retry
+from downloaders.common import (
+    CSV_DATA_FOLDER,
+    DatabaseConverter,
+    DataDownloader,
+    http_get_with_retry,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,19 +26,25 @@ class FREDDownloader(DataDownloader):
 
     url: str = "https://api.stlouisfed.org/fred/series/observations"
 
-    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int):
+    def __init__(
+        self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int
+    ):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.api_key: str = api_key
         self.start_date: str = f"{request_year}-01-01"
         self.end_date: str = str(date.today())
 
-    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(
+        self, return_csv: bool = False, max_workers: Optional[int] = None
+    ) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
             return df_dict if return_csv else None
 
-        def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
+        def worker(
+            table_name: str, table_config: Dict[str, Any]
+        ) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
                 params = {
                     "series_id": table_config["code"],
@@ -80,7 +91,9 @@ class FREDDownloader(DataDownloader):
         load_dotenv()
         env_workers = os.environ.get("FRED_WORKERS")
         workers = max_workers or (
-            int(env_workers) if env_workers and env_workers.isdigit() else min(12, (os.cpu_count() or 4) * 2)
+            int(env_workers)
+            if env_workers and env_workers.isdigit()
+            else min(12, (os.cpu_count() or 4) * 2)
         )
         logger.info("FRED submitting %d tasks (workers=%d)", len(items), workers)
         from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -96,13 +109,21 @@ class FREDDownloader(DataDownloader):
                     if return_csv:
                         for name, df in df_dict.items():
                             try:
-                                data_folder_path = os.path.join(os.fspath(CSV_DATA_FOLDER), name)
+                                data_folder_path = os.path.join(
+                                    os.fspath(CSV_DATA_FOLDER), name
+                                )
                                 os.makedirs(data_folder_path, exist_ok=True)
                                 csv_path = os.path.join(data_folder_path, f"{name}.csv")
                                 df.to_csv(csv_path, index=True)
-                                logging.info("%s saved to %s Successfully!", name, csv_path)
+                                logging.info(
+                                    "%s saved to %s Successfully!", name, csv_path
+                                )
                             except Exception as err:
-                                logging.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
+                                logging.error(
+                                    "%s FAILED DOWNLOAD CSV in method 'to_db', since %s",
+                                    name,
+                                    err,
+                                )
                                 continue
                 except Exception as e:
                     logging.error("FRED future for %s raised: %s", tn, e)

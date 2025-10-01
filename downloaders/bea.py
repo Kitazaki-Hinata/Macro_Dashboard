@@ -23,20 +23,28 @@ class BEADownloader(DataDownloader):
     current_year: int = date.today().year
     csv_data_folder: str = os.fspath(CSV_DATA_FOLDER)
 
-    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int):
+    def __init__(
+        self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int
+    ):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.api_key: str = api_key
         self.request_year: int = request_year
-        self.time_range: str = ",".join(map(str, range(request_year, BEADownloader.current_year + 1)))
+        self.time_range: str = ",".join(
+            map(str, range(request_year, BEADownloader.current_year + 1))
+        )
         self.time_range_lag: str = self.time_range[:-5]
 
-    def to_db(self, return_csv: bool = False, max_workers: Optional[int] = None) -> Optional[Dict[str, pd.DataFrame]]:
+    def to_db(
+        self, return_csv: bool = False, max_workers: Optional[int] = None
+    ) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
         items = list(self.json_dict.items())
         if not items:
             return None
 
-        def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
+        def worker(
+            table_name: str, table_config: Dict[str, Any]
+        ) -> Tuple[str, Optional[pd.DataFrame]]:
             try:
                 logger.info(
                     "BEA start: table=%s code=%s freq=%s years=%s",
@@ -54,7 +62,11 @@ class BEADownloader(DataDownloader):
                         Frequency=table_config["freq"],
                         Year=self.time_range,
                     )
-                    logger.info("BEA fetched primary range for %s (%.3fs)", table_name, time.perf_counter() - t0)
+                    logger.info(
+                        "BEA fetched primary range for %s (%.3fs)",
+                        table_name,
+                        time.perf_counter() - t0,
+                    )
                 except beaapi.beaapi_error.BEAAPIResponseError:
                     t0 = time.perf_counter()
                     bea_tbl = beaapi.get_data(
@@ -64,14 +76,24 @@ class BEADownloader(DataDownloader):
                         Frequency=table_config["freq"],
                         Year=self.time_range_lag,
                     )
-                    logger.warning("BEA fallback years used for %s (%.3fs)", table_name, time.perf_counter() - t0)
+                    logger.warning(
+                        "BEA fallback years used for %s (%.3fs)",
+                        table_name,
+                        time.perf_counter() - t0,
+                    )
                 df: pd.DataFrame = pd.DataFrame(bea_tbl)
                 try:
                     ld_series = df["LineDescription"].fillna("")
-                    pick = ld_series.iloc[1] if len(ld_series) > 1 else (ld_series.iloc[0] if len(ld_series) else "")
+                    pick = (
+                        ld_series.iloc[1]
+                        if len(ld_series) > 1
+                        else (ld_series.iloc[0] if len(ld_series) else "")
+                    )
                 except Exception:
                     pick = ""
-                df_filtered: pd.DataFrame = df[df["LineDescription"].isin([pick, ""])].copy()
+                df_filtered: pd.DataFrame = df[
+                    df["LineDescription"].isin([pick, ""])
+                ].copy()
 
                 def _last_or_none(s: pd.Series) -> Any:
                     return s.iloc[-1] if len(s) else None
@@ -85,10 +107,16 @@ class BEADownloader(DataDownloader):
                 )
                 df_modified.columns = [f"{table_config['name']}"]
                 df_modified.index.name = "TimePeriod"
-                logger.info("BEA_%s Successfully extracted! rows=%d", table_name, len(df_modified))
+                logger.info(
+                    "BEA_%s Successfully extracted! rows=%d",
+                    table_name,
+                    len(df_modified),
+                )
 
                 if df_modified.empty:
-                    logging.error("%s is empty, FAILED INSERT, locate in to_db", table_name)
+                    logging.error(
+                        "%s is empty, FAILED INSERT, locate in to_db", table_name
+                    )
                     return table_name, None
                 converter = DatabaseConverter()
                 final_result_df = converter.write_into_db(
@@ -100,12 +128,16 @@ class BEADownloader(DataDownloader):
                 )
                 return table_name, final_result_df
             except Exception as e:
-                logger.error("%s FAILED DOWNLOAD/REFORMAT in BEA worker: %s", table_name, e)
+                logger.error(
+                    "%s FAILED DOWNLOAD/REFORMAT in BEA worker: %s", table_name, e
+                )
                 return table_name, None
 
         workers_env = os.environ.get("BEA_WORKERS")
         workers = max_workers or (
-            int(workers_env) if workers_env and workers_env.isdigit() else min(8, (os.cpu_count() or 4) * 2)
+            int(workers_env)
+            if workers_env and workers_env.isdigit()
+            else min(8, (os.cpu_count() or 4) * 2)
         )
         logger.info("BEA submitting %d tasks (workers=%d)", len(items), workers)
         with ThreadPoolExecutor(max_workers=workers) as ex:
@@ -119,13 +151,21 @@ class BEADownloader(DataDownloader):
                     if return_csv:
                         for name, df in df_dict.items():
                             try:
-                                data_folder_path = os.path.join(BEADownloader.csv_data_folder, name)
+                                data_folder_path = os.path.join(
+                                    BEADownloader.csv_data_folder, name
+                                )
                                 os.makedirs(data_folder_path, exist_ok=True)
                                 csv_path = os.path.join(data_folder_path, f"{name}.csv")
                                 df.to_csv(csv_path, index=True)
-                                logging.info("%s saved to %s Successfully!", name, csv_path)
+                                logging.info(
+                                    "%s saved to %s Successfully!", name, csv_path
+                                )
                             except Exception as err:
-                                logging.error("%s FAILED DOWNLOAD CSV in method 'to_csv', since %s", name, err)
+                                logging.error(
+                                    "%s FAILED DOWNLOAD CSV in method 'to_csv', since %s",
+                                    name,
+                                    err,
+                                )
                                 continue
                 except Exception as e:
                     logging.error("BEA future for %s raised: %s", tn, e)
