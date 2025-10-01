@@ -33,7 +33,9 @@ class BLSDownloader(DataDownloader):
     url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
     headers: Tuple[str, str] = ("Content-type", "application/json")
 
-    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int):
+    def __init__(
+        self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int
+    ):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.api_key: str = api_key
         self.start_year: int = request_year
@@ -46,7 +48,11 @@ class BLSDownloader(DataDownloader):
         cancel_token: Optional[CancellationToken] = None,
     ) -> Optional[Dict[str, pd.DataFrame]]:
         df_dict: Dict[str, pd.DataFrame] = {}
-        bls_debug = os.environ.get("BLS_DEBUG", "").strip().lower() in ("1", "true", "yes")
+        bls_debug = os.environ.get("BLS_DEBUG", "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         if bls_debug:
             if cancel_token is not None and cancel_token.cancelled():
                 raise CancelledError("operation cancelled before BLS debug write")
@@ -70,7 +76,9 @@ class BLSDownloader(DataDownloader):
             if token is not None:
                 token.raise_if_cancelled()
 
-        def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
+        def worker(
+            table_name: str, table_config: Dict[str, Any]
+        ) -> Tuple[str, Optional[pd.DataFrame]]:
             _check_cancel()
             try:
                 logger.info(
@@ -119,18 +127,32 @@ class BLSDownloader(DataDownloader):
             except Exception:
                 try:
                     df = pd.DataFrame(json_data)
-                    logger.warning("%s FAILED REFORMAT: DROP USELESS COLUMNS, continue", table_name)
+                    logger.warning(
+                        "%s FAILED REFORMAT: DROP USELESS COLUMNS, continue", table_name
+                    )
                 except Exception as err:
-                    logger.error("%s FAILED REFORMAT data from BLS, errors in df managing, %s", table_name, err)
+                    logger.error(
+                        "%s FAILED REFORMAT data from BLS, errors in df managing, %s",
+                        table_name,
+                        err,
+                    )
                     return table_name, None
 
             if table_config["needs_pct"] is True:
                 try:
                     df["value"] = pd.to_numeric(df["value"])
-                    df["MoM_growth"] = ((df["value"] - df["value"].shift(1)) / (df["value"].shift(1)) * -1).shift(-1)
+                    df["MoM_growth"] = (
+                        (df["value"] - df["value"].shift(1))
+                        / (df["value"].shift(1))
+                        * -1
+                    ).shift(-1)
                     df = df.drop(df.columns[-2], axis=1)
                 except Exception as err:
-                    logger.error("%s FAILED REFORMAT PERCENTAGE, probably due to df error, %s", table_name, err)
+                    logger.error(
+                        "%s FAILED REFORMAT PERCENTAGE, probably due to df error, %s",
+                        table_name,
+                        err,
+                    )
                     return table_name, None
 
             converter = DatabaseConverter()
@@ -148,7 +170,9 @@ class BLSDownloader(DataDownloader):
 
         load_dotenv()
         env_workers = os.environ.get("BLS_WORKERS")
-        workers = max_workers or (int(env_workers) if env_workers and env_workers.isdigit() else 4)
+        workers = max_workers or (
+            int(env_workers) if env_workers and env_workers.isdigit() else 4
+        )
         logger.info("BLS submitting %d tasks (workers=%d)", len(items), workers)
         with ThreadPoolExecutor(max_workers=workers) as ex:
             future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
@@ -180,6 +204,8 @@ class BLSDownloader(DataDownloader):
                     df.to_csv(csv_path, index=True)
                     logging.info("%s saved to %s Successfully!", name, csv_path)
                 except Exception as err:
-                    logging.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
+                    logging.error(
+                        "%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err
+                    )
                     continue
         return df_dict if return_csv else None

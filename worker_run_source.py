@@ -2,6 +2,7 @@
 独立进程执行单个数据源的下载，便于父进程实现强制取消。
 用法: python worker_run_source.py <request_json_path> <start_year:int> <source:str> [--csv]
 """
+
 from __future__ import annotations
 
 import logging
@@ -12,7 +13,9 @@ from logging_config import start_logging, stop_logging
 
 def main() -> int:
     if len(sys.argv) < 4:
-        logging.error("Usage: worker_run_source.py <request_json_path> <start_year:int> <source> [--csv]")
+        logging.error(
+            "Usage: worker_run_source.py <request_json_path> <start_year:int> <source> [--csv]"
+        )
         return 2
     req_path = sys.argv[1]
     try:

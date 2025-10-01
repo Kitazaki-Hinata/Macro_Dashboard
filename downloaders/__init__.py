@@ -62,7 +62,9 @@ class DownloaderFactory:
 
         config = json_data.get(source_key)
         if not isinstance(config, dict):
-            logging.error("DownloaderFactory: missing configuration for source '%s'", source)
+            logging.error(
+                "DownloaderFactory: missing configuration for source '%s'", source
+            )
             return None
 
         api_key = cls._get_api_key(source_key)

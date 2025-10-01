@@ -43,7 +43,9 @@ class TEDownloader(DataDownloader):
     time_pause: float = random.uniform(1, 1.3)
     time_wait: int = 10
 
-    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int):
+    def __init__(
+        self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int
+    ):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.start_year: int = request_year
         self.start_date: str = f"{request_year}-01-01"
@@ -52,7 +54,9 @@ class TEDownloader(DataDownloader):
         self.driver = webdriver.Chrome(options=options)
         self.driver.maximize_window()
 
-    def _calc_function(self, x1: float, x2: float, y1: float, y2: float) -> Tuple[float, float]:
+    def _calc_function(
+        self, x1: float, x2: float, y1: float, y2: float
+    ) -> Tuple[float, float]:
         gradient = round((y1 - y2) / (x1 - x2), 3)
         intercept = round((y1 - gradient * x1), 3)
         return float(gradient), float(intercept)
@@ -78,26 +82,45 @@ class TEDownloader(DataDownloader):
             )
             self.driver.execute_script("arguments[0].click();", five_year_button)
             time.sleep(TEDownloader.time_pause)
-        except (TimeoutException, ElementClickInterceptedException, NoSuchElementException, StaleElementReferenceException) as e:
+        except (
+            TimeoutException,
+            ElementClickInterceptedException,
+            NoSuchElementException,
+            StaleElementReferenceException,
+        ) as e:
             logger.error("%s FAILED TO CLICK 5y button, %s", data_name, e)
             return None
 
         try:
             if check_cancel is not None:
                 check_cancel()
-            chart_type_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                EC.element_to_be_clickable((By.XPATH, '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/button'))
+            chart_type_button = WebDriverWait(
+                self.driver, TEDownloader.time_wait
+            ).until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/button')
+                )
             )
             self.driver.execute_script("arguments[0].click();", chart_type_button)
             time.sleep(TEDownloader.time_pause)
             if check_cancel is not None:
                 check_cancel()
             chart_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
-                EC.element_to_be_clickable((By.XPATH, '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/div/div[1]/button'))
+                EC.element_to_be_clickable(
+                    (
+                        By.XPATH,
+                        '//*[@id="chart"]/div/div/div[1]/div/div[3]/div/div/div[1]/button',
+                    )
+                )
             )
             self.driver.execute_script("arguments[0].click();", chart_button)
             time.sleep(TEDownloader.time_wait)
-        except (TimeoutException, ElementClickInterceptedException, NoSuchElementException, StaleElementReferenceException) as e:
+        except (
+            TimeoutException,
+            ElementClickInterceptedException,
+            NoSuchElementException,
+            StaleElementReferenceException,
+        ) as e:
             logger.error("%s FAILED TO CLICK chart buttons, %s", data_name, e)
             return None
 
@@ -114,9 +137,13 @@ class TEDownloader(DataDownloader):
                     previous_num = float(tds[2].text.strip())
                     current_data_date = str(tds[4].text.replace(" ", "_"))
                 else:
-                    raise Exception(f"{data_name}, tds tag's length haven't reach 2, during html convert stage")
+                    raise Exception(
+                        f"{data_name}, tds tag's length haven't reach 2, during html convert stage"
+                    )
             else:
-                raise Exception(f"{data_name}, HAVEN'T FOUND ROWS during html convert stage")
+                raise Exception(
+                    f"{data_name}, HAVEN'T FOUND ROWS during html convert stage"
+                )
 
             rects = soup.find_all("rect", class_="highcharts-point")
             heights: List[float] = []
@@ -129,7 +156,9 @@ class TEDownloader(DataDownloader):
                         except Exception:
                             continue
 
-            gradient, intercept = self._calc_function(heights[-1], heights[-2], current_num, previous_num)
+            gradient, intercept = self._calc_function(
+                heights[-1], heights[-2], current_num, previous_num
+            )
             data_list = [intercept + gradient * num for num in heights]
 
             month_map = {
@@ -177,9 +206,13 @@ class TEDownloader(DataDownloader):
             for table_name, table_config in self.json_dict.items():
                 _check_cancel()
                 data_name = table_config["name"]
-                df = self._get_data_from_trading_economics_month(data_name=data_name, check_cancel=_check_cancel)
+                df = self._get_data_from_trading_economics_month(
+                    data_name=data_name, check_cancel=_check_cancel
+                )
                 if df is None:
-                    logger.error("FAILED TO EXTRACT %s, check PREVIOUS loggings", table_name)
+                    logger.error(
+                        "FAILED TO EXTRACT %s, check PREVIOUS loggings", table_name
+                    )
                     continue
                 converter = DatabaseConverter()
                 _check_cancel()
@@ -210,7 +243,9 @@ class TEDownloader(DataDownloader):
                     df.to_csv(csv_path, index=True)
                     logging.info("%s saved to %s Successfully!", name, csv_path)
                 except Exception as err:
-                    logging.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
+                    logging.error(
+                        "%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err
+                    )
                     continue
 
         return df_dict if return_csv else None
