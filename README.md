@@ -41,26 +41,12 @@
 
 ```powershell
 # Windows PowerShell
+    
+    
 pip install uv
-uv sync
-```
-
-#### 3. 获取 API key
-
-请访问以下地址获取免费API key：
-
-- BEA: <https://apps.bea.gov/api/signup/>
-- FRED St. Louis: <https://fredaccount.stlouisfed.org/apikeys>
-- BLS: <https://data.bls.gov/registrationEngine/>
-
+    
 #### 4. 使用方法
 
-- 打开软件，点击左边栏最下方“设置”按钮，在API KEY栏中依次填写，或者在项目根目录新建文件「.env」，按以下方式写入 API key：
-
-```ini
-bea = "XXXXXX-YOUR-API-KEY"
-fred = "YOURAPIKEY-123456"
-bls = "YOUR-API-KEY-000000"
 ```
 
 - 如果没有下载数据，选择开始年份（目前支持的最早年份是 2020年），勾选同意须知后点击下载按钮下载数据。
@@ -153,12 +139,14 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 
 
 ### 五、待完成事项
+
 <details>
     <summary>点击展开事项</summary>
 
 **debug waitlist :**
-- **重要：下载数据的多线程逻辑会导致程序崩溃（闪退）**
-- **重要：点击下载数据后，取消也会导致程序崩溃**
+
+- ~~**重要：下载数据的多线程逻辑会导致程序崩溃（闪退）**~~ ✅ *2025-10-01：线程清理与取消令牌已修复*
+- ~~**重要：点击下载数据后，取消也会导致程序崩溃**~~ ✅ *2025-10-01：取消路径异步化，已通过多轮测试*
 - **新bug：four chart 光标十字针无法同步**
 - four chart里面ctrl加滚轮无法同时缩放四个图表的纵轴
 - One_chart导入db里面的列名以及限制输入框只能输入列名
@@ -167,9 +155,11 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - four chart里面数据有错开，数量都一致
 - no show second line data on preview labeled
 - one chart里面的右坐标轴字体没法缩小
-- 应用comfortaa字体失败
-    
+- ~~应用comfortaa字体失败~~ ✅ *2025-10-01：修正 `font-family` 样式拼写，字体可正常加载*
+- i18n 国际化
+
 **extra function waitlist :**
+
 - 新板块：彭博文章
 - 新板块：美债期限结构
 - 设置图表网格的透明度&颜色

@@ -3175,7 +3175,7 @@ margin-right:20px;
                       </property>
                       <property name="styleSheet">
                        <string notr="true">color:white; 
-font-famlily:&quot;Comfortaa&quot;;
+ font-family:&quot;Comfortaa&quot;;
 border :0;
 background:#262a2f;
 padding :5px;
@@ -3948,7 +3948,7 @@ margin-left: 1px;</string>
                             </property>
                             <property name="styleSheet">
                              <string notr="true">color:white; 
-font-famlily:&quot;Comfortaa&quot;;
+ font-family:&quot;Comfortaa&quot;;
 border :0;
 background:transparent;
 padding :5px;
