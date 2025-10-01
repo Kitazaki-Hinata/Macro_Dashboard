@@ -157,7 +157,7 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
     <summary>点击展开事项</summary>
 
 **debug waitlist :**
-- **重要：下载数据的多线程逻辑会导致程序崩溃**
+- **重要：下载数据的多线程逻辑会导致程序崩溃（闪退）**
 - **重要：点击下载数据后，取消也会导致程序崩溃**
 - **新bug：four chart 无法连接，应该是设置legend导致的**
 - One_chart导入db里面的列名以及限制输入框只能输入列名
@@ -166,6 +166,7 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - four chart里面数据有错开，数量都一致
 - no show second line data on preview labeled
 - one chart里面的右坐标轴字体没法缩小
+- 应用comfortaa字体失败
     
 **extra function waitlist :**
 - 新板块：彭博文章

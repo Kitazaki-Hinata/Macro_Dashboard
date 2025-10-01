@@ -1308,6 +1308,8 @@ class TEDownloader(DataDownloader):
                 except Exception as e:
                     logging.error(f"{name} FAILED DOWNLOAD CSV in method 'to_db', since {e}")
                     continue
+
+        self.driver.quit()
         return None
 
 
