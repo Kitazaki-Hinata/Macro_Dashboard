@@ -10,19 +10,20 @@
 """
 
 import json
-import logging
 import sys
 import threading
 import traceback
 from types import TracebackType
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 from pathlib import Path
 from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtCore import QEvent, QObject, QTimer, Qt
 from gui.ui_mainwindow import mainWindow
 from downloaders import DownloaderFactory  # type: ignore  # 示例引用，避免静态检查器误报未使用
 from logging_config import start_logging, stop_logging
+from gui.logging_i18n import log_critical, log_error, log_info, log_warning
 from gui.ui_prestart_window import Prestart_ui
+from gui.i18n_support import set_locale, translate
 
 SMART_QUOTES_MAP = {
     "\u201c": '"',
@@ -52,9 +53,9 @@ def _show_exception_dialog(summary: str, detail: str) -> None:
 
     def _present() -> None:
         box = QMessageBox()
-        box.setWindowTitle("未捕获的异常")
+        box.setWindowTitle(translate("errors.unhandled.title"))
         box.setIcon(QMessageBox.Icon.Critical)
-        box.setText("程序运行中出现未捕获的错误，详细信息已写入日志文件。")
+        box.setText(translate("errors.unhandled.message"))
         box.setInformativeText(summary)
         box.setDetailedText(detail)
         box.setStandardButtons(QMessageBox.StandardButton.Ok)
@@ -75,8 +76,9 @@ def _handle_uncaught_exception(
     detail = _format_exception(exc_type, exc_value, exc_traceback)
     summary = str(exc_value).strip() or exc_type.__name__
 
-    logging.critical(
-        "Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback)
+    log_critical(
+        "system.uncaught_exception",
+        exc_info=(exc_type, exc_value, exc_traceback),
     )
     _show_exception_dialog(summary, detail)
 
@@ -118,7 +120,7 @@ def _normalize_smart_chars(text: str) -> str:
 def _load_json_raw(path: Path) -> Optional[Dict[str, Any]]:
     """底层读取函数：多编码尝试 + 智能字符清洗。"""
     if not path.exists():
-        logging.error("read_json ERROR: file not found: %s", path)
+        log_error("read_json.file_not_found", {"path": str(path)})
         return None
     raw = path.read_bytes()
     tried_encodings = [
@@ -132,16 +134,18 @@ def _load_json_raw(path: Path) -> Optional[Dict[str, Any]]:
         try:
             text = raw.decode(enc)
             if enc != "utf-8":
-                logging.warning("read_json: decoded with fallback encoding=%s", enc)
+                log_warning("read_json.fallback_encoding", {"encoding": enc})
             text = _normalize_smart_chars(text)
             return json.loads(text)
         except Exception as e:  # noqa: BLE001
             last_err = e
             continue
-    logging.error(
-        "read_json FAILED: all encodings tried %s, last_err=%s",
-        tried_encodings,
-        last_err,
+    log_error(
+        "read_json.failed_all",
+        {
+            "encodings": ", ".join(tried_encodings),
+            "error": str(last_err) if last_err else "",
+        },
     )
     return None
 
@@ -156,8 +160,30 @@ def read_json() -> Dict[str, Any]:
     data = _load_json_raw(path)
     if data is None:
         return {}
-    logging.info("read_json loaded file=%s keys=%s", path, list(data.keys())[:6])
+    preview_keys = list(data.keys())[:6]
+    log_info(
+        "read_json.loaded",
+        {"path": str(path), "keys": ", ".join(map(str, preview_keys))},
+    )
     return data
+
+
+def _load_language_from_settings() -> str:
+    settings_path = Path(__file__).resolve().parent / "gui" / "settings.json"
+    try:
+        with settings_path.open("r", encoding="utf-8") as fh:
+            raw = json.load(fh)
+    except Exception:
+        return set_locale("zh")
+
+    if not isinstance(raw, dict):
+        return set_locale("zh")
+
+    raw_dict = cast(Dict[str, Any], raw)
+    preferred = raw_dict.get("language")
+    if not isinstance(preferred, str):
+        preferred = "zh"
+    return set_locale(preferred)
 
 
 if __name__ == "__main__":
@@ -177,11 +203,12 @@ if __name__ == "__main__":
         # 初始化日志和配置
         start_logging(process_tag="gui")
         json_data: Dict[str, Any] = read_json()
+        preferred_locale = _load_language_from_settings()
 
         # 使用定时器延迟创建主窗口
         def load_main_window():
             global window
-            window = mainWindow()
+            window = mainWindow(language=preferred_locale)
             window.show()
             prestart_window.close()  # 关闭预启动窗口
 

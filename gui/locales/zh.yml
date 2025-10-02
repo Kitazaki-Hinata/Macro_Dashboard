@@ -1,0 +1,159 @@
+zh:
+  errors:
+    unhandled:
+      title: "未处理的错误"
+      message: "程序发生未预期的错误，请查看日志并重新启动应用。"
+  download:
+    backend_unavailable: "下载后端不可用（%{error}），正在运行模拟进度。"
+    cancelled: "已取消下载。"
+    cancelled_source: "已取消 %{source} 的下载。"
+    completed: "%{source} 下载完成。"
+    creating: "正在准备 %{source} 的下载任务..."
+    downloading: "正在下载 %{source}..."
+    exporting_csv: "正在导出 %{source} 为 CSV..."
+    failed_generic: "下载失败：%{error}"
+    failed_source: "%{source} 下载失败：%{error}"
+    mock_done: "【模拟】%{source} 下载完成。"
+    mock_failed: "【模拟】%{source} 下载失败：%{error}"
+    mock_step: "【模拟】%{source} 进度 %{step}/%{total}"
+    none_selected: "请至少选择一个数据源。"
+    skip: "跳过 %{source}，未找到下载器。"
+    request:
+      load_failed: "读取 request_id.json 失败：%{error}"
+  notes:
+    current_file: "当前文件：%{name}"
+    instructions_file: "Notes 编辑器说明（只读）"
+    instructions_reminder: "该笔记为只读，请遵循使用说明。"
+    reminder:
+      default: "提醒：请仔细阅读使用说明。"
+      save: "记得及时保存你的笔记。"
+    rename:
+      placeholder: "输入新名称并按回车"
+      prompt: "输入新的文件名称"
+    save_failed: "笔记保存失败。"
+    save_success: "笔记保存成功。"
+    status:
+      enter_name: "请先输入笔记名称。"
+      invalid_chars: "名称不能包含空格或特殊字符。"
+      name_conflict: "已有同名笔记，请更换名称。"
+      create_success: "笔记创建完成。"
+      cannot_delete: "该笔记无法删除。"
+      delete_success: "笔记删除成功。"
+      not_exist: "未找到该名称的笔记。"
+      rename_success: "笔记重命名成功。"
+      invalid_chars_numeric: "仅允许字母、数字和下划线。"
+      enter_valid: "请输入有效的名称。"
+      not_found: "未找到对应的笔记按钮。"
+  logs:
+    console_cleared: "控制台内容已清空。"
+    console_unavailable: "无法访问控制台。"
+    messages:
+      console:
+        cleared: "控制台内容已清空。"
+        unavailable: "无法访问控制台。"
+        clear_failed: "清空控制台文本区域失败：%{error}"
+        forwarded: "%{message}"
+      settings:
+        language:
+          persist_failed: "无法保存语言偏好：%{error}"
+        api:
+          env_load_failed: ".env 文件加载失败：%{error}"
+          save_invoked: "正在保存 API 密钥。"
+          env_created: "API 密钥已保存到 %{path}。"
+          env_create_failed: "无法将 API 密钥保存到 %{path}：%{error}"
+        json:
+          read_failed: "读取设置文件 %{path} 失败：%{error}"
+          write_failed: "写入设置文件失败：%{error}"
+        one_chart:
+          write_failed: "写入单图设置失败：%{error}"
+        four_chart:
+          write_failed: "写入四图设置失败：%{error}"
+        table:
+          write_failed: "写入表格设置失败：%{error}"
+      notes:
+        file_missing: "找不到笔记文件：%{path}"
+        file_read_failed: "读取笔记文件 %{path} 失败：%{error}"
+        save_failed_error: "保存笔记 %{path} 失败：%{error}"
+      database:
+        file_missing: "未找到数据库文件，请先下载数据。"
+        table_missing: "数据库中缺少 Time_Series 表，请先下载数据。"
+        columns_failed: "获取 sqlite 列名称失败：%{error}"
+      request_id:
+        load_failed: "读取 request_id.json 失败：%{error}"
+      download:
+        cleanup:
+          schedule_failed: "调度下载清理任务失败：%{error}"
+          thread_timeout: "下载线程未及时退出，将强制终止。"
+          terminate_failed: "强制终止下载线程失败：%{error}"
+  settings:
+    api:
+      loaded: "已从 .env 载入 API 密钥。"
+      saved: "API 密钥已保存。"
+      save_failed: "API 密钥保存失败。"
+    actions:
+      save: "保存"
+    language:
+      label: "界面语言"
+      option:
+        en: "英文"
+        zh: "中文"
+  status:
+    recent_update: "最近更新：%{time}"
+    recent_update_missing: "最近更新时间未设置。"
+  ui:
+    main:
+      window_title: "宏观仪表盘"
+      header_title: "宏观仪表盘"
+      data_placeholder: "数据名称会显示在这里"
+    table:
+      placeholder: "表格：当前选择的表名"
+    four:
+      title: "四图界面"
+      connect: "联动图表"
+    notes:
+      section_title: "随意记录你的想法"
+      section_subtitle: "这里可以存放你的想法与感受"
+      instructions_button: "使用说明"
+      status_bar_hint: "请输入文件名后点击按钮"
+      editor_title: "笔记编辑器"
+      default_current_file: "当前文件：[只读] Notes 编辑器说明"
+      tooltip: "欢迎在这里记录你的笔记～"
+    settings:
+      panel_title: "设置面板"
+      panel_subtitle: "配置 API / 下载数据 / 关于与条款"
+      api_hint: "在此输入 API 密钥并点击“保存”按钮"
+      api_label:
+        bea: "BEA API 密钥："
+        fred: "FRED API 密钥："
+        bls: "BLS API 密钥："
+      status_placeholder: "状态信息会显示在这里"
+      about_title: "关于与条款"
+    download:
+      heading: "选择数据源并下载数据"
+      sources:
+        bea: "BEA 数据 API"
+        yf: "Yfinance API"
+        fred: "FRED 数据 API"
+        bls: "BLS 数据 API"
+        te: "TE 数据"
+        ism: "ISM"
+        fw: "CME 利率观察"
+        dfm: "达拉斯联储制造业"
+        nyf: "纽约联储"
+        cin: "通胀即时预测"
+        em: "CME 迷你期货"
+        fs: "外汇互换"
+      data_start_year: "数据起始年份"
+      options:
+        csv: "下载 CSV"
+        all: "下载全部数据"
+        parallel: "启用并行下载"
+        max_threads: "最大线程数"
+      actions:
+        start: "开始下载"
+        cancel: "取消下载"
+        clear_logs: "清空日志"
+      console_title: "控制台与日志信息"
+      terms_checkbox: "我已阅读并同意条款与条件。"
+    footer:
+      signature: "Love from : Kitazaki Hinata"

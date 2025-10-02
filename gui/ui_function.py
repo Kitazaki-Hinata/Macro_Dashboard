@@ -6,7 +6,6 @@
 # pyright: reportUnknownParameterType=false, reportUnknownArgumentType=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportMissingTypeStubs=false
 
 import os
-import logging
 import sqlite3
 import json
 import math
@@ -21,6 +20,12 @@ from gui import *
 
 
 from dotenv import dotenv_values
+from gui.i18n_support import translate
+from gui.logging_i18n import log_error, log_info, log_warning
+
+
+def tr(key: str, **kwargs: Any) -> str:
+    return translate(key, **kwargs)
 
 
 class _MainWindowProto(Protocol):
@@ -110,9 +115,7 @@ class _DownloadWorker(QObject):
             except Exception as e:  # ModuleNotFoundError 等
                 DownloaderFactory = None  # type: ignore
                 _backend_available = False
-                self.progress.emit(
-                    f"Backend not available: {e}. Running mock download..."
-                )
+                self.progress.emit(tr("download.backend_unavailable", error=str(e)))
 
             sources = (
                 [
@@ -133,13 +136,13 @@ class _DownloadWorker(QObject):
                 else list(self._selected_sources)
             )
             if not sources:
-                self.progress.emit("No sources selected. Nothing to do.")
+                self.progress.emit(tr("download.none_selected"))
                 self.finished.emit()
                 return
 
             for src in sources:
                 if self._is_cancelled:
-                    self.progress.emit("Cancelled by user.")
+                    self.progress.emit(tr("download.cancelled"))
                     break
                 if not _backend_available:
                     # 模拟下载进度
@@ -149,23 +152,32 @@ class _DownloadWorker(QObject):
                         for i in range(5):
                             if self._is_cancelled:
                                 break
-                            self.progress.emit(f"{src}: mock step {i+1}/5...")
+                            self.progress.emit(
+                                tr(
+                                    "download.mock_step",
+                                    source=src,
+                                    step=i + 1,
+                                    total=5,
+                                )
+                            )
                             time.sleep(0.3)
-                        self.progress.emit(f"{src} done (mock).")
+                        self.progress.emit(tr("download.mock_done", source=src))
                     except Exception as e:
-                        self.progress.emit(f"{src} mock failed: {e}")
+                        self.progress.emit(
+                            tr("download.mock_failed", source=src, error=str(e))
+                        )
                     continue
 
-                self.progress.emit(f"Creating downloader for: {src}...")
+                self.progress.emit(tr("download.creating", source=src))
                 downloader = DownloaderFactory.create_downloader(  # type: ignore[reportUnknownMemberType]
                     source=src,
                     json_data=self._json_data,
                     request_year=self._start_year,
                 )
                 if downloader is None:
-                    self.progress.emit(f"Skip {src}: no downloader available.")
+                    self.progress.emit(tr("download.skip", source=src))
                     continue
-                self.progress.emit(f"Downloading {src} data to database...")
+                self.progress.emit(tr("download.downloading", source=src))
                 try:
                     # 优先判断 download_csv_check 是否被选中
                     if (
@@ -173,7 +185,7 @@ class _DownloadWorker(QObject):
                         and hasattr(self.main_window, "download_csv_check")
                         and self.main_window.download_csv_check.isChecked()
                     ):
-                        self.progress.emit(f"Exporting {src} data to CSV...")
+                        self.progress.emit(tr("download.exporting_csv", source=src))
                         downloader.to_db(
                             return_csv=True, cancel_token=self._cancel_token
                         )
@@ -181,16 +193,18 @@ class _DownloadWorker(QObject):
                         downloader.to_db(
                             return_csv=False, cancel_token=self._cancel_token
                         )
-                    self.progress.emit(f"{src} done.")
+                    self.progress.emit(tr("download.completed", source=src))
                 except CancelledError:
                     self._is_cancelled = True
-                    self.progress.emit(f"{src} cancelled.")
+                    self.progress.emit(tr("download.cancelled_source", source=src))
                     break
                 except Exception as e:
-                    self.progress.emit(f"{src} failed: {e}")
+                    self.progress.emit(
+                        tr("download.failed_source", source=src, error=str(e))
+                    )
                     continue
         except Exception as e:
-            self.failed.emit(str(e))
+            self.failed.emit(tr("download.failed_generic", error=str(e)))
             return
         finally:
             self.finished.emit()
@@ -219,6 +233,47 @@ class UiFunctions:  # 删除:mainWindow
         except Exception:
             pass
 
+    def _set_note_status(self, key: str, *, success: bool, **kwargs: Any) -> None:
+        try:
+            self.main_window.note_status_bar.setText(tr(key, **kwargs))
+            color = "#90b6e7" if success else "#EE5C88"
+            self.main_window.note_status_bar.setStyleSheet(f"color: {color}")
+        except Exception:
+            pass
+
+    def _set_note_current_file(self, file_name: str) -> None:
+        try:
+            self.main_window.note_update_label.setText(
+                tr("notes.current_file", name=file_name)
+            )
+            self.main_window.note_label_notes.setText(tr("notes.reminder.save"))
+            self.main_window.note_label_notes.setStyleSheet(
+                "color: #ee5c88; margin-left : 20px"
+            )
+        except Exception:
+            pass
+
+    def apply_language(self, locale: str, persist: bool) -> None:
+        if persist:
+            self._save_language_preference(locale)
+        # 根据当前打开的笔记刷新标签
+        current_name = ""
+        try:
+            current_name = self.main_window._get_current_file_name()  # type: ignore[attr-defined]
+        except Exception:
+            current_name = ""
+        if current_name:
+            self._set_note_current_file(current_name)
+
+    def _save_language_preference(self, locale: str) -> None:
+        try:
+            data = self.get_settings_from_json()
+            data["language"] = locale
+            with open(self._get_json_settings_path(), "w", encoding="utf-8") as fh:
+                json.dump(data, fh, ensure_ascii=False, indent=2)
+        except Exception as e:
+            log_error("settings.language.persist_failed", {"error": str(e)})
+
     def set_color(self, widget: Any):
         current_color = widget.styleSheet().split(":")[1][1:]  # 当前的颜色
         color = QColorDialog.getColor(current_color)
@@ -234,6 +289,7 @@ class UiFunctions:  # 删除:mainWindow
                 from datetime import date
 
                 data["recent_update_time"] = str(date.today())
+            data.setdefault("language", "zh")
             one = data.setdefault("one_chart_settings", {})
             two = one.setdefault("first_data", {})
             one_second = one.setdefault("second_data", {})
@@ -352,7 +408,7 @@ class UiFunctions:  # 删除:mainWindow
         try:
             cfg = dotenv_values(path)
         except Exception as e:
-            logging.error(f"Failed to load .env: {e}")
+            log_error("settings.api.env_load_failed", {"error": str(e)})
             return
         bea = (cfg.get("bea") or "").strip()
         fred = (cfg.get("fred") or "").strip()
@@ -362,7 +418,7 @@ class UiFunctions:  # 删除:mainWindow
             self.main_window.fred_api.setText(fred)
             self.main_window.bls_api.setText(bls)
             if bea or fred or bls:
-                self.main_window.status_label.setText("Loaded API keys from .env")
+                self.main_window.status_label.setText(tr("settings.api.loaded"))
                 self.main_window.status_label.setStyleSheet("color: #90b6e7")
         except Exception:
             # 如果控件不可用则忽略
@@ -370,7 +426,7 @@ class UiFunctions:  # 删除:mainWindow
 
     def settings_api_save(self):
         # find whether exist .env file
-        logging.info("settings_api_save invoked")
+        log_info("settings.api.save_invoked")
         path = self._env_file_path()
 
         # get api_text from line edit
@@ -385,16 +441,17 @@ class UiFunctions:  # 删除:mainWindow
                 f.write(f'bea = "{bea_api}" \n')
                 f.write(f'fred = "{fred_api}" \n')
                 f.write(f'bls = "{bls_api}" ')
-            self.main_window.status_label.setText("API key saved successfully")
+            self.main_window.status_label.setText(tr("settings.api.saved"))
             self.main_window.status_label.setStyleSheet("color: #90b6e7")
-            logging.info(f".env file created successfully at path: {path}")
+            log_info("settings.api.env_created", {"path": path})
 
         except Exception as e:
-            self.main_window.status_label.setText(
-                "FAILED to save API key, see log file"
-            )
+            self.main_window.status_label.setText(tr("settings.api.save_failed"))
             self.main_window.status_label.setStyleSheet("color: #fa88aa")
-            logging.error(f"Failed to create .env file at path: {path}, since {e}")
+            log_error(
+                "settings.api.env_create_failed",
+                {"path": path, "error": str(e)},
+            )
 
     def download_all_checkbox_settings(self):
         checkbox_list = [
@@ -439,14 +496,16 @@ class UiFunctions:  # 删除:mainWindow
                 self.main_window.console_area.clear()
                 cleared = True
         except Exception as e:
-            logging.error(f"Failed to clear console text area: {e}")
+            log_error("console.clear_failed", {"error": str(e)})
 
-        message = (
-            "Console log window cleared. Log files remain unchanged."
-            if cleared
-            else "Console log window unavailable. Log files remain unchanged."
+        message_key = (
+            "logs.console_cleared" if cleared else "logs.console_unavailable"
         )
-        logging.info(message)
+        message = tr(message_key)
+        if cleared:
+            log_info("console.cleared")
+        else:
+            log_info("console.unavailable")
 
         try:
             self._append_console(message)
@@ -462,21 +521,19 @@ class UiFunctions:  # 删除:mainWindow
 
         # illegal judgement
         if note_name == "":
-            self.main_window.note_status_bar.setText("Please enter a note name")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.enter_name", success=False)
             return
 
         illegal_chars = '\\/:*?"<>| '
         for char in illegal_chars:
             if char in note_name:
-                self.main_window.note_status_bar.setText(
-                    '\\ / : * ? " < > |, space are invalid'
+                self._set_note_status(
+                    "notes.status.invalid_chars",
+                    success=False,
                 )
-                self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
                 return
         if note_name == "note_instructions_btn" or note_name == "User_instructions":
-            self.main_window.note_status_bar.setText("Name Conflict, change a name")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.name_conflict", success=False)
             return
 
         # check whether has duplication 防止命名重复
@@ -486,10 +543,7 @@ class UiFunctions:  # 删除:mainWindow
             if item and item.widget():
                 widget = item.widget()
                 if isinstance(widget, QPushButton) and widget.text() == note_name:
-                    self.main_window.note_status_bar.setText(
-                        "Name Conflict, change a name"
-                    )
-                    self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+                    self._set_note_status("notes.status.name_conflict", success=False)
                     return
 
         button_name = self.main_window.note_enter_passage_name.text()
@@ -510,8 +564,7 @@ class UiFunctions:  # 删除:mainWindow
         new_button.clicked.connect(
             lambda checked: self.note_btn_open_file_slot(button_name)  # type: ignore
         )
-        self.main_window.note_status_bar.setText("Create note successful")
-        self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
+        self._set_note_status("notes.status.create_success", success=True)
 
     def note_delete_page(self):
         """点击后删除文章对应的按钮"""
@@ -519,13 +572,11 @@ class UiFunctions:  # 删除:mainWindow
         layout = self.main_window.scrollAreaWidgetContents.layout()
 
         if not note_name:
-            self.main_window.note_status_bar.setText("Please enter a note name")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.enter_name", success=False)
             return
 
         if note_name == "note_instructions_btn" or note_name == "User_instructions":
-            self.main_window.note_status_bar.setText("This file cannot be deleted")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.cannot_delete", success=False)
             return
 
         # 遍历布局中的所有控件来找到匹配的按钮
@@ -550,15 +601,13 @@ class UiFunctions:  # 删除:mainWindow
                     break
 
         if found:
-            self.main_window.note_status_bar.setText("Delete note successful")
-            self.main_window.note_status_bar.setStyleSheet("color: #90b6e7")
+            self._set_note_status("notes.status.delete_success", success=True)
             self.main_window.plainTextEdit.clear()
             self.main_window.plainTextEdit.setReadOnly(True)
             self.main_window.save_text.setDisabled(True)
 
         else:
-            self.main_window.note_status_bar.setText("Note does not exist")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.not_exist", success=False)
 
     def note_rename_page(self):
         """重命名文章  rename the file"""
@@ -566,8 +615,7 @@ class UiFunctions:  # 删除:mainWindow
         layout = self.main_window.scrollAreaWidgetContents.layout()
 
         if not note_name:
-            self.main_window.note_status_bar.setText("Please enter a note name")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.enter_name", success=False)
             return
 
         if (
@@ -575,8 +623,7 @@ class UiFunctions:  # 删除:mainWindow
             or note_name == "User_instructions"
             or note_name == "User_Instructions"
         ):
-            self.main_window.note_status_bar.setText("Name Conflict, change a name")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.name_conflict", success=False)
             return
 
         found = False
@@ -588,7 +635,7 @@ class UiFunctions:  # 删除:mainWindow
                     # 保存旧的objectName用于后续的信号重新连接
                     old_object_name = widget.objectName()
 
-                    widget.setText("Enter and press any to finish")
+                    widget.setText(tr("notes.rename.prompt"))
                     widget.setStyleSheet(
                         """
                         color : #90b6e7;
@@ -609,7 +656,7 @@ class UiFunctions:  # 删除:mainWindow
                         max-height : 15px;
                     """
                     )
-                    line_edit.setPlaceholderText("Enter new name here")
+                    line_edit.setPlaceholderText(tr("notes.rename.placeholder"))
                     line_edit.setObjectName(f"rename_edit_{note_name}")
                     layout.insertWidget(i + 1, line_edit)
 
@@ -679,37 +726,29 @@ class UiFunctions:  # 删除:mainWindow
                                         )
                                     )  # type: ignore
 
-                                    self.main_window.note_status_bar.setText(
-                                        "Rename successful"
-                                    )
-                                    self.main_window.note_status_bar.setStyleSheet(
-                                        "color: #90b6e7"
+                                    self._set_note_status(
+                                        "notes.status.rename_success",
+                                        success=True,
                                     )
 
                                     layout.removeWidget(le)
                                     le.deleteLater()
                                 else:
-                                    self.main_window.note_status_bar.setText(
-                                        "Name Conflict, change a name"
-                                    )
-                                    self.main_window.note_status_bar.setStyleSheet(
-                                        "color: #EE5C88"
+                                    self._set_note_status(
+                                        "notes.status.name_conflict",
+                                        success=False,
                                     )
                                     le.setFocus()
                             else:
-                                self.main_window.note_status_bar.setText(
-                                    '\\ / : * ? " < > |, space, nums are invalid'
-                                )
-                                self.main_window.note_status_bar.setStyleSheet(
-                                    "color: #EE5C88"
+                                self._set_note_status(
+                                    "notes.status.invalid_chars_numeric",
+                                    success=False,
                                 )
                                 le.setFocus()
                         else:
-                            self.main_window.note_status_bar.setText(
-                                "Please enter a valid note name"
-                            )
-                            self.main_window.note_status_bar.setStyleSheet(
-                                "color: #EE5C88"
+                            self._set_note_status(
+                                "notes.status.enter_valid",
+                                success=False,
                             )
                             le.setFocus()
 
@@ -723,8 +762,7 @@ class UiFunctions:  # 删除:mainWindow
                     break
 
         if not found:
-            self.main_window.note_status_bar.setText("Note not found")
-            self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
+            self._set_note_status("notes.status.not_found", success=False)
 
     def note_btn_open_file_slot(self, file_name: str):
         # 传入打开的文件名称，所有新建的按钮均调用这个槽函数
@@ -739,22 +777,17 @@ class UiFunctions:  # 删除:mainWindow
             with open(selected_note_dir, "r", encoding="utf-8") as file:
                 content = file.read()
                 self.main_window.plainTextEdit.setPlainText(content)
-                self.main_window.note_update_label.setText(
-                    f"Current file name : {file_name}"
-                )
-                self.main_window.note_label_notes.setText(
-                    'Reminder : Remember to click "SAVE" button on the right hand side after you finish writing your notes.'
-                )
-                self.main_window.note_label_notes.setStyleSheet(
-                    "color: #ee5c88; margin-left : 20px"
-                )
+                self._set_note_current_file(file_name)
         except FileNotFoundError:
             self.main_window.plainTextEdit.setPlainText("")
-            logging.error(f"File {selected_note_dir} not found")
+            log_error("notes.file_missing", {"path": selected_note_dir})
             return
         except Exception as e:
             self.main_window.plainTextEdit.setPlainText("")
-            logging.error(f"Error reading file {selected_note_dir}: {str(e)}")
+            log_error(
+                "notes.file_read_failed",
+                {"path": selected_note_dir, "error": str(e)},
+            )
             return
 
     def note_open_instruction(self):
@@ -768,14 +801,14 @@ class UiFunctions:  # 删除:mainWindow
                 self.main_window.plainTextEdit.setPlainText(content)
         except FileNotFoundError:
             self.main_window.plainTextEdit.setPlainText("")
-            logging.error(f"File {selected_note_dir} not found")
+            log_error("notes.file_missing", {"path": selected_note_dir})
             return
         self.main_window.note_update_label.setText(
-            f"Current file name : [Read Only] Notes Editor Instructions"
+            tr("notes.instructions_file")
         )
         self.main_window.plainTextEdit.setReadOnly(True)
         self.main_window.note_label_notes.setText(
-            f"Reminder : Please read instructions carefully."
+            tr("notes.instructions_reminder")
         )
         self.main_window.note_label_notes.setStyleSheet(
             "color: #ee5c88; margin-left : 20px"
@@ -791,15 +824,20 @@ class UiFunctions:  # 删除:mainWindow
             file_content = self.main_window.plainTextEdit.toPlainText()
             with open(selected_note_dir, "w", encoding="utf-8") as file:
                 file.write(file_content)
-            self.main_window.note_label_notes.setText(f"Note successfully saved!")
+            self.main_window.note_label_notes.setText(
+                tr("notes.save_success")
+            )
             self.main_window.note_label_notes.setStyleSheet(
                 "color: #90b6e7; margin-left : 20px"
             )
 
         except Exception as e:
-            logging.error(f"Error: notes editor cannot save writing file, error is {e}")
+            log_error(
+                "notes.save_failed_error",
+                {"path": selected_note_dir, "error": str(e)},
+            )
             self.main_window.note_label_notes.setText(
-                f'WARNING : THIS NOTE FAILED TO SAVE, PLEASE CHECK LOG FILE "doc/error.log" FILE!!!'
+                tr("notes.save_failed")
             )
             self.main_window.note_label_notes.setStyleSheet(
                 "color: #ee5c88; margin-left : 20px"
@@ -884,7 +922,10 @@ class UiFunctions:  # 删除:mainWindow
             else:
                 existing_data = {}
         except Exception as e:
-            logging.error(f"Error in reading json settings file: {e}")
+            log_error(
+                "settings.json.read_failed",
+                {"path": settings_file_path, "error": str(e)},
+            )
             existing_data = {}
         return self._ensure_settings_structure(existing_data)
 
@@ -1221,7 +1262,7 @@ class UiFunctions:  # 删除:mainWindow
             except Exception:
                 pass
         except Exception as e:
-            logging.error(f"写入 one_chart settings.json 失败: {e}")
+            log_error("settings.one_chart.write_failed", {"error": str(e)})
 
         # ================= 关闭设置窗口 =================
         try:
@@ -1301,7 +1342,7 @@ class UiFunctions:  # 删除:mainWindow
             with open(self._get_json_settings_path(), "w", encoding="utf-8") as f:
                 json.dump(existing_data, f, indent=2, ensure_ascii=False)
         except Exception as e:
-            logging.error(f"Error writing settings file: {e}")
+            log_error("settings.four_chart.write_failed", {"error": str(e)})
 
         # 关闭窗口
         widget.close()
@@ -1320,7 +1361,7 @@ class UiFunctions:  # 删除:mainWindow
             with open(self._get_json_settings_path(), "w", encoding="utf-8") as f:
                 json.dump(existing_data, f, ensure_ascii=False, indent=4)
         except Exception as e:
-            logging.error(f"写入 table settings 失败: {e}")
+            log_error("settings.table.write_failed", {"error": str(e)})
         try:
             widget.close()
         except Exception:
@@ -1341,7 +1382,7 @@ class UiFunctions:  # 删除:mainWindow
             sqlite_file_path = os.path.join(current_file_path, "..", "data.db")
             sqlite_file_path = os.path.abspath(sqlite_file_path)
             if not os.path.exists(sqlite_file_path):
-                logging.error("Database file not found. Please download data first.")
+                log_error("database.file_missing")
                 return []
             conn = sqlite3.connect(sqlite_file_path)
             cursor = conn.cursor()
@@ -1351,16 +1392,14 @@ class UiFunctions:  # 删除:mainWindow
             table_exists = cursor.fetchone()
             if not table_exists:
                 conn.close()
-                logging.error(
-                    "Time_Series table not found in database. Please download data to create it."
-                )
+                log_error("database.table_missing")
                 return []
             cursor.execute("SELECT * FROM Time_Series LIMIT 0")
             column_names = [d[0] for d in cursor.description][1:]
             conn.close()
             return column_names
         except Exception as e:
-            logging.error(f"Failed to get sqlite column names: {e}")
+            log_error("database.columns_failed", {"error": str(e)})
             try:
                 conn.close()  # type: ignore
             except Exception:
@@ -1373,7 +1412,7 @@ class UiFunctions:  # 删除:mainWindow
         except Exception:
             pass
         try:
-            logging.getLogger(__name__).info(text)
+            log_info("console.forwarded", {"message": text})
         except Exception:
             pass
 
@@ -1385,8 +1424,10 @@ class UiFunctions:  # 删除:mainWindow
             with open(os.path.abspath(req_path), "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
-            logging.error(f"Failed to load request_id.json: {e}")
-            self._append_console(f"Failed to load request_id.json: {e}")
+            log_error("request_id.load_failed", {"error": str(e)})
+            self._append_console(
+                tr("download.request.load_failed", error=str(e))
+            )
             return None
 
     def start_download(self):
@@ -1475,7 +1516,7 @@ class UiFunctions:  # 删除:mainWindow
         try:
             QTimer.singleShot(0, self._cleanup_thread)
         except Exception as e:
-            logging.error(f"Failed to schedule download cleanup: {e}")
+            log_error("download.cleanup.schedule_failed", {"error": str(e)})
             self._cleanup_thread()
 
     def _cleanup_thread(self):
@@ -1531,16 +1572,17 @@ class UiFunctions:  # 删除:mainWindow
                     if cleanup_done:
                         return
                     if thread.isRunning():
-                        logging.warning(
-                            "Download thread did not exit in time; forcing termination."
-                        )
+                        log_warning("download.cleanup.thread_timeout")
                         try:
                             thread.terminate()
                         except Exception as err:
-                            logging.error(f"Failed to terminate download thread: {err}")
+                            log_error(
+                                "download.cleanup.terminate_failed",
+                                {"error": str(err)},
+                            )
                     finalize_thread()
 
-                QTimer.singleShot(5000, force_terminate)
+                QTimer.singleShot(2000, force_terminate)
             else:
                 finalize_thread()
             self._dl_thread = None
@@ -1567,7 +1609,7 @@ class UiFunctions:  # 删除:mainWindow
             with open(self._get_json_settings_path(), "w", encoding="utf-8") as f:
                 json.dump(existing_data, f, indent=2, ensure_ascii=False)
         except Exception as e:
-            logging.error(f"Error writing settings file: {e}")
+            log_error("settings.json.write_failed", {"error": str(e)})
 
     def cancel_download(self):
         did = False
@@ -1579,6 +1621,8 @@ class UiFunctions:  # 删除:mainWindow
             did = True
         if did:
             self._append_console("Cancelling...")
+            if self._dl_thread is not None:
+                self._schedule_cleanup()
         else:
             self._append_console("No running task to cancel.")
 

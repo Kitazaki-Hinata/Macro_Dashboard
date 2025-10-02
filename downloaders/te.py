@@ -65,14 +65,29 @@ class TEDownloader(DataDownloader):
         self,
         data_name: str,
         check_cancel: Optional[Callable[[], None]] = None,
+        cancel_token: Optional[CancellationToken] = None,
     ) -> Optional[pd.DataFrame]:
+        def _pause(duration: float) -> None:
+            if duration <= 0:
+                return
+            if cancel_token is None:
+                time.sleep(duration)
+                return
+            deadline = time.monotonic() + duration
+            while True:
+                cancel_token.raise_if_cancelled()
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    return
+                time.sleep(min(0.1, remaining))
+
         if check_cancel is not None:
             check_cancel()
         url = self.url + data_name.replace("_", "-")
         self.driver.get(url)
         if check_cancel is not None:
             check_cancel()
-        time.sleep(TEDownloader.time_pause)
+        _pause(TEDownloader.time_pause)
 
         try:
             if check_cancel is not None:
@@ -81,7 +96,7 @@ class TEDownloader(DataDownloader):
                 EC.element_to_be_clickable((By.XPATH, '//*[@id="dateSpansDiv"]/a[3]'))
             )
             self.driver.execute_script("arguments[0].click();", five_year_button)
-            time.sleep(TEDownloader.time_pause)
+            _pause(TEDownloader.time_pause)
         except (
             TimeoutException,
             ElementClickInterceptedException,
@@ -102,7 +117,7 @@ class TEDownloader(DataDownloader):
                 )
             )
             self.driver.execute_script("arguments[0].click();", chart_type_button)
-            time.sleep(TEDownloader.time_pause)
+            _pause(TEDownloader.time_pause)
             if check_cancel is not None:
                 check_cancel()
             chart_button = WebDriverWait(self.driver, TEDownloader.time_wait).until(
@@ -114,7 +129,7 @@ class TEDownloader(DataDownloader):
                 )
             )
             self.driver.execute_script("arguments[0].click();", chart_button)
-            time.sleep(TEDownloader.time_wait)
+            _pause(float(TEDownloader.time_wait))
         except (
             TimeoutException,
             ElementClickInterceptedException,
@@ -207,7 +222,9 @@ class TEDownloader(DataDownloader):
                 _check_cancel()
                 data_name = table_config["name"]
                 df = self._get_data_from_trading_economics_month(
-                    data_name=data_name, check_cancel=_check_cancel
+                    data_name=data_name,
+                    check_cancel=_check_cancel,
+                    cancel_token=token,
                 )
                 if df is None:
                     logger.error(
