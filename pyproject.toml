@@ -20,6 +20,4 @@ dependencies = [
     "logging>=0.4.9.6",
     "typing>=3.10.0.0",
     "numpy>=2.3.1",
-    "python-i18n>=0.3.9",
-    "PyYAML>=6.0",
 ]

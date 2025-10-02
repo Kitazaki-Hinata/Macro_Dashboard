@@ -10,29 +10,25 @@
 """
 
 import json
+import logging
 import sys
 import threading
 import traceback
 from types import TracebackType
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, Optional
 from pathlib import Path
 from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtCore import QEvent, QObject, QTimer, Qt
 from gui.ui_mainwindow import mainWindow
 from downloaders import DownloaderFactory  # type: ignore  # 示例引用，避免静态检查器误报未使用
 from logging_config import start_logging, stop_logging
-from gui.logging_i18n import log_critical, log_error, log_info, log_warning
 from gui.ui_prestart_window import Prestart_ui
-from gui.i18n_support import set_locale, translate
 
 SMART_QUOTES_MAP = {
-    "\u201c": '"',
-    "\u201d": '"',  # 左/右双引号
-    "\u2018": "'",
-    "\u2019": "'",  # 左/右单引号
-    "\u2013": "-",
-    "\u2014": "-",  # 短/长破折号
-    "\u00a0": " ",  # 不换行空格
+    '\u201c': '"', '\u201d': '"',  # 左/右双引号
+    '\u2018': "'", '\u2019': "'",  # 左/右单引号
+    '\u2013': '-',  '\u2014': '-',   # 短/长破折号
+    '\u00a0': ' ',                    # 不换行空格
 }
 
 
@@ -41,7 +37,7 @@ def _format_exception(
     exc_value: BaseException,
     exc_traceback: Optional[TracebackType],
 ) -> str:
-    return "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    return ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
 
 
 def _show_exception_dialog(summary: str, detail: str) -> None:
@@ -53,9 +49,9 @@ def _show_exception_dialog(summary: str, detail: str) -> None:
 
     def _present() -> None:
         box = QMessageBox()
-        box.setWindowTitle(translate("errors.unhandled.title"))
+        box.setWindowTitle("未捕获的异常")
         box.setIcon(QMessageBox.Icon.Critical)
-        box.setText(translate("errors.unhandled.message"))
+        box.setText("程序运行中出现未捕获的错误，详细信息已写入日志文件。")
         box.setInformativeText(summary)
         box.setDetailedText(detail)
         box.setStandardButtons(QMessageBox.StandardButton.Ok)
@@ -76,10 +72,7 @@ def _handle_uncaught_exception(
     detail = _format_exception(exc_type, exc_value, exc_traceback)
     summary = str(exc_value).strip() or exc_type.__name__
 
-    log_critical(
-        "system.uncaught_exception",
-        exc_info=(exc_type, exc_value, exc_traceback),
-    )
+    logging.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
     _show_exception_dialog(summary, detail)
 
 
@@ -87,7 +80,6 @@ def _install_global_exception_handlers() -> None:
     sys.excepthook = _handle_uncaught_exception
 
     if hasattr(threading, "excepthook"):
-
         def _thread_hook(args: threading.ExceptHookArgs) -> None:  # type: ignore[attr-defined]
             exc_type = args.exc_type or Exception
             exc_value = args.exc_value or exc_type()
@@ -116,39 +108,26 @@ def _normalize_smart_chars(text: str) -> str:
             text = text.replace(k, v)
     return text
 
-
 def _load_json_raw(path: Path) -> Optional[Dict[str, Any]]:
     """底层读取函数：多编码尝试 + 智能字符清洗。"""
     if not path.exists():
-        log_error("read_json.file_not_found", {"path": str(path)})
+        logging.error("read_json ERROR: file not found: %s", path)
         return None
     raw = path.read_bytes()
-    tried_encodings = [
-        "utf-8",
-        "utf-8-sig",
-        "cp1252",
-        "gbk",
-    ]  # cp1252 兼容 0x93, 最后尝试 gbk 以便日志更友好
+    tried_encodings = ['utf-8', 'utf-8-sig', 'cp1252', 'gbk']  # cp1252 兼容 0x93, 最后尝试 gbk 以便日志更友好
     last_err: Optional[Exception] = None
     for enc in tried_encodings:
         try:
             text = raw.decode(enc)
-            if enc != "utf-8":
-                log_warning("read_json.fallback_encoding", {"encoding": enc})
+            if enc != 'utf-8':
+                logging.warning("read_json: decoded with fallback encoding=%s", enc)
             text = _normalize_smart_chars(text)
             return json.loads(text)
         except Exception as e:  # noqa: BLE001
             last_err = e
             continue
-    log_error(
-        "read_json.failed_all",
-        {
-            "encodings": ", ".join(tried_encodings),
-            "error": str(last_err) if last_err else "",
-        },
-    )
+    logging.error("read_json FAILED: all encodings tried %s, last_err=%s", tried_encodings, last_err)
     return None
-
 
 def read_json() -> Dict[str, Any]:
     """读取 `request_id.json`，带编码回退与智能字符清洗。
@@ -160,30 +139,8 @@ def read_json() -> Dict[str, Any]:
     data = _load_json_raw(path)
     if data is None:
         return {}
-    preview_keys = list(data.keys())[:6]
-    log_info(
-        "read_json.loaded",
-        {"path": str(path), "keys": ", ".join(map(str, preview_keys))},
-    )
+    logging.info("read_json loaded file=%s keys=%s", path, list(data.keys())[:6])
     return data
-
-
-def _load_language_from_settings() -> str:
-    settings_path = Path(__file__).resolve().parent / "gui" / "settings.json"
-    try:
-        with settings_path.open("r", encoding="utf-8") as fh:
-            raw = json.load(fh)
-    except Exception:
-        return set_locale("zh")
-
-    if not isinstance(raw, dict):
-        return set_locale("zh")
-
-    raw_dict = cast(Dict[str, Any], raw)
-    preferred = raw_dict.get("language")
-    if not isinstance(preferred, str):
-        preferred = "zh"
-    return set_locale(preferred)
 
 
 if __name__ == "__main__":
@@ -194,8 +151,8 @@ if __name__ == "__main__":
         # 先显示预启动窗口
         prestart_window = Prestart_ui()
         prestart_window.setWindowFlags(
-            prestart_window.windowFlags()
-            | Qt.WindowType.WindowStaysOnTopHint  # 始终置顶 prestart window
+            prestart_window.windowFlags() |
+            Qt.WindowType.WindowStaysOnTopHint  # 始终置顶 prestart window
         )
         prestart_window.show()
         app.processEvents()  # 立刻渲染prestart window
@@ -203,12 +160,11 @@ if __name__ == "__main__":
         # 初始化日志和配置
         start_logging(process_tag="gui")
         json_data: Dict[str, Any] = read_json()
-        preferred_locale = _load_language_from_settings()
 
         # 使用定时器延迟创建主窗口
         def load_main_window():
             global window
-            window = mainWindow(language=preferred_locale)
+            window = mainWindow()
             window.show()
             prestart_window.close()  # 关闭预启动窗口
 
@@ -230,3 +186,14 @@ if __name__ == "__main__":
     #     request_year = request_year
     # )
     # fred_downloader.to_db(return_csv = False)
+
+
+
+
+
+
+
+
+
+
+

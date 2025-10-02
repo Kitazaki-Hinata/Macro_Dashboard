@@ -27,12 +27,7 @@ logger = logging.getLogger(__name__)
 class YFDownloader(DataDownloader):
     """Yahoo Finance 下载器。"""
 
-    def __init__(
-        self,
-        json_dict: Dict[str, Dict[str, Any]],
-        api_key: Optional[str],
-        request_year: int,
-    ):
+    def __init__(self, json_dict: Dict[str, Dict[str, Any]], api_key: Optional[str], request_year: int):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
         self.start_date: str = f"{request_year}-01-01"
         self.end_date: str = str(date.today())
@@ -54,9 +49,7 @@ class YFDownloader(DataDownloader):
             if token is not None:
                 token.raise_if_cancelled()
 
-        def worker(
-            table_name: str, table_config: Dict[str, Any]
-        ) -> Tuple[str, Optional[pd.DataFrame]]:
+        def worker(table_name: str, table_config: Dict[str, Any]) -> Tuple[str, Optional[pd.DataFrame]]:
             _check_cancel()
             try:
                 index = table_config["code"]
@@ -79,9 +72,7 @@ class YFDownloader(DataDownloader):
                 except Exception:
                     pass
                 if data.empty:
-                    logger.warning(
-                        "YF %s returned empty dataframe, skip DB write", table_name
-                    )
+                    logger.warning("YF %s returned empty dataframe, skip DB write", table_name)
                     return table_name, None
                 converter = DatabaseConverter()
                 _check_cancel()
@@ -97,9 +88,7 @@ class YFDownloader(DataDownloader):
             except CancelledError:
                 raise
             except Exception as e:
-                logger.error(
-                    "to_db, %s FAILED EXTRACT DATA from Yfinance, %s", table_name, e
-                )
+                logger.error("to_db, %s FAILED EXTRACT DATA from Yfinance, %s", table_name, e)
                 return table_name, None
 
         load_dotenv()
@@ -125,8 +114,6 @@ class YFDownloader(DataDownloader):
                     df.to_csv(csv_path, index=True)
                     logging.info("%s saved to %s Successfully!", name, csv_path)
                 except Exception as err:
-                    logging.error(
-                        "%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err
-                    )
+                    logging.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
                     continue
         return df_dict if return_csv else None
