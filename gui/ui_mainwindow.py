@@ -148,6 +148,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         '''SETTINGS page btn '''
         self.one_chart_ui.finish_btn.clicked.connect(lambda : self.ui_functions.one_finish_settings(self.one_chart_ui, self.one_chart_settings_window))
         self.one_chart_ui.cancel_btn.clicked.connect(lambda : self.ui_functions.one_close_setting_window(self.one_chart_ui, self.one_chart_settings_window))
+        self.one_chart_ui.reset_btn.clicked.connect(lambda : self.ui_functions.one_reset_settings(self.one_chart_ui))
 
         self.four_chart_ui.finish_btn.clicked.connect(
             lambda: self.ui_functions.four_finish_settings(self.four_chart_ui, self.four_chart_settings_window)
@@ -155,6 +156,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.four_chart_ui.cancel_btn.clicked.connect(
             lambda: self.ui_functions.four_close_setting_window(self.four_chart_ui, self.four_chart_settings_window)
         )
+        self.four_chart_ui.reset_btn.clicked.connect(lambda : self.ui_functions.four_reset_settings(self.four_chart_ui))
 
         self.table_ui.finish_btn.clicked.connect(
             lambda: self.ui_functions.table_finish_settings(self.table_ui, self.table_settings_window)

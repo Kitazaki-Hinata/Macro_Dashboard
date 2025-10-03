@@ -298,6 +298,11 @@ class Ui_OneChartSettingsPanel(object):
 "    icon: url(:/png/sub_resource/cancel.png);\n"
 "    icon-size: 20px 20px;\n"
 "}\n"
+"QPushButton#reset_btn {\n"
+"    icon: url(:/png/sub_resource/reset.png);\n"
+"    icon-size: 16px 16px;\n"
+"}\n"
+"\n"
 "\n"
 "")
         self.horizontalLayout = QHBoxLayout(self.ctrl_btn_container)
@@ -306,6 +311,18 @@ class Ui_OneChartSettingsPanel(object):
         self.horizontalSpacer = QSpacerItem(495, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.reset_btn = QPushButton(self.ctrl_btn_container)
+        self.reset_btn.setObjectName(u"reset_btn")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(25)
+        sizePolicy.setVerticalStretch(25)
+        sizePolicy.setHeightForWidth(self.reset_btn.sizePolicy().hasHeightForWidth())
+        self.reset_btn.setSizePolicy(sizePolicy)
+        self.reset_btn.setMinimumSize(QSize(25, 25))
+        self.reset_btn.setMaximumSize(QSize(25, 25))
+
+        self.horizontalLayout.addWidget(self.reset_btn)
 
         self.cancel_btn = QPushButton(self.ctrl_btn_container)
         self.cancel_btn.setObjectName(u"cancel_btn")
@@ -340,6 +357,7 @@ class Ui_OneChartSettingsPanel(object):
         self.first_color_btn.setText("")
         self.data_name_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"Data Name", None))
         self.first_data_title.setText(QCoreApplication.translate("OneChartSettingsPanel", u"First Data (Main)", None))
+        self.reset_btn.setText("")
         self.cancel_btn.setText("")
         self.finish_btn.setText("")
     # retranslateUi

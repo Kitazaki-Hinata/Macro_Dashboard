@@ -779,13 +779,14 @@ class UiFunctions():  # 删除:mainWindow
             existing_data = {}
         return self._ensure_settings_structure(existing_data)
 
+    # ONE WINDOW
     def one_finish_settings(self, window: Any, widget: QWidget):
         '''确认按钮的槽函数'''
         # define variables
         first_data = window.first_data_selection_box.currentText()
         second_data = window.second_data_selection_box.currentText()
 
-        first_lag = window.first_time_lag.value()
+        first_lag  = window.first_time_lag.value()
         second_lag = window.second_time_lag.value()
 
         first_color = window.first_color_btn.styleSheet().split(":")[1][1:]
@@ -1024,7 +1025,8 @@ class UiFunctions():  # 删除:mainWindow
                         main_plot_widget.hideAxis('right')
                 except Exception:
                     pass
-        # ================= 保存设置到 JSON =================
+
+        # 保存到json
         try:
             settings_path = self._get_json_settings_path()
             with open(settings_path, 'w', encoding='utf-8') as f:
@@ -1077,7 +1079,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception as e:
             logging.error(f"写入 one_chart settings.json 失败: {e}")
 
-        # ================= 关闭设置窗口 =================
+        # 关闭窗口
         try:
             widget.close()
         except Exception:
@@ -1085,14 +1087,23 @@ class UiFunctions():  # 删除:mainWindow
 
         self.main_window.title_label_2.setText(first_data)
 
-    # ===================== ONE WINDOW 关闭（保持原接口） =====================
     def one_close_setting_window(self, window: Any, widget: QWidget):
         try:
             widget.close()
         except Exception:
             pass
 
-    # ===================== FOUR CHART SETTINGS =====================
+    def one_reset_settings(self, window: Any):
+        # 重置设置面板默认值
+        window.first_color_btn.setStyleSheet(f"background-color: #90b6e7")
+        window.second_color_btn.setStyleSheet(f"background-color: #ee5c88")
+        window.first_time_lag.setValue(0)
+        window.second_time_lag.setValue(0)
+        window.first_data_selection_box.setCurrentIndex(0)
+        window.second_data_selection_box.setCurrentIndex(0)
+
+
+    # FOUR CHART SETTINGS
     def four_finish_settings(self, window: Any, widget: QWidget):
         first_data = window.first_data_selection_box.currentText()
         second_data = window.second_data_selection_box.currentText()
@@ -1166,7 +1177,18 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
-    # ===================== TABLE SETTINGS (占位，可后续完善) =====================
+    def four_reset_settings(self, window: Any):
+        window.first_color_btn.setStyleSheet(f"background-color: #90b6e7")
+        window.second_color_btn.setStyleSheet(f"background-color: #90b6e7")
+        window.third_color_btn.setStyleSheet(f"background-color: #90b6e7")
+        window.fourth_color_btn.setStyleSheet(f"background-color: #90b6e7")
+        window.first_data_selection_box.setCurrentIndex(0)
+        window.second_data_selection_box.setCurrentIndex(0)
+        window.third_data_selection_box.setCurrentIndex(0)
+        window.fourth_data_selection_box.setCurrentIndex(0)
+
+
+    # TABLE SETTINGS
     def table_finish_settings(self, window: Any, widget: QWidget):
         existing_data = self.get_settings_from_json()
         # TODO: 根据表格设置界面控件读取列选择等
@@ -1186,7 +1208,7 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
-    # ===================== 恢复缺失: 获取 SQLite 列名称 =====================
+    #获取 SQLite 列名称
     def _get_sqlite_col_name(self) -> list[str]:
         """获取 sqlite 数据库 Time_Series 表的列名 (除去第一列 date)。
         若数据库或表不存在，返回空列表并记录日志。"""

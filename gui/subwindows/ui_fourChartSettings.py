@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_fourChartSettings.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -279,6 +279,7 @@ class Ui_FourChartSettingsPanel(object):
 
         self.fourth_color_btn = QPushButton(self.settings_panel)
         self.fourth_color_btn.setObjectName(u"fourth_color_btn")
+        self.fourth_color_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.fourth_color_btn.setStyleSheet(u"background : #90b6e7")
 
         self.gridLayout.addWidget(self.fourth_color_btn, 4, 2, 1, 1)
@@ -315,7 +316,10 @@ class Ui_FourChartSettingsPanel(object):
 "    icon: url(:/png/sub_resource/cancel.png);\n"
 "    icon-size: 20px 20px;\n"
 "}\n"
-"\n"
+"QPushButton#reset_btn {\n"
+"    icon: url(:/png/sub_resource/reset.png);\n"
+"    icon-size: 16px 16px;\n"
+"}\n"
 "")
         self.horizontalLayout = QHBoxLayout(self.ctrl_btn_container)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -323,6 +327,13 @@ class Ui_FourChartSettingsPanel(object):
         self.horizontalSpacer = QSpacerItem(495, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.reset_btn = QPushButton(self.ctrl_btn_container)
+        self.reset_btn.setObjectName(u"reset_btn")
+        self.reset_btn.setMinimumSize(QSize(25, 25))
+        self.reset_btn.setMaximumSize(QSize(25, 25))
+
+        self.horizontalLayout.addWidget(self.reset_btn)
 
         self.cancel_btn = QPushButton(self.ctrl_btn_container)
         self.cancel_btn.setObjectName(u"cancel_btn")
@@ -360,6 +371,7 @@ class Ui_FourChartSettingsPanel(object):
         self.data_name_title.setText(QCoreApplication.translate("FourChartSettingsPanel", u"Data Name", None))
         self.fourth_data_title.setText(QCoreApplication.translate("FourChartSettingsPanel", u"Fourth Chart", None))
         self.fourth_color_btn.setText("")
+        self.reset_btn.setText("")
         self.cancel_btn.setText("")
         self.finish_btn.setText("")
     # retranslateUi
