@@ -85,6 +85,4 @@ gui/subwindows/ui_tableSettings_ui.py
 gui/subwindows/ui_oneChartSettings_ui.py
 gui/subwindows/ui_fourChartSettings_ui.py
 gui/resources_rc_rc.py
-
-
-/settings.json
+gui/settings.json
