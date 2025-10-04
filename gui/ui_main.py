@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -19,9 +19,8 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
     QLabel, QLineEdit, QMainWindow, QPlainTextEdit,
     QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
-    QSpinBox, QStackedWidget, QTabWidget, QTableView,
-    QTextEdit, QVBoxLayout, QWidget)
-
+    QSpinBox, QStackedWidget, QTableView, QTextEdit,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -136,6 +135,58 @@ class Ui_MainWindow(object):
 "        QSpinBox::down-button:pressed {\n"
 "            background: #404043;\n"
 "        }\n"
+"\n"
+"\n"
+"/*================================== ====*/\n"
+"/* scroll bar*/\n"
+" QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: #303030;\n"
+"    width: 8px;\n"
+"    margin: 2"
+                        "1px 0 21px 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+" QScrollBar::handle:vertical {	\n"
+"	background: #90b6e7;\n"
+"    min-height: 25px;\n"
+"	border-radius: 4px\n"
+" }\n"
+"\n"
+"\n"
+"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6ed1\u6761\u6309\u94ae*/\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-bottom-left-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"    background: #252526;\n"
+"     height: 20px;\n"
+"	border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+"\n"
+"\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc\u666f\u989c\u8272*/\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"     background: none;\n"
+" }\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"     back"
+                        "ground: none;\n"
+" }\n"
+"        \n"
+"        \n"
+"\n"
+"\n"
 "        \n"
 "")
         self.style_sheet = QWidget(MainWindow)
@@ -434,17 +485,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.tab_window = QTabWidget(self.page_one_container)
-        self.tab_window.setObjectName(u"tab_window")
-        self.tab_window.setEnabled(True)
-        font1 = QFont()
-        font1.setFamilies([u"Comfortaa"])
-        font1.setBold(True)
-        self.tab_window.setFont(font1)
-        self.tab_window.setAcceptDrops(False)
-        self.tab_window.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.tab_window.setAutoFillBackground(False)
-        self.tab_window.setStyleSheet(u"* {\n"
+        self.widget_2 = QWidget(self.page_one_container)
+        self.widget_2.setObjectName(u"widget_2")
+        self.widget_2.setMinimumSize(QSize(0, 0))
+        self.widget_2.setStyleSheet(u"* {\n"
 "	background-color : #33363a;\n"
 "	font-family : \"Comfortaa\";\n"
 "}\n"
@@ -478,61 +522,52 @@ class Ui_MainWindow(object):
 "	size:50%\n"
 "}\n"
 "")
-        self.tab_window.setTabPosition(QTabWidget.TabPosition.North)
-        self.tab_window.setTabShape(QTabWidget.TabShape.Rounded)
-        self.tab_window.setElideMode(Qt.TextElideMode.ElideRight)
-        self.tab_window.setUsesScrollButtons(False)
-        self.tab_window.setDocumentMode(True)
-        self.tab_window.setTabsClosable(True)
-        self.tab_window.setMovable(True)
-        self.tab_window.setTabBarAutoHide(False)
-        self.tab = QWidget()
-        self.tab.setObjectName(u"tab")
-        self.verticalLayout_5 = QVBoxLayout(self.tab)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalSpacer_3 = QSpacerItem(0, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.verticalLayout_35 = QVBoxLayout(self.widget_2)
+        self.verticalLayout_35.setObjectName(u"verticalLayout_35")
+        self.verticalSpacer_10 = QSpacerItem(0, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
-        self.verticalLayout_5.addItem(self.verticalSpacer_3)
+        self.verticalLayout_35.addItem(self.verticalSpacer_10)
 
-        self.btn_and_text_container = QWidget(self.tab)
+        self.btn_and_text_container = QWidget(self.widget_2)
         self.btn_and_text_container.setObjectName(u"btn_and_text_container")
-        self.btn_and_text_container.setMaximumSize(QSize(16777215, 40))
+        self.btn_and_text_container.setMinimumSize(QSize(0, 65))
+        self.btn_and_text_container.setMaximumSize(QSize(16777215, 65))
         self.btn_and_text_container.setStyleSheet(u"")
-        self.horizontalLayout_3 = QHBoxLayout(self.btn_and_text_container)
-        self.horizontalLayout_3.setSpacing(3)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.text_container = QWidget(self.btn_and_text_container)
-        self.text_container.setObjectName(u"text_container")
-        self.text_container.setMaximumSize(QSize(16777215, 40))
-        self.verticalLayout_6 = QVBoxLayout(self.text_container)
-        self.verticalLayout_6.setSpacing(6)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
-        self.title_label = QLabel(self.text_container)
-        self.title_label.setObjectName(u"title_label")
-        self.title_label.setMaximumSize(QSize(16777215, 20))
-        font2 = QFont()
-        font2.setFamilies([u"Comfortaa"])
-        font2.setPointSize(14)
-        font2.setBold(True)
-        self.title_label.setFont(font2)
-        self.title_label.setStyleSheet(u"color: #ffffff; \n"
+        self.horizontalLayout_21 = QHBoxLayout(self.btn_and_text_container)
+        self.horizontalLayout_21.setSpacing(3)
+        self.horizontalLayout_21.setObjectName(u"horizontalLayout_21")
+        self.horizontalLayout_21.setContentsMargins(0, 0, 0, 0)
+        self.text_container_3 = QWidget(self.btn_and_text_container)
+        self.text_container_3.setObjectName(u"text_container_3")
+        self.text_container_3.setMaximumSize(QSize(16777215, 40))
+        self.verticalLayout_34 = QVBoxLayout(self.text_container_3)
+        self.verticalLayout_34.setSpacing(6)
+        self.verticalLayout_34.setObjectName(u"verticalLayout_34")
+        self.verticalLayout_34.setContentsMargins(0, 0, 0, 0)
+        self.title_label_2 = QLabel(self.text_container_3)
+        self.title_label_2.setObjectName(u"title_label_2")
+        self.title_label_2.setMaximumSize(QSize(16777215, 20))
+        font1 = QFont()
+        font1.setFamilies([u"Comfortaa"])
+        font1.setPointSize(14)
+        font1.setBold(True)
+        self.title_label_2.setFont(font1)
+        self.title_label_2.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
-        self.verticalLayout_6.addWidget(self.title_label)
+        self.verticalLayout_34.addWidget(self.title_label_2)
 
-        self.update_label = QLabel(self.text_container)
-        self.update_label.setObjectName(u"update_label")
-        self.update_label.setMaximumSize(QSize(16777215, 12))
-        self.update_label.setFont(font)
-        self.update_label.setStyleSheet(u"margin-left : 10px; \n"
+        self.update_label_2 = QLabel(self.text_container_3)
+        self.update_label_2.setObjectName(u"update_label_2")
+        self.update_label_2.setMaximumSize(QSize(16777215, 12))
+        self.update_label_2.setFont(font)
+        self.update_label_2.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
 
-        self.verticalLayout_6.addWidget(self.update_label)
+        self.verticalLayout_34.addWidget(self.update_label_2)
 
 
-        self.horizontalLayout_3.addWidget(self.text_container)
+        self.horizontalLayout_21.addWidget(self.text_container_3)
 
         self.btn_frame = QFrame(self.btn_and_text_container)
         self.btn_frame.setObjectName(u"btn_frame")
@@ -552,15 +587,6 @@ class Ui_MainWindow(object):
 "	border-radius : 9px;\n"
 "}\n"
 "\n"
-"\n"
-"QPushButton#one_add_page {\n"
-"    icon: url(:/png/png/add_page.png);\n"
-"    icon-size: 17px 17px;\n"
-"}\n"
-"QPushButton#one_add_page:pressed {\n"
-"    icon: url(:/png_press/png/add_page_press.png);\n"
-"    icon-size: 17px 17px;\n"
-"}\n"
 "QPushButton#one_set_preference {\n"
 "    icon: url(:/png/png/set_preference.png);\n"
 "    icon-size: 17px 17px;\n"
@@ -572,50 +598,46 @@ class Ui_MainWindow(object):
         self.btn_frame.setFrameShape(QFrame.Shape.NoFrame)
         self.btn_frame.setFrameShadow(QFrame.Shadow.Plain)
         self.btn_frame.setLineWidth(0)
-        self.horizontalLayout_4 = QHBoxLayout(self.btn_frame)
-        self.horizontalLayout_4.setSpacing(0)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.one_add_page = QPushButton(self.btn_frame)
-        self.one_add_page.setObjectName(u"one_add_page")
-        self.one_add_page.setMaximumSize(QSize(25, 25))
-        self.one_add_page.setStyleSheet(u"")
+        self.horizontalLayout_22 = QHBoxLayout(self.btn_frame)
+        self.horizontalLayout_22.setSpacing(0)
+        self.horizontalLayout_22.setObjectName(u"horizontalLayout_22")
+        self.horizontalLayout_22.setContentsMargins(0, 0, 0, 0)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_4.addWidget(self.one_add_page)
+        self.horizontalLayout_22.addItem(self.horizontalSpacer)
 
         self.one_set_preference = QPushButton(self.btn_frame)
         self.one_set_preference.setObjectName(u"one_set_preference")
         self.one_set_preference.setMaximumSize(QSize(25, 25))
         self.one_set_preference.setStyleSheet(u"")
 
-        self.horizontalLayout_4.addWidget(self.one_set_preference)
+        self.horizontalLayout_22.addWidget(self.one_set_preference)
 
 
-        self.horizontalLayout_3.addWidget(self.btn_frame)
+        self.horizontalLayout_21.addWidget(self.btn_frame)
 
-        self.horizontalSpacer = QSpacerItem(10, 1, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_5 = QSpacerItem(10, 1, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_3.addItem(self.horizontalSpacer)
+        self.horizontalLayout_21.addItem(self.horizontalSpacer_5)
 
 
-        self.verticalLayout_5.addWidget(self.btn_and_text_container)
+        self.verticalLayout_35.addWidget(self.btn_and_text_container)
 
-        self.verticalSpacer_4 = QSpacerItem(20, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.verticalSpacer_9 = QSpacerItem(20, 7, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
-        self.verticalLayout_5.addItem(self.verticalSpacer_4)
+        self.verticalLayout_35.addItem(self.verticalSpacer_9)
 
-        self.graph_widget = QWidget(self.tab)
-        self.graph_widget.setObjectName(u"graph_widget")
-        self.graph_widget.setStyleSheet(u"background-color : #262a2f;\n"
+        self.graph_widget_2 = QWidget(self.widget_2)
+        self.graph_widget_2.setObjectName(u"graph_widget_2")
+        self.graph_widget_2.setStyleSheet(u"background-color : #262a2f;\n"
 "border-radius:30px;\n"
 "margin-left : 10px;\n"
 "margin-right : 10px;")
 
-        self.verticalLayout_5.addWidget(self.graph_widget)
+        self.verticalLayout_35.addWidget(self.graph_widget_2)
 
-        self.tab_window.addTab(self.tab, "")
 
-        self.verticalLayout_4.addWidget(self.tab_window)
+        self.verticalLayout_4.addWidget(self.widget_2)
 
         self.stackedWidget.addWidget(self.page_one_container)
         self.page_table_container = QWidget()
@@ -625,7 +647,7 @@ class Ui_MainWindow(object):
         self.text_and_btn = QWidget(self.page_table_container)
         self.text_and_btn.setObjectName(u"text_and_btn")
         self.text_and_btn.setMinimumSize(QSize(0, 82))
-        self.text_and_btn.setMaximumSize(QSize(16777215, 16777215))
+        self.text_and_btn.setMaximumSize(QSize(16777215, 82))
         self.text_and_btn.setStyleSheet(u"QPushButton {\n"
 "	background-color : #252526;\n"
 "	border-radius : 9px;\n"
@@ -655,7 +677,7 @@ class Ui_MainWindow(object):
         self.table_title_label = QLabel(self.text_container_2)
         self.table_title_label.setObjectName(u"table_title_label")
         self.table_title_label.setMaximumSize(QSize(16777215, 20))
-        self.table_title_label.setFont(font2)
+        self.table_title_label.setFont(font1)
         self.table_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -665,7 +687,7 @@ class Ui_MainWindow(object):
         self.table_update_label.setObjectName(u"table_update_label")
         self.table_update_label.setMaximumSize(QSize(16777215, 12))
         self.table_update_label.setFont(font)
-        self.table_update_label.setStyleSheet(u"margin-left : 10px; \n"
+        self.table_update_label.setStyleSheet(u"margin-left : 9px; \n"
 "color : #90b6e7;")
 
         self.verticalLayout_9.addWidget(self.table_update_label)
@@ -721,6 +743,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.four_text_widget = QWidget(self.page_four_container)
         self.four_text_widget.setObjectName(u"four_text_widget")
+        self.four_text_widget.setMinimumSize(QSize(0, 80))
         self.four_text_widget.setMaximumSize(QSize(16777215, 80))
         self.four_text_widget.setStyleSheet(u"QPushButton {\n"
 "	background-color : #252526;\n"
@@ -761,7 +784,7 @@ class Ui_MainWindow(object):
         self.four_title_label = QLabel(self.four_text_container)
         self.four_title_label.setObjectName(u"four_title_label")
         self.four_title_label.setMaximumSize(QSize(16777215, 20))
-        self.four_title_label.setFont(font2)
+        self.four_title_label.setFont(font1)
         self.four_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -771,7 +794,7 @@ class Ui_MainWindow(object):
         self.four_update_label.setObjectName(u"four_update_label")
         self.four_update_label.setMaximumSize(QSize(16777215, 12))
         self.four_update_label.setFont(font)
-        self.four_update_label.setStyleSheet(u"margin-left : 10px; \n"
+        self.four_update_label.setStyleSheet(u"margin-left : 8px; \n"
 "color : #90b6e7;")
 
         self.verticalLayout_7.addWidget(self.four_update_label)
@@ -782,7 +805,10 @@ class Ui_MainWindow(object):
         self.connect_charts = QCheckBox(self.four_text_widget)
         self.connect_charts.setObjectName(u"connect_charts")
         self.connect_charts.setMaximumSize(QSize(150, 16777215))
-        self.connect_charts.setFont(font1)
+        font2 = QFont()
+        font2.setFamilies([u"Comfortaa"])
+        font2.setBold(True)
+        self.connect_charts.setFont(font2)
         self.connect_charts.setStyleSheet(u"color:white;")
 
         self.horizontalLayout_5.addWidget(self.connect_charts)
@@ -847,6 +873,51 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.page_four_container)
         self.page_note_container = QWidget()
         self.page_note_container.setObjectName(u"page_note_container")
+        self.page_note_container.setStyleSheet(u"QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: #ffffff;\n"
+"    width: 17.5px;\n"
+"    margin: 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+"QScrollBar::handle:vertical {	\n"
+"	background: #90b6e7;\n"
+"	width :8px;\n"
+"    min-height: 25px;\n"
+"	border-radius: 4px\n"
+" }\n"
+"\n"
+"\n"
+"/*\u8bbe\u7f6e\u4e0a\u4e0b\u6309\u94ae*/\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"    background: transparent;\n"
+"     height: 20px;\n"
+"	border-bottom-left-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"     height: 20px;\n"
+"	border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+"\n"
+"\n"
+"/*\u9632\u6b62\u906e\u4f4f\u6ed1\u6761\u80cc\u666f\u989c\u8272*/\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+" "
+                        "    background: none;\n"
+" }\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"     background: none;\n"
+" }\n"
+"")
         self.horizontalLayout_7 = QHBoxLayout(self.page_note_container)
         self.horizontalLayout_7.setSpacing(0)
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
@@ -1228,7 +1299,7 @@ class Ui_MainWindow(object):
         self.note_title_label = QLabel(self.note_text_container)
         self.note_title_label.setObjectName(u"note_title_label")
         self.note_title_label.setMaximumSize(QSize(16777215, 20))
-        self.note_title_label.setFont(font2)
+        self.note_title_label.setFont(font1)
         self.note_title_label.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
 
@@ -1248,6 +1319,7 @@ class Ui_MainWindow(object):
 
         self.save_text = QPushButton(self.text_enter_container)
         self.save_text.setObjectName(u"save_text")
+        self.save_text.setEnabled(False)
         self.save_text.setMaximumSize(QSize(25, 25))
 
         self.horizontalLayout_8.addWidget(self.save_text)
@@ -1261,7 +1333,7 @@ class Ui_MainWindow(object):
 
         self.note_label_notes = QLabel(self.content_area)
         self.note_label_notes.setObjectName(u"note_label_notes")
-        self.note_label_notes.setFont(font1)
+        self.note_label_notes.setFont(font2)
         self.note_label_notes.setStyleSheet(u"color : #EE5C88; margin-left : 20px")
 
         self.verticalLayout_11.addWidget(self.note_label_notes)
@@ -1369,7 +1441,7 @@ class Ui_MainWindow(object):
         self.note_title_label_2 = QLabel(self.note_text_container_2)
         self.note_title_label_2.setObjectName(u"note_title_label_2")
         self.note_title_label_2.setMaximumSize(QSize(16777215, 20))
-        self.note_title_label_2.setFont(font2)
+        self.note_title_label_2.setFont(font1)
         self.note_title_label_2.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 1px; ")
 
@@ -1944,14 +2016,14 @@ class Ui_MainWindow(object):
 "\n"
 "\n"
 "/*clear lags*/\n"
-"QPushButton#clear_lag_btn {\n"
+"QPushButton#clear_log_btn {\n"
 "	background-color:#EE5C88;\n"
 "	color : #252526;\n"
 "}\n"
-"QPushButton#clear_lag_btn::hover {\n"
+"QPushButton#clear_log_btn::hover {\n"
 "	background : #fa88aa;\n"
 "}\n"
-"QPushButton#clear_lag_btn::pressed {\n"
+"QPushButton#clear_log_btn::pressed {\n"
 "	background : #EE5C88;\n"
 "}")
         self.verticalLayout_27 = QVBoxLayout(self.download_btn_container)
@@ -1971,12 +2043,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_27.addWidget(self.cancel_btn)
 
-        self.clear_lag_btn = QPushButton(self.download_btn_container)
-        self.clear_lag_btn.setObjectName(u"clear_lag_btn")
-        self.clear_lag_btn.setFont(font5)
-        self.clear_lag_btn.setStyleSheet(u"")
+        self.clear_log_btn = QPushButton(self.download_btn_container)
+        self.clear_log_btn.setObjectName(u"clear_log_btn")
+        self.clear_log_btn.setFont(font5)
+        self.clear_log_btn.setStyleSheet(u"")
 
-        self.verticalLayout_27.addWidget(self.clear_lag_btn)
+        self.verticalLayout_27.addWidget(self.clear_log_btn)
 
 
         self.verticalLayout_32.addWidget(self.download_btn_container)
@@ -2073,7 +2145,7 @@ class Ui_MainWindow(object):
         self.author_name_and_time = QLabel(self.frame)
         self.author_name_and_time.setObjectName(u"author_name_and_time")
         self.author_name_and_time.setMaximumSize(QSize(16777215, 16777215))
-        self.author_name_and_time.setFont(font1)
+        self.author_name_and_time.setFont(font2)
         self.author_name_and_time.setStyleSheet(u"color:#90b6e7;\n"
 "font-family:\"Comfortaa\";\n"
 "padding:3px;\n"
@@ -2093,8 +2165,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
-        self.tab_window.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -2126,19 +2197,14 @@ class Ui_MainWindow(object):
         self.settings_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.settings_btn.setText("")
-#if QT_CONFIG(tooltip)
-        self.tab_window.setToolTip("")
-#endif // QT_CONFIG(tooltip)
-        self.title_label.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
-        self.update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
-        self.one_add_page.setText("")
+        self.title_label_2.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
+        self.update_label_2.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.one_set_preference.setText("")
-        self.tab_window.setTabText(self.tab_window.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Tab Box 1", None))
         self.table_title_label.setText(QCoreApplication.translate("MainWindow", u"Table : Selected Table Name", None))
-        self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.page_table_set_preference.setText("")
         self.four_title_label.setText(QCoreApplication.translate("MainWindow", u"Four Charts Interface", None))
-        self.four_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : 2025-08-01", None))
+        self.four_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.connect_charts.setText(QCoreApplication.translate("MainWindow", u" Connect Charts", None))
         self.four_settings_button.setText("")
 #if QT_CONFIG(tooltip)
@@ -2192,13 +2258,15 @@ class Ui_MainWindow(object):
 "\n"
 "        The file storage directory o"
                         "f this document editor is \"software path/note\" (which is the \"note\" folder within the software directory). If you need to operate, please do it directly in the folder. Be careful not to operate the folder while the software is running. \n"
+"        \n"
 "        The button on the upper right corner is the save button. Please make sure to click the save button after each time you finish writing the article. The script will recognize the text in the middle text editing area and transfer it to the corresponding txt file. (The automatic save function will be added in the subsequent updates.)\n"
 "        On the lower left corner, there are three buttons in sequence:\n"
 "                New note, Rename note, Delete note. \n"
+"\n"
 "        -- Create a new note:\n"
 "        1. First, enter the name of the note in the bottom input box. Please make sure not to include spaces, as well as characters such as \\ / : * ? \" < > | which are system-prohibited for use as file names.\n"
-"        2. Click the \"Create Note\" button at the bott"
-                        "om left corner, and you will see the corresponding button in the Notes Editor sidebar on the left. Click the button to enter the document editing mode.\n"
+"        2. Click the \"Create Note\" "
+                        "button at the bottom left corner, and you will see the corresponding button in the Notes Editor sidebar on the left. Click the button to enter the document editing mode.\n"
 "\n"
 "        -- Rename a note:\n"
 "        1. Enter the name of the note you want to change in the bottom input box. Pay attention to the case. The script will try to match the corresponding button.\n"
@@ -2206,8 +2274,8 @@ class Ui_MainWindow(object):
 "        3. After the modification is completed, press any key or click anywhere on the interface to complete the modification. The script will automatically modify the txt document under the folder directory.\n"
 "        -- Delete a note:\n"
 "        1. Enter the name of the note you want to delete in the bottom input box.\n"
-"        2. Click the \"Delete\""
-                        " button. (Note that no confirmation window will pop up when deleting and the file cannot be restored. Please be cautious when deleting) \n"
+"        2. C"
+                        "lick the \"Delete\" button. (Note that no confirmation window will pop up when deleting and the file cannot be restored. Please be cautious when deleting) \n"
 "\n"
 "        The edit box currently does not support inserting images or editing font styles. Updates will be gradually released in the future.\n"
 "        Enjoy your use! (\u2220\u00b7\u03c9< )\u2312\u2605 Love from Kitazaki Hinata", None))
@@ -2222,7 +2290,7 @@ class Ui_MainWindow(object):
         self.status_label.setText(QCoreApplication.translate("MainWindow", u"Status will be displayed here", None))
         self.other_group_box.setTitle("")
         self.other_option_text.setText(QCoreApplication.translate("MainWindow", u"About & Terms", None))
-        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 1.0.0</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
+        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 0.9.00_beta</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
         self.image_label.setText("")
         self.textEdit.setDocumentTitle("")
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -2238,7 +2306,7 @@ class Ui_MainWindow(object):
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">The source code is open and available under the MIT-Non Commercial (MIT-NC) License terms.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:9pt;\">Some UI elements (SVG and PNG icons, components) are sourced from [FAWZIUIUX]\uff1afawziuiux.com/#Home.  All rights belong to the original author.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI"
-                        "'; font-size:9pt;\">Special thanks to : SeaStar</span></p></body></html>", None))
+                        "'; font-size:9pt;\">Special thanks to : SeaStar, yuyoux7</span></p></body></html>", None))
         self.read_and_agree_check.setText(QCoreApplication.translate("MainWindow", u"I have read and agree to the Terms and Conditions.", None))
         self.download_data_box.setTitle("")
         self.download_text.setText(QCoreApplication.translate("MainWindow", u"Select data resources and download data", None))
@@ -2259,7 +2327,7 @@ class Ui_MainWindow(object):
         self.download_for_all_check.setText(QCoreApplication.translate("MainWindow", u"Download ALL data", None))
         self.download_btn.setText(QCoreApplication.translate("MainWindow", u"Download", None))
         self.cancel_btn.setText(QCoreApplication.translate("MainWindow", u"Cancel Download", None))
-        self.clear_lag_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
+        self.clear_log_btn.setText(QCoreApplication.translate("MainWindow", u"Clear logs", None))
         self.parallel_download_check.setText(QCoreApplication.translate("MainWindow", u"Enable parallel downloads", None))
         self.max_threads_label.setText(QCoreApplication.translate("MainWindow", u"Max threads", None))
         self.console_text.setText(QCoreApplication.translate("MainWindow", u"Console & Logging Information", None))

@@ -76,3 +76,13 @@ web_crawlers/__pycache__/
 /Macro-Data-Dashboard.GUI/Macro-Data-Dashboard.GUI/obj/
 /Macro-Data-Dashboard.GUI/bin/
 /Macro-Data-Dashboard.GUI/obj/
+/logs
+/gui/dwfunction
+gui/ui_main_ui.py
+gui/subwindows/sub_resources_rc_rc.py
+gui/subwindows/ui_prestart_ui.py
+gui/subwindows/ui_tableSettings_ui.py
+gui/subwindows/ui_oneChartSettings_ui.py
+gui/subwindows/ui_fourChartSettings_ui.py
+gui/resources_rc_rc.py
+gui/settings.json
