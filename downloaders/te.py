@@ -207,7 +207,8 @@ class TEDownloader(DataDownloader):
                 _check_cancel()
                 data_name = table_config["name"]
                 df = self._get_data_from_trading_economics_month(
-                    data_name=data_name, check_cancel=_check_cancel
+                    data_name=data_name,
+                    check_cancel=_check_cancel
                 )
                 if df is None:
                     logger.error(

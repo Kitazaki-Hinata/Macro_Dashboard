@@ -156,13 +156,16 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [ ] no show second line data on preview labeled
 - [ ] one chart里面的右坐标轴字体没法缩小
 - [x] ~~应用comfortaa字体失败~~ ✅ *2025-10-01：修正 `font-family` 样式拼写，字体可正常加载*
+- [ ] ism数据只能下载ism_service
+- [ ] 所有非时序数据只用csv，所以要新建一个目录在csv下面，方便遍历
+- [ ] 删除ism多余的print，当解决完报错以后
 
 **extra function waitlist :**
 
 - [ ] 新板块：彭博文章
 - [ ] 新板块：美债期限结构
 - [ ] 设置图表网格的透明度&颜色
-- [ ] ~~reset设置框内的内容，包括颜色，数据名称~~ ✅ *2025-10-04：已添加*
+- [x] ~~reset设置框内的内容，包括颜色，数据名称~~ ✅ *2025-10-04：已添加*
 - [ ] 设立一个使用说明页面
 - [ ] 储存上次设置好的线条样式
 - [ ] i18n 多语言支持（简中，繁中，日文）

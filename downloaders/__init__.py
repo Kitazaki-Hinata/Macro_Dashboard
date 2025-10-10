@@ -14,6 +14,7 @@ from .common import DataDownloader
 from .fred import FREDDownloader
 from .te import TEDownloader
 from .yf import YFDownloader
+from .ism import ISMDownloader
 
 __all__ = [
     "DownloaderFactory",
@@ -23,6 +24,7 @@ __all__ = [
     "FREDDownloader",
     "TEDownloader",
     "YFDownloader",
+    "ISMDownloader"
 ]
 
 DownloaderType = Type[DataDownloader]
@@ -32,12 +34,12 @@ _DOWNLOADERS: Dict[str, DownloaderType] = {
     "fred": FREDDownloader,
     "bls": BLSDownloader,
     "te": TEDownloader,
+    "ism": ISMDownloader
 }
 
 
 class DownloaderFactory:
     """Factory for creating concrete downloader instances by source name."""
-
     @staticmethod
     def _get_api_key(source: str) -> str:
         load_dotenv()

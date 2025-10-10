@@ -1717,7 +1717,7 @@ class Ui_MainWindow(object):
         font6.setPointSize(12)
         self.textEdit.setFont(font6)
         self.textEdit.setStyleSheet(u"color:white; \n"
-"font-famlily:\"Comfortaa\";\n"
+" font-family:\"Comfortaa\";\n"
 "border :0;\n"
 "background:#262a2f;\n"
 "padding :5px;\n"
@@ -1873,7 +1873,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_31.setContentsMargins(0, 0, 0, 0)
         self.ism = QCheckBox(self.cs_data)
         self.ism.setObjectName(u"ism")
-        self.ism.setEnabled(False)
+        self.ism.setEnabled(True)
         self.ism.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.ism)
@@ -2117,7 +2117,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.console_area.sizePolicy().hasHeightForWidth())
         self.console_area.setSizePolicy(sizePolicy1)
         self.console_area.setStyleSheet(u"color:white; \n"
-"font-famlily:\"Comfortaa\";\n"
+" font-family:\"Comfortaa\";\n"
 "border :0;\n"
 "background:transparent;\n"
 "padding :5px;\n"

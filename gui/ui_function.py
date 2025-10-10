@@ -109,12 +109,12 @@ class _DownloadWorker(QObject):
                 "fred",
                 "bls",
                 "te",
+                "ism",
                 # "fw",
                 # "dfm",
                 # "em",
                 # "fs",
                 # "cin",
-                # "ism",
                 # "nyf"
                 ] if self._download_all else list(self._selected_sources)
             if not sources:
@@ -387,7 +387,7 @@ class UiFunctions():  # 删除:mainWindow
             for checkbox in checkbox_list:
                 try:
                     checkbox.setEnabled(True)
-                    checkbox.setChecked(True)
+                    checkbox.setChecked(False)
                 except Exception:
                     pass
 
@@ -1274,13 +1274,18 @@ class UiFunctions():  # 删除:mainWindow
         start_year = int(self.main_window.int_year_spinbox.value())
         sources: list[str]
         download_all_bool = False
-        if bool(self.main_window.download_for_all_check.isChecked()):
-            sources = ["bea", "yf", "fred", "bls", "te"]
-            download_all_bool = True
 
+        # all sources name 是所有已经存在的数据源
+        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism"]
+
+        # 如果都下载，就直接sources = all sources name
+        if bool(self.main_window.download_for_all_check.isChecked()):
+            sources : list = all_sources_name
+            download_all_bool = True
+        # 否则，遍历list，然后再sources这个list当中添加选中的源
         else:
             sources = []
-            for name in ("bea", "yf", "fred", "bls", "te"):
+            for name in all_sources_name:
                 w = getattr(self.main_window, name, None)
                 try:
                     if w is not None and bool(w.isChecked()):
