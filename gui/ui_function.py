@@ -149,7 +149,7 @@ class _DownloadWorker(QObject):
                 if downloader is None:
                     self.progress.emit(f"Skip {src}: no downloader available.")
                     continue
-                self.progress.emit(f"Downloading {src} data to database...")
+                self.progress.emit(f"Downloading {src} data to local...")
                 try:
                     # 优先判断 download_csv_check 是否被选中
                     if self.main_window and hasattr(self.main_window, "download_csv_check") and self.main_window.download_csv_check.isChecked():

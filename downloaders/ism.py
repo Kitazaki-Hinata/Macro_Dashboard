@@ -18,8 +18,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-
-
 from downloaders.common import (
     CSV_DATA_FOLDER,
     CancelledError,
@@ -27,6 +25,8 @@ from downloaders.common import (
     DatabaseConverter,
     DataDownloader,
 )
+
+
 
 logger = logging.getLogger(__name__)
 month_dict = {
@@ -43,7 +43,6 @@ month_dict = {
     "11" : "november",
     "12" : "december"
 }
-
 
 
 class ISMDownloader(DataDownloader):
@@ -72,7 +71,6 @@ class ISMDownloader(DataDownloader):
             html = self.driver.page_source  # crawl whole html
         except Exception as e:
             logging.error(f"Failed to crawl html, haven't identify url, error:{e}")
-            print("Failed to crawl html, haven't identify url")
             self.driver.quit()
             return
 
@@ -92,14 +90,12 @@ class ISMDownloader(DataDownloader):
                     col_values.append(first_col_text)  # append data into list
             df = pd.DataFrame([col_values])
             self.total_df = pd.concat([self.total_df, df], ignore_index=True)
-            print(f"成功抓取一份ISM报告数据 // successfully get 1 ISM report data")
             check_cancel()
 
             del html  # delete variables
             del col_values
         except Exception as e:
             logger.warning(f"Failed to extract one specific ISM report, error: {e}, continue...")
-            print(f"Failed to extract one specific ISM report, error: {e}")
             self.success_extract_or_not = False
             pass
 
@@ -121,11 +117,9 @@ class ISMDownloader(DataDownloader):
                 EC.element_to_be_clickable((By.XPATH, '//*[@id="onetrust-accept-btn-handler"]'))
             )
             accept_button.click()
-            print("Accepted all cookies of ISM website // 已识别cookies按钮并继续")
             time.sleep(random.uniform(0.3, 1))
         except NoSuchElementException:
             logging.warning(f"Haven't detected cookies button in ISM manu, continue")
-            print("Haven't detected cookies button in ISM manu, continue")
             pass
 
         # main to report
@@ -139,7 +133,6 @@ class ISMDownloader(DataDownloader):
             time.sleep(random.uniform(0.3, 1)) # load data, random num to prevent IP ban
         except NoSuchElementException:
             logging.error(f"Failed to navigate to report url, no button element, stop crawling")
-            print("Failed to navigate to report url, stop crawling ...// 并没有找到元素，停止爬取此数据")
             self.driver.quit()
             return pd.DataFrame()
 
@@ -151,11 +144,9 @@ class ISMDownloader(DataDownloader):
                     (By.XPATH, '//*[@id="alert-modal-disclaimer___BV_modal_body_"]/center/input'))
             )
             disclaimer_button.click()
-            print("Accepted disclaimer of ISM website // 已识别disclaimer按钮并继续")
             time.sleep(random.uniform(0.6,1.3))
         except NoSuchElementException:
             logging.warning(f"Haven't detected disclaimer button in ISM manu, continue")
-            print("提示：没有识别到ISM manu cookies按钮，程序继续进行 // Notify: Haven't detected cookies button, but continue...")
             pass
 
         # crawl current data
@@ -170,7 +161,6 @@ class ISMDownloader(DataDownloader):
         month_num = reversed_dict.get(extract_month)
         if not month_num:
             logger.error(f"Cannot find month in URL：{extract_month}")
-            print(f"URL中无法识别月份：{extract_month}")
             return pd.DataFrame()
 
         prev_months = []  # store str "month" name  正常提取5个月报告
@@ -190,7 +180,6 @@ class ISMDownloader(DataDownloader):
 
         # convert into csv
         check_cancel()
-        print("已经提取所有数据，正在转换成csv文件... // converting to csv...")
         self.total_df.columns = [
             "Manufacture PMI",
             "New Orders",
@@ -207,7 +196,6 @@ class ISMDownloader(DataDownloader):
         prev_months.insert(0, extract_month)
         series_month = pd.Series(prev_months)
         self.total_df.insert(0, "Month", series_month)
-        print("成功下载ISM manufacture细分数据！// Successfully download ISM manufacture data!")
         return self.total_df
 
     def ism_service(self, check_cancel)->pd.DataFrame:
@@ -228,10 +216,8 @@ class ISMDownloader(DataDownloader):
                 EC.element_to_be_clickable((By.XPATH, '//*[@id="onetrust-accept-btn-handler"]'))
             )
             accept_button.click()
-            print("Accepted all cookies of ISM website // 已识别cookies按钮并继续")
             time.sleep(random.uniform(0.3, 1))
-        except NoSuchElementException:
-            print("提示：没有识别到ISM service cookies按钮，程序继续进行 // Notify: Haven't detected cookies button, but continue...")
+        except Exception as e:
             pass
 
         # main to report
@@ -242,24 +228,23 @@ class ISMDownloader(DataDownloader):
                     (By.XPATH, '//*[@id="main"]/div[2]/div[2]/div/div/div[2]/div/div[2]/div[2]/center/p[1]/a[1]'))
             )
             view_button.click()
-        except NoSuchElementException:
+        except Exception as e:
             logging.error("Failed to navigate to report url, stop crawling ...// 并没有找到元素，停止爬取此数据")
-            print("Failed to navigate to report url, stop crawling ...// 沒有找到元素，停止爬取此數據")
             self.driver.quit()
             return pd.DataFrame()  # return empty df
 
         # click disclaimer button if exists
         check_cancel()
-        try:
-            disclaimer_button = WebDriverWait(self.driver, 3).until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, '//*[@id="alert-modal-disclaimer___BV_modal_body_"]/center/input'))
-            )
-            disclaimer_button.click()
-        except NoSuchElementException:
-            logging.warning("Notify: Haven't detected cookies button, but continue...")
-            print("提示：没有识别到ISM service cookies按钮，程序继续进行 // Notify: Haven't detected cookies button, but continue...")
-            pass
+        # try:
+        #     disclaimer_button = WebDriverWait(self.driver, 3).until(
+        #         EC.element_to_be_clickable(
+        #             (By.XPATH, '//*[@id="alert-modal-disclaimer___BV_modal_body_"]/center/input'))
+        #     )
+        #     disclaimer_button.click()
+        # except NoSuchElementException:
+        #     logging.warning("Notify: Haven't detected cookies button, but continue...")
+        #     print("提示：没有识别到ISM service cookies按钮，程序继续进行 // Notify: Haven't detected cookies button, but continue...")
+        #     pass
 
         # crawl current data
         self.ism_manu_html_extractor(check_cancel = check_cancel)  # Note: data are saved in self.total_df
@@ -273,7 +258,6 @@ class ISMDownloader(DataDownloader):
         month_num = reversed_dict.get(extract_month)
         if not month_num:
             logging.error(f"Cannot identify month: {extract_month}")
-            print(f"URL中无法识别月份：{extract_month}")
             return pd.DataFrame()
 
         prev_months = []  # store str "month" name
@@ -293,7 +277,6 @@ class ISMDownloader(DataDownloader):
 
         # convert into csv
         check_cancel()
-        print("已经提取所有数据，正在转换成csv文件... // converting to csv...")
         self.total_df.columns = [
             "Service PMI",
             "Business Activity",
@@ -311,7 +294,6 @@ class ISMDownloader(DataDownloader):
         prev_months.insert(0, extract_month)
         series_month = pd.Series(prev_months)
         self.total_df.insert(0, "Month", series_month)
-        print("成功下载ISM service细分数据！// Successfully download ISM service data!")
         return self.total_df
 
 
@@ -327,7 +309,7 @@ class ISMDownloader(DataDownloader):
             if check_cancel is not None:
                 check_cancel()
             df = self.ism_service(check_cancel = check_cancel)
-        elif data_name == "ISM_manufacturing":
+        elif data_name == "ISM_manufacture":
             if check_cancel is not None:
                 check_cancel()
             df = self.ism_manufacture(check_cancel = check_cancel)
@@ -383,7 +365,7 @@ class ISMDownloader(DataDownloader):
                 )
                 _check_cancel()
 
-                # 创建一个容器，返回df_dict，结构是，数据名称：df
+                # 创建一个容器，结构是，数据名称：df
                 df_dict : dict = {}
                 df_dict[table_name] = df
 
@@ -395,8 +377,13 @@ class ISMDownloader(DataDownloader):
                     # 如果需要下载csv，传入参数=True
                     _check_cancel()
                     for name, df in df_dict.items():
+                        # 先寻找table共有的文件夹，如果没有则创建
                         try:
-                            data_folder_path = os.path.join(os.fspath(CSV_DATA_FOLDER), name)
+                            table_data_folder_path = os.path.join(os.fspath(CSV_DATA_FOLDER), "A_TABLE_DATA")
+                            if not os.path.exists(table_data_folder_path):
+                                # 创建文件夹
+                                os.makedirs(table_data_folder_path, exist_ok=True)  # exist_ok 创建文件夹的时候，如果文件夹已经存在，则不报错
+                            data_folder_path = os.path.join(os.fspath(table_data_folder_path), name)
                             os.makedirs(data_folder_path, exist_ok=True)
                             csv_path = os.path.join(data_folder_path, f"{name}.csv")
                             df.to_csv(csv_path, index=True)
@@ -405,7 +392,6 @@ class ISMDownloader(DataDownloader):
                             logging.error(
                                 "%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err
                             )
-                            print("下载csv失败，ism423，前面都正常")
                             continue
 
         except CancelledError:
