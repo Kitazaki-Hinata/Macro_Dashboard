@@ -1299,10 +1299,7 @@ QPushButton#page_table_set_preference:pressed {
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">background-color : #262a2f;
-border-radius:30px;
-margin-left : 10px;
-margin-right : 10px;</string>
+                 <string notr="true">background: transparent;</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_10">
                  <property name="spacing">
@@ -1321,11 +1318,7 @@ margin-right : 10px;</string>
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QTableView" name="tableView">
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                  </widget>
+                  <widget class="QTableView" name="tableView"/>
                  </item>
                 </layout>
                </widget>
@@ -3423,7 +3416,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="bea">
                                   <property name="enabled">
-                                   <bool>true</bool>
+                                   <bool>false</bool>
                                   </property>
                                   <property name="text">
                                    <string>BEA data API</string>
@@ -3436,7 +3429,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="yf">
                                   <property name="enabled">
-                                   <bool>true</bool>
+                                   <bool>false</bool>
                                   </property>
                                   <property name="text">
                                    <string>Yfinance API</string>
@@ -3449,7 +3442,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="fred">
                                   <property name="enabled">
-                                   <bool>true</bool>
+                                   <bool>false</bool>
                                   </property>
                                   <property name="text">
                                    <string>FRED data API</string>
@@ -3462,7 +3455,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="bls">
                                   <property name="enabled">
-                                   <bool>true</bool>
+                                   <bool>false</bool>
                                   </property>
                                   <property name="text">
                                    <string>BLS data API</string>
@@ -3475,7 +3468,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="te">
                                   <property name="enabled">
-                                   <bool>true</bool>
+                                   <bool>false</bool>
                                   </property>
                                   <property name="text">
                                    <string>TE data</string>
@@ -3506,7 +3499,7 @@ color : #777785;
                                 <item>
                                  <widget class="QCheckBox" name="ism">
                                   <property name="enabled">
-                                   <bool>true</bool>
+                                   <bool>false</bool>
                                   </property>
                                   <property name="text">
                                    <string>ISM</string>

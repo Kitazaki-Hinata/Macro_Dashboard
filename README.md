@@ -144,9 +144,6 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
     <summary>点击展开事项</summary>
 
 **debug waitlist :**
-
-- [x] ~~**重要：下载数据的多线程逻辑会导致程序崩溃（闪退）**~~ ✅ *2025-10-01：线程清理与取消令牌已修复*
-- [x] ~~**重要：点击下载数据后，取消也会导致程序崩溃**~~ ✅ *2025-10-01：取消路径异步化，已通过多轮测试*
 - [ ] **新bug：four chart 光标十字针无法同步**
 - [ ] four chart里面ctrl加滚轮无法同时缩放四个图表的纵轴
 - [ ] One_chart导入db里面的列名以及限制输入框只能输入列名
@@ -155,17 +152,13 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [ ] four chart里面数据有错开，数量都一致
 - [ ] no show second line data on preview labeled
 - [ ] one chart里面的右坐标轴字体没法缩小
-- [x] ~~应用comfortaa字体失败~~ ✅ *2025-10-01：修正 `font-family` 样式拼写，字体可正常加载*
-- [x] ~~ism数据只能下载ism_service~~ ✅ *2025-10-11：修正筛选过程中的命名错误和consent btn识别错误*
-- [x] ~~所有非时序数据只用csv，所以要新建一个目录在csv下面，方便遍历~~ ✅ *2025-10-11：添加文件夹路径*
-- [ ] 添加cme fedwatch数据但是还没有连接gui
 - [ ] One chart里面的time lags功能（数据错位）还没有添加
-**extra function waitlist :**
+- [ ] FedWatch数据源里会存在浮点数错误
 
+**extra function waitlist :**
 - [ ] 新板块：彭博文章
 - [ ] 新板块：美债期限结构
 - [ ] 设置图表网格的透明度&颜色
-- [x] ~~reset设置框内的内容，包括颜色，数据名称~~ ✅ *2025-10-04：已添加*
 - [ ] 设立一个使用说明页面
 - [ ] 储存上次设置好的线条样式
 - [ ] i18n 多语言支持（简中，繁中，日文）

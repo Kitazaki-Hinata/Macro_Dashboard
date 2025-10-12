@@ -35,6 +35,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)  # type: ignore
         self.ui_functions = UiFunctions(self)
         self.chart_functions = ChartFunction(self)
+        self.table_functions = TableFunction(self)
 
         # import fonts 使用字体
         self.load_custom_fonts()

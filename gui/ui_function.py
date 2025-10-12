@@ -13,6 +13,7 @@ import math
 from datetime import datetime
 from typing import Optional, Dict, Any, Protocol
 import pyqtgraph as pg
+import pandas as pd
 from PySide6.QtCore import QTimer
 
 from downloaders.common import CancellationToken, CancelledError
@@ -66,6 +67,7 @@ class _MainWindowProto(Protocol):
     # Download controls
     download_csv_check: Any
     chart_functions : Any
+    table_functions: Any
     four_chart_one: Any
     four_chart_two: Any
     four_chart_three: Any
@@ -228,7 +230,7 @@ class UiFunctions():  # 删除:mainWindow
                 slot.setdefault('time_lags',0)
                 slot.setdefault('color', default_color)
             table = data.setdefault('table_settings', {})
-            table.setdefault('columns', [])
+            table.setdefault('table_name', [])
         except Exception:
             pass
         return data
@@ -753,6 +755,17 @@ class UiFunctions():  # 删除:mainWindow
             except:
                 pass
 
+        if name == "table":
+            try:
+                current_file_path = os.path.dirname(os.path.abspath(__file__))
+                table_csv_folder_path = os.path.join(current_file_path, "..", "csv", "A_TABLE_DATA")
+                ui.first_data_selection_box.setCurrentText(os.listdir(table_csv_folder_path)[0])
+                ui.first_data_selection_box.clear()   # 先清除，再添加选项
+                for file_name in os.listdir(table_csv_folder_path):
+                    ui.first_data_selection_box.addItem(file_name)
+            except:
+                pass
+
         # 打开窗口
         window.show()
 
@@ -1190,13 +1203,30 @@ class UiFunctions():  # 删除:mainWindow
 
     # TABLE SETTINGS
     def table_finish_settings(self, window: Any, widget: QWidget):
+        table_data_name = window.first_data_selection_box.currentText()
         existing_data = self.get_settings_from_json()
-        # TODO: 根据表格设置界面控件读取列选择等
+        existing_data["table_settings"]["table_name"] = table_data_name
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_path, "..", "csv", "A_TABLE_DATA", f"{table_data_name}", f"{table_data_name}.csv")
+
+        # 读取csv文件
+        table_data : pd.DataFrame = pd.read_csv(file_path)
+        if table_data.empty:
+            logging.error("Table data is empty.")
+            return
+
+        # 调用table_functions然后使用里面的函数写入table
+        self.main_window.table_functions.show_table(table_data)
+
+        # 修改widget label名称
+        self.main_window.table_title_label.setText(f"Current Table Name : {table_data_name}")
+
+
         try:
             with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
                 json.dump(existing_data, f, ensure_ascii=False, indent=4)
         except Exception as e:
-            logging.error(f"写入 table settings 失败: {e}")
+            logging.error(f"Failed to save settings, error: {e}")
         try:
             widget.close()
         except Exception:

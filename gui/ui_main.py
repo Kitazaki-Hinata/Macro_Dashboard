@@ -719,17 +719,13 @@ class Ui_MainWindow(object):
         self.table_container = QWidget(self.page_table_container)
         self.table_container.setObjectName(u"table_container")
         self.table_container.setMaximumSize(QSize(16777215, 16777215))
-        self.table_container.setStyleSheet(u"background-color : #262a2f;\n"
-"border-radius:30px;\n"
-"margin-left : 10px;\n"
-"margin-right : 10px;")
+        self.table_container.setStyleSheet(u"background: transparent;")
         self.verticalLayout_10 = QVBoxLayout(self.table_container)
         self.verticalLayout_10.setSpacing(0)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
         self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
         self.tableView = QTableView(self.table_container)
         self.tableView.setObjectName(u"tableView")
-        self.tableView.setStyleSheet(u"")
 
         self.verticalLayout_10.addWidget(self.tableView)
 
@@ -1830,35 +1826,35 @@ class Ui_MainWindow(object):
         self.verticalLayout_29.setContentsMargins(0, 0, 0, 0)
         self.bea = QCheckBox(self.ts_data)
         self.bea.setObjectName(u"bea")
-        self.bea.setEnabled(True)
+        self.bea.setEnabled(False)
         self.bea.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bea)
 
         self.yf = QCheckBox(self.ts_data)
         self.yf.setObjectName(u"yf")
-        self.yf.setEnabled(True)
+        self.yf.setEnabled(False)
         self.yf.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.yf)
 
         self.fred = QCheckBox(self.ts_data)
         self.fred.setObjectName(u"fred")
-        self.fred.setEnabled(True)
+        self.fred.setEnabled(False)
         self.fred.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.fred)
 
         self.bls = QCheckBox(self.ts_data)
         self.bls.setObjectName(u"bls")
-        self.bls.setEnabled(True)
+        self.bls.setEnabled(False)
         self.bls.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bls)
 
         self.te = QCheckBox(self.ts_data)
         self.te.setObjectName(u"te")
-        self.te.setEnabled(True)
+        self.te.setEnabled(False)
         self.te.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.te)
@@ -1873,7 +1869,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_31.setContentsMargins(0, 0, 0, 0)
         self.ism = QCheckBox(self.cs_data)
         self.ism.setObjectName(u"ism")
-        self.ism.setEnabled(True)
+        self.ism.setEnabled(False)
         self.ism.setCheckable(True)
 
         self.verticalLayout_31.addWidget(self.ism)

@@ -157,6 +157,7 @@ class ChartFunction:
         self.four_plot_widgets["four_chart_three_plot"] = self.init_chart_widgets(self.main_window.four_chart_three, "four_chart_three_plot")
         self.four_plot_widgets["four_chart_four_plot"] = self.init_chart_widgets(self.main_window.four_chart_four, "four_chart_four_plot")
         # 统一 legend 清理函数（供外部调用）
+
     def clean_legend(self, widget: QWidget):
         """移除一个 PlotWidget legend 中的所有条目，但不删除 LegendItem 自身。
         防止重复条目残留。外部在重新绘图前可调用。
