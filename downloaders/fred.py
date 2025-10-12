@@ -73,9 +73,11 @@ class FREDDownloader(DataDownloader):
                 keep_cols = [c for c in df.columns if c in ("date", "value")]
                 df = df[keep_cols].copy()
 
-                if table_config.get("needs_pct", False):
+                if table_config.get("needs_pct", False):   # 查找needs_pct，如果不存在返回false
                     df["value"] = pd.to_numeric(df["value"], errors="coerce")
                     df["MoM_growth"] = df["value"].pct_change()
+                    if table_config.get("needs_cleaning", False):
+                        df["MoM_growth"] = df["MoM_growth"].ffill()
                     df = df[["date", "MoM_growth"]]
                 else:
                     df["value"] = df["value"].replace(".", np.nan)

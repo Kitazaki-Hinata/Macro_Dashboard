@@ -159,6 +159,7 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [x] ~~ism数据只能下载ism_service~~ ✅ *2025-10-11：修正筛选过程中的命名错误和consent btn识别错误*
 - [x] ~~所有非时序数据只用csv，所以要新建一个目录在csv下面，方便遍历~~ ✅ *2025-10-11：添加文件夹路径*
 - [ ] 添加cme fedwatch数据但是还没有连接gui
+- [ ] One chart里面的time lags功能（数据错位）还没有添加
 **extra function waitlist :**
 
 - [ ] 新板块：彭博文章

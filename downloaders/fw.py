@@ -25,7 +25,7 @@ from downloaders.common import (
 )
 
 
-class CMEfedWatch(DataDownloader):
+class CMEfedWatchDownloader(DataDownloader):
     '''The probability of rate decision for future Fed meetings,
     use tables or integrate bar chart as means of visualizing data
     这个直接放表格，因为展示的是未来几次议息会议加息/降息的概率
@@ -85,9 +85,8 @@ class CMEfedWatch(DataDownloader):
                 EC.element_to_be_clickable((By.XPATH, '//*[@id="onetrust-accept-btn-handler"]'))
             )
             cookies_button.click()
-            print("点击了CME的cookies许可按钮 // Cookies button are clicked ")
         except:
-            print("提示：未识别到CME fedwatch cookies按钮，程序继续 // Notify: Cookies button haven't been identified but continued... ")
+            logging.info("提示：未识别到CME fedwatch cookies按钮，程序继续 // Notify: Cookies button haven't been identified but continued...")
             pass
 
         # 有 iframe 的话，先切换
@@ -97,9 +96,9 @@ class CMEfedWatch(DataDownloader):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="cmeIframe-jtxelq2f"]'))
             )
             self.driver.switch_to.frame(iframe)
-            print("切换到了iframe")
         except Exception:
-            print("提示：CME没有iframe，继续 // Notify: No iframe, continue...")
+            logging.info("提示：未识别到CME fedwatch iframe，程序继续 // Notify: Iframe haven't been identified but continued...")
+            pass
 
         # 滚动页面以确保按钮加载
         for i in range(2):
@@ -121,7 +120,6 @@ class CMEfedWatch(DataDownloader):
                 )
                 self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", element)
                 self.driver.execute_script("arguments[0].click();", element)
-                print(f"✅ 成功点击第 {index+1} 个按钮")
 
                 time.sleep(0.5)
 
@@ -160,19 +158,14 @@ class CMEfedWatch(DataDownloader):
                     os.makedirs(self.cme_folder_path, exist_ok = True)
                     csv_path = os.path.join(self.cme_folder_path, f"{self.date_list[index]}.csv")
                     self.total_df.to_csv(csv_path, index = True)
-
-                    print(f"成功下载数据喵~ // File successfully downloaded!")
                 except Exception as e:
-                    print(f"数据读取成功但下载csv失败, save_to_csv报错，原因是{e}//Failed to download csv")
-
+                    logging.info(f"fw.py line 163, Data download successfully but failed to download csv, save_to_csv报错，原因是{e}")
 
             except Exception as e:
-                print(f"点击第{index}按钮失败: {str(e)} // Failed to press button, reason is {e}")
                 logging.error(f"Failed to press button, reason is {e}")
                 return
 
         self.driver.quit()
-        print("已经下载完所有数据，正在重新排序数据// Finish downloading all data, resorting data...")
         return
 
 
@@ -188,7 +181,6 @@ class CMEfedWatch(DataDownloader):
 
             # 调用下载好的多个csv数据
             df_storage_list.append(self.parse_single_file(csv_path))
-            print(f"完成第{num}个文件的pd处理 // Finished processing file No.{num}")
             num = num + 1
         del df_storage_list[0]           # 这里删除重复的数据
 
@@ -312,5 +304,5 @@ if __name__ == "__main__":
             "name": "FedWatch"
         }
     }
-    ism = CMEfedWatch(json_dict = json_dict, api_key = "1", request_year = 2020)
+    ism = CMEfedWatchDownloader(json_dict = json_dict, api_key = "1", request_year = 2020)
     ism.to_db(return_csv=True)

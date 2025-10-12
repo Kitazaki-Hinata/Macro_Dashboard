@@ -190,6 +190,12 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
+    "Corporate_bond_spread_d": {
+      "name": "Corporate_Bond_Spread",
+      "code": "BAMLC0A0CM",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
     "mic_consumer_sentiment_m": {
       "name": "Michigan_Consumer_Sentiment",
       "code": "UMCSENT",
