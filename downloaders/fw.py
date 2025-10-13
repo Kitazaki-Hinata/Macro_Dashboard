@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import re
+import shutil
 import logging
 import random
 import os
@@ -121,7 +122,7 @@ class CMEfedWatchDownloader(DataDownloader):
                 self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", element)
                 self.driver.execute_script("arguments[0].click();", element)
 
-                time.sleep(0.5)
+                time.sleep(0.65)
 
                 # get data from html 获取html
                 original_html = self.driver.page_source
@@ -289,7 +290,12 @@ class CMEfedWatchDownloader(DataDownloader):
             raise
 
         finally:
+            # 去除没用的 data 文件夹，并quit driver
             try:
+                current_file_path = os.path.abspath(os.path.dirname(__file__))
+                useless_path = os.path.join(current_file_path, "..", "data")
+                if os.path.exists(useless_path):
+                    shutil.rmtree(useless_path)
                 self.driver.quit()
             except Exception:
                 pass

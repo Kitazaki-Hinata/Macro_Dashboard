@@ -113,7 +113,7 @@ class _DownloadWorker(QObject):
                 "te",
                 "ism",
                 "fw"
-                # "dfm",
+                "dfm",
                 # "em",
                 # "fs",
                 # "cin",
@@ -757,17 +757,22 @@ class UiFunctions():  # 删除:mainWindow
 
         if name == "table":
             try:
+                # 下拉框显示当前已经显示的数据
+                existing_data: Dict[str, Any] = self.get_settings_from_json()
+
                 current_file_path = os.path.dirname(os.path.abspath(__file__))
                 table_csv_folder_path = os.path.join(current_file_path, "..", "csv", "A_TABLE_DATA")
-                ui.first_data_selection_box.setCurrentText(os.listdir(table_csv_folder_path)[0])
                 ui.first_data_selection_box.clear()   # 先清除，再添加选项
                 for file_name in os.listdir(table_csv_folder_path):
                     ui.first_data_selection_box.addItem(file_name)
-            except:
-                pass
 
-        # 打开窗口
-        window.show()
+                ui.first_data_selection_box.setCurrentText(existing_data["table_settings"]["table_name"])
+
+            except:
+                    pass
+
+            # 打开窗口
+            window.show()
 
 
     '''ONE CHART PAGE SETTINGS SLOTS METHODS'''
@@ -1216,7 +1221,10 @@ class UiFunctions():  # 删除:mainWindow
             return
 
         # 调用table_functions然后使用里面的函数写入table
-        self.main_window.table_functions.show_table(table_data)
+        if window.stretch_table_check.isChecked():
+            self.main_window.table_functions.show_table(table_data, stretch = True)
+        else:
+            self.main_window.table_functions.show_table(table_data, stretch = False)
 
         # 修改widget label名称
         self.main_window.table_title_label.setText(f"Current Table Name : {table_data_name}")
@@ -1306,7 +1314,7 @@ class UiFunctions():  # 删除:mainWindow
         download_all_bool = False
 
         # all sources name 是所有已经存在的数据源
-        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism", "fw"]
+        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism", "fw", "dfm"]
 
         # 如果都下载，就直接sources = all sources name
         if bool(self.main_window.download_for_all_check.isChecked()):

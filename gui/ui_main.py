@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTableView, QTextEdit,
     QVBoxLayout, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -185,10 +186,54 @@ class Ui_MainWindow(object):
 " }\n"
 "        \n"
 "        \n"
+"/*================================== ====*/\n"
+"/* \u6a2a\u5411\u6eda\u52a8\u6761 */\n"
+"QScrollBar:horizontal {\n"
+"    border: none;\n"
+"    background: #303030;\n"
+"    height: 8px;\n"
+"    margin: 0px 20px 0px 20px;\n"
+"    border-radius: 0px;\n"
+"}\n"
 "\n"
+"QScrollBar::handle:horizontal {\n"
+"    background: #90b6e7;\n"
+"    min-width: 30px;\n"
+"    border-radius: 6px;\n"
+"}\n"
 "\n"
-"        \n"
-"")
+"QScrollBar::handle:horizontal:hover {\n"
+"    background: #a8c7f0;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"    border: none;\n"
+"    background: #252526;\n"
+"    width: 20px;\n"
+"    border-top-right-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    border: none;\n"
+"    background: #252526;\n"
+"    width: 20px;\n"
+"    border-top-left-radius: 4px;\n"
+"    border-bottom-left-radius: 4px;\n"
+"    subcontrol-position: left;\n"
+"    sub"
+                        "control-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {\n"
+"    background: none;\n"
+"}")
         self.style_sheet = QWidget(MainWindow)
         self.style_sheet.setObjectName(u"style_sheet")
         self.style_sheet.setStyleSheet(u"QWidget#header_bar {\n"
@@ -673,13 +718,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_9 = QVBoxLayout(self.text_container_2)
         self.verticalLayout_9.setSpacing(6)
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
-        self.verticalLayout_9.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_9.setContentsMargins(9, 0, 9, 0)
         self.table_title_label = QLabel(self.text_container_2)
         self.table_title_label.setObjectName(u"table_title_label")
         self.table_title_label.setMaximumSize(QSize(16777215, 20))
         self.table_title_label.setFont(font1)
         self.table_title_label.setStyleSheet(u"color: #ffffff; \n"
-"margin-left : 7px; ")
+"margin-left : 0; ")
 
         self.verticalLayout_9.addWidget(self.table_title_label)
 
@@ -687,7 +732,7 @@ class Ui_MainWindow(object):
         self.table_update_label.setObjectName(u"table_update_label")
         self.table_update_label.setMaximumSize(QSize(16777215, 12))
         self.table_update_label.setFont(font)
-        self.table_update_label.setStyleSheet(u"margin-left : 9px; \n"
+        self.table_update_label.setStyleSheet(u"margin-left : 0; \n"
 "color : #90b6e7;")
 
         self.verticalLayout_9.addWidget(self.table_update_label)
@@ -723,7 +768,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_10 = QVBoxLayout(self.table_container)
         self.verticalLayout_10.setSpacing(0)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_10.setContentsMargins(9, 0, 9, 0)
         self.tableView = QTableView(self.table_container)
         self.tableView.setObjectName(u"tableView")
 
@@ -1117,7 +1162,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 224, 554))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 116, 54))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"

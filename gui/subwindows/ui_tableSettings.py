@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_tableSettings.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,18 +15,18 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QGridLayout, QHBoxLayout,
-    QLabel, QPushButton, QSizePolicy, QSpacerItem,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGridLayout,
+    QHBoxLayout, QLabel, QPushButton, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 import gui.subwindows.sub_resources_rc
 
 class Ui_TableSettingsPanel(object):
     def setupUi(self, TableSettingsPanel):
         if not TableSettingsPanel.objectName():
             TableSettingsPanel.setObjectName(u"TableSettingsPanel")
-        TableSettingsPanel.resize(300, 150)
-        TableSettingsPanel.setMinimumSize(QSize(300, 150))
-        TableSettingsPanel.setMaximumSize(QSize(300, 150))
+        TableSettingsPanel.resize(300, 200)
+        TableSettingsPanel.setMinimumSize(QSize(300, 200))
+        TableSettingsPanel.setMaximumSize(QSize(300, 200))
         TableSettingsPanel.setStyleSheet(u"* {\n"
 "background : #262a2f;\n"
 "}\n"
@@ -129,6 +129,43 @@ class Ui_TableSettingsPanel(object):
 " QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
 "     background: none;\n"
 " }\n"
+"\n"
+"/*\u5168\u5c40checkbox\u6837\u5f0f \u591a\u9009\u6846*/\n"
+"QCheckBox {\n"
+"            spacing: 8px;    /*\u591a\u9009\u6846\u4e0e\u5b57\u4f53\u7684\u7a7a\u683c*/\n"
+"            font-size: 11px;\n"
+"        }\n"
+"        \n"
+"QCheckBox::indicator {\n"
+"            width: 12px;\n"
+"            height: 12px;\n"
+"            border: 1px solid #555555;\n"
+"            border-radius: 5px;\n"
+"            background: #202023"
+                        ";\n"
+"        }\n"
+"        \n"
+"QCheckBox::indicator:hover {\n"
+"            border: 1px solid #ffffff;\n"
+"        }\n"
+"\n"
+"        \n"
+"QCheckBox::indicator:checked {\n"
+"            border: 1px solid #90b6e7;\n"
+"            image: url(:/png/sub_resource/true.png);\n"
+"        }\n"
+"QCheckBox::indicator:disabled {\n"
+"            border: 1px solid #454555;\n"
+"            background: #454555;\n"
+"        }\n"
+"        \n"
+"        QCheckBox::indicator:checked:disabled {\n"
+"            background: #454555;\n"
+"            border: 2px solid #454555;\n"
+"        }\n"
+"\n"
+"\n"
+"\n"
 "        \n"
 "        ")
         self.verticalLayout = QVBoxLayout(TableSettingsPanel)
@@ -185,13 +222,25 @@ class Ui_TableSettingsPanel(object):
 "\n"
 "")
         self.gridLayout = QGridLayout(self.settings_panel)
+        self.gridLayout.setSpacing(9)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(15, -1, 15, -1)
-        self.first_data_title = QLabel(self.settings_panel)
-        self.first_data_title.setObjectName(u"first_data_title")
-        self.first_data_title.setMaximumSize(QSize(80, 16777215))
+        self.first_data_selection_box = QComboBox(self.settings_panel)
+        self.first_data_selection_box.setObjectName(u"first_data_selection_box")
+        self.first_data_selection_box.setMinimumSize(QSize(0, 25))
+        self.first_data_selection_box.setEditable(True)
+        self.first_data_selection_box.setMinimumContentsLength(0)
 
-        self.gridLayout.addWidget(self.first_data_title, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.first_data_selection_box, 1, 1, 1, 1)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer, 4, 1, 1, 1)
+
+        self.stretch_table_title = QLabel(self.settings_panel)
+        self.stretch_table_title.setObjectName(u"stretch_table_title")
+
+        self.gridLayout.addWidget(self.stretch_table_title, 3, 0, 1, 1)
 
         self.data_name_title = QLabel(self.settings_panel)
         self.data_name_title.setObjectName(u"data_name_title")
@@ -201,18 +250,20 @@ class Ui_TableSettingsPanel(object):
 
         self.gridLayout.addWidget(self.data_name_title, 0, 1, 1, 1)
 
-        self.first_data_selection_box = QComboBox(self.settings_panel)
-        self.first_data_selection_box.setObjectName(u"first_data_selection_box")
-        self.first_data_selection_box.setMinimumSize(QSize(0, 25))
-        self.first_data_selection_box.setEditable(True)
-        self.first_data_selection_box.setMinimumContentsLength(0)
+        self.stretch_table_check = QCheckBox(self.settings_panel)
+        self.stretch_table_check.setObjectName(u"stretch_table_check")
 
-        self.gridLayout.addWidget(self.first_data_selection_box, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.stretch_table_check, 3, 1, 1, 1)
 
-        self.widget = QWidget(self.settings_panel)
-        self.widget.setObjectName(u"widget")
+        self.first_data_title = QLabel(self.settings_panel)
+        self.first_data_title.setObjectName(u"first_data_title")
+        self.first_data_title.setMaximumSize(QSize(80, 16777215))
 
-        self.gridLayout.addWidget(self.widget, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.first_data_title, 1, 0, 1, 1)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 5, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+
+        self.gridLayout.addItem(self.verticalSpacer_2, 2, 1, 1, 1)
 
 
         self.verticalLayout.addWidget(self.settings_panel)
@@ -281,8 +332,10 @@ class Ui_TableSettingsPanel(object):
     def retranslateUi(self, TableSettingsPanel):
         TableSettingsPanel.setWindowTitle(QCoreApplication.translate("TableSettingsPanel", u"Settings", None))
         self.label.setText(QCoreApplication.translate("TableSettingsPanel", u"Data Selection and Settings", None))
-        self.first_data_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Table Data", None))
+        self.stretch_table_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Stretch Table", None))
         self.data_name_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Data Name", None))
+        self.stretch_table_check.setText("")
+        self.first_data_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Table Data", None))
         self.cancel_btn.setText("")
         self.finish_btn.setText("")
     # retranslateUi

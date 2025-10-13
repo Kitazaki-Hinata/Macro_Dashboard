@@ -496,10 +496,10 @@
   },
   "dfm": {
     "dallas_fed_manufacture_unadj": {
-      "name": "Dallas_Federal_Manufacture_unadjusted_Index"
+      "name": "Unadj_Dallas_Federal_Manu_Index"
     },
     "dallas_fed_manufacture_adj": {
-      "name": "Dallas_Federal_Manufacture_adjusted_Index"
+      "name": "Adj_Dallas_Federal_Manu_Index"
     }
   },
   "nyf": {

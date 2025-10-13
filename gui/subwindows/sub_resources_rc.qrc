@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="png">
+    <file>sub_resource/true.png</file>
     <file>sub_resource/reset.png</file>
     <file>sub_resource/prestart.png</file>
     <file>sub_resource/accept.png</file>
