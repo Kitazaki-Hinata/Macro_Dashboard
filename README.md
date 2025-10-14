@@ -81,16 +81,13 @@ pip install uv
 - [ ] 劳动力参与率 (Labor Force Participation Rate)
 - [ ] 劳工成本与劳工效率
 - [ ] 职位空缺与求职者比率 (Job Openings to Applicants Ratio)
-- [ ] 分行业就业增长（如科技、医疗、制造业细分）
 - [ ] 临时工雇佣数据 (Temporary Help Services Employment)
 - [ ] 亚特兰大联储薪资增长追踪 (Wage Growth Tracker)
 - [ ] 中间品生产者价格指数 (Intermediate PPI)
 - [ ] 原材料生产者价格指数 (Crude Materials PPI)
-- [ ] 薪资通胀压力指标 (如单位劳动力成本)
 - [ ] 租金等价通胀指标 (Zillow租金指数、CoreLogic房价指数)
 - [ ] 月度零售销售额 (Advance Monthly Retail Sales)
 - [ ] 电子商务销售额占比
-- [ ] 密歇根消费者现况指数 (Current Conditions Index)
 - [ ] 核心资本货物订单 (非国防除飞机订单)
 - [ ] 建筑支出月报 (Construction Spending)
 - [ ] 企业并购活动金额与数量
@@ -99,11 +96,10 @@ pip install uv
 - [ ] 实际有效汇率指数 (Real Effective Exchange Rate)
 - [ ] 主要贸易伙伴国对美出口依存度
 - [ ] 供应链压力指数 (如纽约联储的GSCPI)
-- [ ] 共债务占GDP比例
+- [ ] 标普PE水平
 - [ ] 州与地方政府财政状况
 - [ ] 社会保障与医疗保险支出趋势
 - [ ] 企业税收与个人税收占比
-- [ ] 商业票据利率
 - [ ] M2货币供应量增长率
 - [ ] 银行信贷标准调查 (Senior Loan Officer Opinion Survey)
 - [ ] 成屋销售月报 (Existing Home Sales)
@@ -153,7 +149,6 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [ ] no show second line data on preview labeled
 - [ ] one chart里面的右坐标轴字体没法缩小
 - [ ] One chart里面的time lags功能（数据错位）还没有添加
-- [ ] FedWatch数据源里会存在浮点数错误
 
 **extra function waitlist :**
 - [ ] 新板块：彭博文章

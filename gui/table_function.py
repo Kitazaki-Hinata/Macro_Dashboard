@@ -2,6 +2,7 @@
 
 import logging
 import pandas as pd
+import numpy as np
 from typing import Protocol
 from PySide6.QtWidgets import QWidget, QTableView, QHeaderView
 from PySide6.QtCore import Qt
@@ -38,8 +39,16 @@ class TableFunction:
                 # 跳过第一列（索引列）
                 if j == 0:
                     continue
-                item = QStandardItem(str(value))
-                
+                if "." and "%" in str(value):
+                    parts = str(value).split(".")
+                    item = QStandardItem(str(parts[0]+"."+parts[1][:3]+" %"))
+                elif "." in str(value):
+                    parts = str(value).split(".")
+                    item = QStandardItem(str(parts[0]+"."+parts[1][:3]))
+                else:
+                    item = QStandardItem(str(value))
+
+
                 # 设置内容居中
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 

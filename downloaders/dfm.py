@@ -53,6 +53,14 @@ class DFMDownloader(DataDownloader):
         options.add_argument("--disable-gpu")
         self.driver = webdriver.Chrome(options = options)
 
+    def _remove_last_space(self, df : pd.DataFrame)-> pd.DataFrame:
+        """Remove last space in dataframe, 下载的数据最后可能有空值，所以要去除"""
+        if len(df) > 1144:  # 确保数据足够长，避免切片越界
+            df = df.iloc[150:-1044]
+        else:
+            df = df.iloc[150:]  # 如果行数太少，只去掉前100行
+        return df
+
     def _dallas_manufacture_index_unadj_get_data(self, file_name : str, check_cancel = None):
         """No seasonal adjustments data"""
         check_cancel()
@@ -158,6 +166,7 @@ class DFMDownloader(DataDownloader):
             "Company outlook",
             "General business activity"
         ]   # rename columns
+        df = self._remove_last_space(df)
         df.to_csv(final_csv_location_path)
 
         # 去除raw data文件
@@ -272,6 +281,7 @@ class DFMDownloader(DataDownloader):
             "Company outlook",
             "General business activity"
         ]   # rename columns
+        df = self._remove_last_space(df)
         df.to_csv(final_csv_location_path)
 
         # 去除raw data文件

@@ -771,8 +771,8 @@ class UiFunctions():  # 删除:mainWindow
             except:
                     pass
 
-            # 打开窗口
-            window.show()
+        # 打开窗口
+        window.show()
 
 
     '''ONE CHART PAGE SETTINGS SLOTS METHODS'''
