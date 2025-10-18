@@ -176,16 +176,6 @@ if __name__ == "__main__":
         # 进程退出前停止日志监听，关闭文件句柄
         stop_logging()
 
-    # --- 以下为测试下载的参考示例（保留注释即可） ---
-    # 使用方式：取消注释并按需修改源与年份；在非 GUI 场景下验证下载逻辑。
-    #
-    # request_year: int = 2020
-    # fred_downloader = DownloaderFactory.create_downloader(
-    #     source = "fred",
-    #     json_data = json_data,
-    #     request_year = request_year
-    # )
-    # fred_downloader.to_db(return_csv = False)
 
 
 

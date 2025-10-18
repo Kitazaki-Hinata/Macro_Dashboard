@@ -117,7 +117,7 @@ class _DownloadWorker(QObject):
                 # "em",
                 # "fs",
                 # "cin",
-                # "nyf"
+                "nyf"
                 ] if self._download_all else list(self._selected_sources)
             if not sources:
                 self.progress.emit("No sources selected. Nothing to do.")
@@ -1314,7 +1314,7 @@ class UiFunctions():  # 删除:mainWindow
         download_all_bool = False
 
         # all sources name 是所有已经存在的数据源
-        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism", "fw", "dfm"]
+        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism", "fw", "dfm", "nyf"]
 
         # 如果都下载，就直接sources = all sources name
         if bool(self.main_window.download_for_all_check.isChecked()):

@@ -21,7 +21,7 @@ from downloaders.common import (
     DataDownloader,
 )
 
-
+logger = logging.getLogger(__name__)
 class DFMDownloader(DataDownloader):
     '''show table data and first line data
     由于细分数据太多，因此ts当中只展示第一列的数据
@@ -319,7 +319,6 @@ class DFMDownloader(DataDownloader):
                     )
                 else:
                     logging.error(f"dfm data failed to identified, line 308, {data_name} is not supported")
-
 
         except CancelledError:
             raise

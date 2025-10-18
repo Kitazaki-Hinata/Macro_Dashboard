@@ -471,12 +471,12 @@
   },
   "te": {
     "leading_eco_index_m": {
-      "name": "leading_economic_index",
+      "name": "Leading_economic_index",
       "needs_pct": false,
       "needs_cleaning": false
     },
     "nfib_business_optimism_index-m": {
-      "name": "nfib_business_optimism_index",
+      "name": "NFIB_business_optimism_index",
       "needs_pct": false,
       "needs_cleaning": false
     }
@@ -503,8 +503,20 @@
     }
   },
   "nyf": {
-    "NewYork_fed_debt_balance": {
-      "name": "New_York_Federal_Debt_Balance"
+    "debt_balance": {
+      "name": "Debt_balance"
+    },
+    "credit_quota" : {
+      "name": "Credit_quota"
+    },
+    "30_days_debt_default" : {
+      "name": "30_Days_debt_default"
+    },
+    "90_days_debt_default" : {
+      "name": "90_Days_debt_default"
+    },
+    "Num_of_debts_bankruptcy_and_default" : {
+      "name": "Num_of_debts_bankruptcy_and_default"
     }
   },
   "cin": {

@@ -25,7 +25,7 @@ from downloaders.common import (
     DataDownloader,
 )
 
-
+logger = logging.getLogger(__name__)
 class CMEfedWatchDownloader(DataDownloader):
     '''The probability of rate decision for future Fed meetings,
     use tables or integrate bar chart as means of visualizing data
