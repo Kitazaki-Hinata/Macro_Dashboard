@@ -150,6 +150,7 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [ ] one chart里面的右坐标轴字体没法缩小
 - [ ] One chart里面的time lags功能（数据错位）还没有添加
 - [ ] 在downloader里面会创建一个多余的data.db
+- [ ] nyf下载excel没有在download里面删除多余的文件
 
 **extra function waitlist :**
 - [ ] 新板块：彭博文章

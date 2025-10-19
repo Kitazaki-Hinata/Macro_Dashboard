@@ -121,8 +121,9 @@ class CMEfedWatchDownloader(DataDownloader):
                 )
                 self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", element)
                 self.driver.execute_script("arguments[0].click();", element)
-
-                time.sleep(0.65)
+                WebDriverWait(self.driver, 5).until(
+                    EC.staleness_of(element)  # 等待元素状态变化
+                )
 
                 # get data from html 获取html
                 original_html = self.driver.page_source
@@ -183,7 +184,7 @@ class CMEfedWatchDownloader(DataDownloader):
             # 调用下载好的多个csv数据
             df_storage_list.append(self.parse_single_file(csv_path))
             num = num + 1
-        del df_storage_list[0]           # 这里删除重复的数据
+        del df_storage_list[-1]           # 这里删除重复的数据
 
         # 下一步处理dataframe list里面，第一列分布不均匀的问题
         check_cancel()

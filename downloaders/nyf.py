@@ -94,73 +94,76 @@ class NYFDownloader(DataDownloader):
     def _original_file_download(self, check_cancel):
         check_cancel()
 
+        # 先删除任何下载文件夹中的之前的文件
+        pattern = r"HHD_C_Report*.xlsx"
+        matching_files = list(self.download_path.glob(pattern))
+        for file in matching_files:
+            try:
+                file.unlink()
+                logger.info(f"Deleted file: {file}")
+            except Exception as e:
+                logger.warning(f"Failed to delete file {file}: {e}")
+                break
+
         # initialize info
         url = r"https://www.newyorkfed.org/microeconomics/hhdc.html"
-        file_name = f"nyf_original_file"
+        # file_name = f"nyf_original_file"
 
-        self.file_folder = os.path.join(self.csv_folder_path, file_name, file_name+"_"+str(date.today())+".xlsx")
-        if os.path.exists(self.file_folder):
-            msg = "文件已存在，正在调取今日数据 // File already exists, retrieving today's data"
-            logging.info(msg)
-            print(msg)
+        try:
+            html = urllib.request.urlopen(url).read()
+        except Exception as e:
+            error_msg = f"Failed to access URL {url}: {e}"
+            logging.error(error_msg)
+            print(error_msg)
             return
-        else:  # 若没有识别到今日下载的文件，则再次下载
-            # self.download_data(url, func_name, file_name, xpath = xpath)
+
+        soup = BeautifulSoup(html, "lxml")
+        iframe = soup.find("iframe", id = "HHDCIframe")
+        if iframe:
+            iframe_src = iframe.get("src")
+
+            # 访问 iframe 的 src 页面，因为iframe是单独的html所以需要重复访问一次
+            full_iframe_url = urllib.parse.urljoin(url, iframe_src)
             try:
-                html = urllib.request.urlopen(url).read()
+                iframe_html = urllib.request.urlopen(full_iframe_url).read()
             except Exception as e:
-                error_msg = f"Failed to access URL {url}: {e}"
+                error_msg = f"Failed to access iframe URL {full_iframe_url}: {e}"
                 logging.error(error_msg)
                 print(error_msg)
                 return
 
-            soup = BeautifulSoup(html, "lxml")
-            iframe = soup.find("iframe", id = "HHDCIframe")
-            if iframe:
-                iframe_src = iframe.get("src")
+            iframe_soup = BeautifulSoup(iframe_html, "lxml")
 
-                # 访问 iframe 的 src 页面，因为iframe是单独的html所以需要重复访问一次
-                full_iframe_url = urllib.parse.urljoin(url, iframe_src)
+            # 找到下载链接
+            link = iframe_soup.find_all("a", class_="glossary-download")
+            if link:
                 try:
-                    iframe_html = urllib.request.urlopen(full_iframe_url).read()
-                except Exception as e:
-                    error_msg = f"Failed to access iframe URL {full_iframe_url}: {e}"
-                    logging.error(error_msg)
-                    print(error_msg)
-                    return
-                    
-                iframe_soup = BeautifulSoup(iframe_html, "lxml")
-
-                # 找到下载链接
-                link = iframe_soup.find_all("a", class_="glossary-download")
-                if link:
-                    try:
-                        href = link[1].get("href")
-                    except IndexError:
-                        error_msg = f"Expected at least 2 download links, but found {len(link)}"
-                        logging.error(error_msg)
-                        print(error_msg)
-                        return
-                        
-                    full_href = urllib.parse.urljoin(full_iframe_url, href)
-
-                    self.driver.get(full_href)
-                    time.sleep(1.5)
-
-                else:
-                    error_msg = "Failed to find download button"
+                    href = link[1].get("href")
+                except IndexError:
+                    error_msg = f"Expected at least 2 download links, but found {len(link)}"
                     logging.error(error_msg)
                     print(error_msg)
                     return
 
-                # 转移文件 move the location of the file
-                self._change_original_file_path(check_cancel = check_cancel)
+                full_href = urllib.parse.urljoin(full_iframe_url, href)
+
+                self.driver.get(full_href)
+                time.sleep(1.5)
 
             else:
-                error_msg = "Failed to find iframe"
+                error_msg = "Failed to find download button"
                 logging.error(error_msg)
                 print(error_msg)
                 return
+
+            # 转移文件 move the location of the file
+            self._change_original_file_path(check_cancel = check_cancel)
+
+        else:
+            error_msg = "Failed to find iframe"
+            logging.error(error_msg)
+            print(error_msg)
+            return
 
     def _read_excel_sheets(self, check_cancel):
         """下载完后，读取Excel文件中的所有sheet，并重新整理到新的文本当中"""
