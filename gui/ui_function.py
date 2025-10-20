@@ -114,7 +114,7 @@ class _DownloadWorker(QObject):
                 "ism",
                 "fw"
                 "dfm",
-                # "em",
+                "em",
                 # "fs",
                 "cin",
                 "nyf"
@@ -1314,7 +1314,7 @@ class UiFunctions():  # 删除:mainWindow
         download_all_bool = False
 
         # all sources name 是所有已经存在的数据源
-        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism", "fw", "dfm", "nyf", "cin"]
+        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism", "fw", "dfm", "nyf", "cin", "em"]
 
         # 如果都下载，就直接sources = all sources name
         if bool(self.main_window.download_for_all_check.isChecked()):

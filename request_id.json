@@ -525,9 +525,6 @@
     }
   },
   "em": {
-    "cme_emini_future_price_curve": {
-      "name": "CME_E_mini_Future_Price_Curve"
-    },
     "cme_emini_future_vol_open_interest": {
       "name": "CME_E_mini_Volume_and_Open_Interest"
     }

@@ -248,18 +248,18 @@ class CMEfedWatchDownloader(DataDownloader):
                     )
                     return
 
-                # 调用write_to_db，尽管不用写入数据库但是需要它的下载顺序和console信息
-                converter = DatabaseConverter()
-                _check_cancel()
-
-                # useless params but must need, for console info
-                converter.write_into_db(
-                    df=df,
-                    start_date = "2020-01-01",
-                    data_name=table_config["name"],
-                    is_time_series=False,
-                    is_pct_data=False,
-                )
+                # # 调用write_to_db，尽管不用写入数据库但是需要它的下载顺序和console信息
+                # converter = DatabaseConverter()
+                # _check_cancel()
+                #
+                # # useless params but must need, for console info
+                # converter.write_into_db(
+                #     df=df,
+                #     start_date = "2020-01-01",
+                #     data_name=table_config["name"],
+                #     is_time_series=False,
+                #     is_pct_data=False,
+                # )
 
                 _check_cancel()
                 df_dict : dict = {}

@@ -353,17 +353,17 @@ class ISMDownloader(DataDownloader):
                     )
                     continue
 
-                # 调用write_to_db，尽管不用写入数据库但是需要它的下载顺序和console信息
-                converter = DatabaseConverter()
-                _check_cancel()
-                converter.write_into_db(
-                    df=df,
-                    start_date = "2020-01-01",   # useless params but must need
-                    data_name=table_config["name"],
-                    is_time_series=False,
-                    is_pct_data=False,
-                )
-                _check_cancel()
+                # # 调用write_to_db，尽管不用写入数据库但是需要它的下载顺序和console信息
+                # converter = DatabaseConverter()
+                # _check_cancel()
+                # converter.write_into_db(
+                #     df=df,
+                #     start_date = "2020-01-01",   # useless params but must need
+                #     data_name=table_config["name"],
+                #     is_time_series=False,
+                #     is_pct_data=False,
+                # )
+                # _check_cancel()
 
                 # 创建一个容器，结构是，数据名称：df
                 df_dict : dict = {}

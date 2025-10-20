@@ -146,11 +146,9 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [ ] 再多次重新设置图表的时候，后面的数据会错位
 - [ ] 软件启动的时候自动读取json里面的内容然后更新
 - [ ] four chart里面数据有错开，数量都一致
-- [ ] no show second line data on preview labeled
 - [ ] one chart里面的右坐标轴字体没法缩小
 - [ ] One chart里面的time lags功能（数据错位）还没有添加
-- [ ] 在downloader里面会创建一个多余的data.db
-- [ ] nyf下载excel没有在download里面删除多余的文件
+- [ ] nyf credit quota最后一列是多余的
 
 **extra function waitlist :**
 - [ ] 新板块：彭博文章
@@ -159,6 +157,7 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [ ] 设立一个使用说明页面
 - [ ] 储存上次设置好的线条样式
 - [ ] i18n 多语言支持（简中，繁中，日文）
+- [ ] 添加Table组件中复制粘贴功能
 
 
 </details>
