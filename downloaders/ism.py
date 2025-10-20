@@ -22,7 +22,6 @@ from downloaders.common import (
     CSV_DATA_FOLDER,
     CancelledError,
     CancellationToken,
-    DatabaseConverter,
     DataDownloader,
 )
 
@@ -102,7 +101,6 @@ class ISMDownloader(DataDownloader):
     def ism_manufacture(self, check_cancel)->pd.DataFrame:
         """运行方法，首先打开report界面，点击报告抓取当前报告
         然后通过修改report url的月份抓取过去5个月的报告，储存数据
-        间隔时间随机，防止被封ip
         Open main url, crawl data, then change url, crawl past data"""
 
         # initialize : clear total_df and load html
@@ -163,8 +161,8 @@ class ISMDownloader(DataDownloader):
             logger.error(f"Cannot find month in URL：{extract_month}")
             return pd.DataFrame()
 
-        prev_months = []  # store str "month" name  正常提取5个月报告
-        for i in range(1, 5):
+        prev_months = []  # store str "month" name  正常提取2个月报告
+        for i in range(1, 2):
             prev_num = (month_num - i - 1) % 12 + 1
             month_name = month_dict[str(prev_num)]
             prev_months.append(month_name)
@@ -261,7 +259,7 @@ class ISMDownloader(DataDownloader):
             return pd.DataFrame()
 
         prev_months = []  # store str "month" name
-        for i in range(1, 5):
+        for i in range(1, 2):
             prev_num = (month_num - i - 1) % 12 + 1
             month_name = month_dict[str(prev_num)]
             prev_months.append(month_name)

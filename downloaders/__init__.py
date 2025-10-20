@@ -20,6 +20,7 @@ from .dfm import DFMDownloader
 from .nyf import NYFDownloader
 from .cin import CINDownloader
 from .em import EMDownloader
+from .fs import FSDownloader
 
 __all__ = [
     "DownloaderFactory",
@@ -35,6 +36,7 @@ __all__ = [
     "NYFDownloader",
     "CINDownloader",
     "EMDownloader",
+    "FSDownloader"
 ]
 
 DownloaderType = Type[DataDownloader]
@@ -49,7 +51,8 @@ _DOWNLOADERS: Dict[str, DownloaderType] = {
     "dfm": DFMDownloader,
     "nyf": NYFDownloader,
     "cin": CINDownloader,
-    "em" : EMDownloader
+    "em" : EMDownloader,
+    "fs" : FSDownloader
 }
 
 

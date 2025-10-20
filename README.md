@@ -72,54 +72,33 @@ pip install uv
 <details>
   <summary>点击查看详情</summary>
 
+**重点数据**
 - [ ] AAII散户投资人情绪指数
 - [ ] NAAIM经理人持仓指数
+- [ ] 标普PE水平
+- [ ] M1与M2剪刀差
+- [ ] 周度原油库存、炼油厂利用率
+
+**非重点数据**
 - [ ] 家庭/企业/政府负债比率，流动性指标
 - [ ] 经常账户，贸易差额，FDI流入流出（BEA: ITA）
 - [ ] 服务贸易（BEA: IntlServTrade）
 - [ ] 美元计价的外储（BEA: IIP）
 - [ ] 劳动力参与率 (Labor Force Participation Rate)
 - [ ] 劳工成本与劳工效率
-- [ ] 职位空缺与求职者比率 (Job Openings to Applicants Ratio)
 - [ ] 临时工雇佣数据 (Temporary Help Services Employment)
 - [ ] 亚特兰大联储薪资增长追踪 (Wage Growth Tracker)
 - [ ] 中间品生产者价格指数 (Intermediate PPI)
-- [ ] 原材料生产者价格指数 (Crude Materials PPI)
-- [ ] 租金等价通胀指标 (Zillow租金指数、CoreLogic房价指数)
-- [ ] 月度零售销售额 (Advance Monthly Retail Sales)
-- [ ] 电子商务销售额占比
-- [ ] 核心资本货物订单 (非国防除飞机订单)
-- [ ] 建筑支出月报 (Construction Spending)
-- [ ] 企业并购活动金额与数量
 - [ ] 标普500企业盈利预期修正比率
-- [ ] 分商品类别的贸易差额 (能源、汽车、农产品等)
-- [ ] 实际有效汇率指数 (Real Effective Exchange Rate)
 - [ ] 主要贸易伙伴国对美出口依存度
 - [ ] 供应链压力指数 (如纽约联储的GSCPI)
-- [ ] 标普PE水平
-- [ ] 州与地方政府财政状况
 - [ ] 社会保障与医疗保险支出趋势
 - [ ] 企业税收与个人税收占比
-- [ ] M2货币供应量增长率
-- [ ] 银行信贷标准调查 (Senior Loan Officer Opinion Survey)
-- [ ] 成屋销售月报 (Existing Home Sales)
-- [ ] 住房空置率 (Homeowner & Rental Vacancy Rates)
 - [ ] 抵押贷款申请指数 (MBA Purchase Index)
 - [ ] 商业地产价格指数 (如NCREIF)
-- [ ] 工业产出与产能利用率 (Federal Reserve G.17报告)
-- [ ] 费城联储制造业指数
-- [ ] 堪萨斯城联储制造业指数
 - [ ] Markit制造业PMI终值
 - [ ] OECD美国综合领先指标
 - [ ] 经济意外指数 (Citi Economic Surprise Index)
-- [ ] 世界大型企业联合会 (Conference Board)
-- [ ] 消费者信心细分（预期指数 vs 现况指数）
-- [ ] 美国能源信息署 (EIA)
-- [ ] 周度原油库存、炼油厂利用率
-- [ ] 全美房地产经纪人协会 (NAR)
-- [ ] 成屋销售价格中位数
-- [ ] 彭博经济意外指数
-- [ ] 标普500同比与基钦周期
  
  </details>
 

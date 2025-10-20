@@ -238,18 +238,6 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
-    "us_ten_year_treasury_rate_d": {
-      "name": "US10Y_Treasury_Rate",
-      "code": "DGS10",
-      "needs_pct": false,
-      "needs_cleaning": false
-    },
-    "bofa_high_yield_index_rate_d": {
-      "name": "BOFA_High_Yield_Bond_Rate_Index",
-      "code": "BAMLH0A0HYM2EY",
-      "needs_pct": false,
-      "needs_cleaning": false
-    },
     "atlanta_gdp_now_q": {
       "name": "Atlanta_GDPNOW",
       "code": "GDPNOW",
@@ -274,6 +262,25 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
+    "M1_total": {
+      "name": "M1_Total",
+      "code": "WM1NS",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "M2_total": {
+      "name": "M2_Total",
+      "code": "WM2NS",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "acquisition_of_assets": {
+      "name": "Acquisition_of_Financial_Assets",
+      "code": "IEAA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+
     "total_us_debt_q": {
       "name": "Total_US_Debt",
       "code": "GFDEBTN",
@@ -298,6 +305,7 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
+
     "housing_permits_m": {
       "name": "Housing_Permits",
       "code": "PERMIT",
@@ -328,6 +336,31 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
+    "housing_afford_index": {
+      "name": "US_Housing_Affordability_Index",
+      "code": "FIXHAI",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "rental_vacancy_q": {
+      "name": "Rental_Vacancy_Rate",
+      "code": "RRVRUSQ156N",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+
+    "us_ten_year_treasury_rate_d": {
+      "name": "US10Y_Treasury_Rate",
+      "code": "DGS10",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "bofa_high_yield_index_rate_d": {
+      "name": "BOFA_High_Yield_Bond_Rate_Index",
+      "code": "BAMLH0A0HYM2EY",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
     "federal_overnight_repurchase_d": {
       "name": "Federal_Overnight_Repurchase",
       "code": "RRPONTSYD",
@@ -346,6 +379,19 @@
       "needs_pct": false,
       "needs_cleaning": true
     },
+    "SOFR": {
+      "name": "SOFR",
+      "code": "SOFR",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "SOFR_30_daily_average": {
+      "name": "SOFR_30_days_average",
+      "code": "SOFR30DAYAVG",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+
     "import_price_index_m": {
       "name": "Import_Price_Index",
       "code": "IR",
@@ -357,8 +403,28 @@
       "code": "IQ",
       "needs_pct": true,
       "needs_cleaning": false
+    },
+    "WTI_crude_oil_price": {
+      "name": "WTI_Crude_Oil_Price",
+      "code": "DCOILWTICO",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "avg_electricity_price": {
+      "name": "US_Average_Electricity_Price_KWh",
+      "code": "APU000072610",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "copper_price": {
+      "name": "Copper_Price",
+      "code": "PCOPPUSDM",
+      "needs_pct": false,
+      "needs_cleaning": false
     }
   },
+
+
   "bls": {
     "eci": {
       "name": "ECI_Employment_Cost_index",
@@ -544,9 +610,6 @@
     },
     "audusd_swap": {
       "name": "AUD_USD_Forex_Swap"
-    },
-    "foreign_ten_year_bonds_in_usd": {
-      "name": "Foreign_10Y_Bonds_in_USD"
     }
   }
 }

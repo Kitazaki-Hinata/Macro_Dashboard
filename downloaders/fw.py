@@ -21,7 +21,6 @@ from downloaders.common import (
     CSV_DATA_FOLDER,
     CancelledError,
     CancellationToken,
-    DatabaseConverter,
     DataDownloader,
 )
 
