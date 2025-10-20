@@ -13,6 +13,7 @@ import math
 from datetime import datetime
 from typing import Optional, Dict, Any, Protocol
 import pyqtgraph as pg
+import pandas as pd
 from PySide6.QtCore import QTimer
 
 from downloaders.common import CancellationToken, CancelledError
@@ -66,6 +67,7 @@ class _MainWindowProto(Protocol):
     # Download controls
     download_csv_check: Any
     chart_functions : Any
+    table_functions: Any
     four_chart_one: Any
     four_chart_two: Any
     four_chart_three: Any
@@ -109,13 +111,13 @@ class _DownloadWorker(QObject):
                 "fred",
                 "bls",
                 "te",
-                # "fw",
-                # "dfm",
-                # "em",
+                "ism",
+                "fw"
+                "dfm",
+                "em",
                 # "fs",
-                # "cin",
-                # "ism",
-                # "nyf"
+                "cin",
+                "nyf"
                 ] if self._download_all else list(self._selected_sources)
             if not sources:
                 self.progress.emit("No sources selected. Nothing to do.")
@@ -149,7 +151,7 @@ class _DownloadWorker(QObject):
                 if downloader is None:
                     self.progress.emit(f"Skip {src}: no downloader available.")
                     continue
-                self.progress.emit(f"Downloading {src} data to database...")
+                self.progress.emit(f"Downloading {src} data to local...")
                 try:
                     # 优先判断 download_csv_check 是否被选中
                     if self.main_window and hasattr(self.main_window, "download_csv_check") and self.main_window.download_csv_check.isChecked():
@@ -228,7 +230,7 @@ class UiFunctions():  # 删除:mainWindow
                 slot.setdefault('time_lags',0)
                 slot.setdefault('color', default_color)
             table = data.setdefault('table_settings', {})
-            table.setdefault('columns', [])
+            table.setdefault('table_name', [])
         except Exception:
             pass
         return data
@@ -387,7 +389,7 @@ class UiFunctions():  # 删除:mainWindow
             for checkbox in checkbox_list:
                 try:
                     checkbox.setEnabled(True)
-                    checkbox.setChecked(True)
+                    checkbox.setChecked(False)
                 except Exception:
                     pass
 
@@ -752,6 +754,22 @@ class UiFunctions():  # 删除:mainWindow
                 ui.fourth_data_selection_box.setCurrentText(existing_data["four_chart_settings"]["fourth_data"]["data_name"])
             except:
                 pass
+
+        if name == "table":
+            try:
+                # 下拉框显示当前已经显示的数据
+                existing_data: Dict[str, Any] = self.get_settings_from_json()
+
+                current_file_path = os.path.dirname(os.path.abspath(__file__))
+                table_csv_folder_path = os.path.join(current_file_path, "..", "csv", "A_TABLE_DATA")
+                ui.first_data_selection_box.clear()   # 先清除，再添加选项
+                for file_name in os.listdir(table_csv_folder_path):
+                    ui.first_data_selection_box.addItem(file_name)
+
+                ui.first_data_selection_box.setCurrentText(existing_data["table_settings"]["table_name"])
+
+            except:
+                    pass
 
         # 打开窗口
         window.show()
@@ -1190,13 +1208,33 @@ class UiFunctions():  # 删除:mainWindow
 
     # TABLE SETTINGS
     def table_finish_settings(self, window: Any, widget: QWidget):
+        table_data_name = window.first_data_selection_box.currentText()
         existing_data = self.get_settings_from_json()
-        # TODO: 根据表格设置界面控件读取列选择等
+        existing_data["table_settings"]["table_name"] = table_data_name
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_path, "..", "csv", "A_TABLE_DATA", f"{table_data_name}", f"{table_data_name}.csv")
+
+        # 读取csv文件
+        table_data : pd.DataFrame = pd.read_csv(file_path)
+        if table_data.empty:
+            logging.error("Table data is empty.")
+            return
+
+        # 调用table_functions然后使用里面的函数写入table
+        if window.stretch_table_check.isChecked():
+            self.main_window.table_functions.show_table(table_data, stretch = True)
+        else:
+            self.main_window.table_functions.show_table(table_data, stretch = False)
+
+        # 修改widget label名称
+        self.main_window.table_title_label.setText(f"Current Table Name : {table_data_name}")
+
+
         try:
             with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
                 json.dump(existing_data, f, ensure_ascii=False, indent=4)
         except Exception as e:
-            logging.error(f"写入 table settings 失败: {e}")
+            logging.error(f"Failed to save settings, error: {e}")
         try:
             widget.close()
         except Exception:
@@ -1274,13 +1312,18 @@ class UiFunctions():  # 删除:mainWindow
         start_year = int(self.main_window.int_year_spinbox.value())
         sources: list[str]
         download_all_bool = False
-        if bool(self.main_window.download_for_all_check.isChecked()):
-            sources = ["bea", "yf", "fred", "bls", "te"]
-            download_all_bool = True
 
+        # all sources name 是所有已经存在的数据源
+        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism", "fw", "dfm", "nyf", "cin", "em", "fs"]
+
+        # 如果都下载，就直接sources = all sources name
+        if bool(self.main_window.download_for_all_check.isChecked()):
+            sources : list = all_sources_name
+            download_all_bool = True
+        # 否则，遍历list，然后再sources这个list当中添加选中的源
         else:
             sources = []
-            for name in ("bea", "yf", "fred", "bls", "te"):
+            for name in all_sources_name:
                 w = getattr(self.main_window, name, None)
                 try:
                     if w is not None and bool(w.isChecked()):

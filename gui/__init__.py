@@ -8,6 +8,7 @@ from . import resources_rc
 from .ui_main import Ui_MainWindow  # type: ignore
 from .ui_function import UiFunctions
 from .chart_function import ChartFunction
+from .table_function import TableFunction
 from gui.subwindows.ui_oneChartSettings import Ui_OneChartSettingsPanel
 from gui.subwindows.ui_fourChartSettings import Ui_FourChartSettingsPanel
 from gui.subwindows.ui_tableSettings import Ui_TableSettingsPanel
@@ -49,5 +50,6 @@ __all__ = [
     "Ui_FourChartSettingsPanel",
     "Ui_TableSettingsPanel",
     "Ui_Prestart_ui",
-    "ChartFunction"
+    "ChartFunction",
+    "TableFunction"
 ]

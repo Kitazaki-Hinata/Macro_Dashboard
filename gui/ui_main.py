@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTableView, QTextEdit,
     QVBoxLayout, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -185,10 +186,51 @@ class Ui_MainWindow(object):
 " }\n"
 "        \n"
 "        \n"
+"/*================================== ====*/\n"
+"/* \u6a2a\u5411\u6eda\u52a8\u6761 */\n"
+"QScrollBar:horizontal {\n"
+"    border: none;\n"
+"    background: #303030;\n"
+"    height: 8px;\n"
+"    margin: 0px 20px 0px 20px;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    	background: #90b6e7;\n"
+"    min-height: 25px;\n"
+"	border-radius: 4px\n"
+"}\n"
 "\n"
 "\n"
-"        \n"
-"")
+"QScrollBar::add-line:horizontal {\n"
+"    border: none;\n"
+"    background: #252526;\n"
+"    width: 20px;\n"
+"    border-top-right-radius: 4px;\n"
+"    border-bottom-right-radius: 4px;\n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    border: none;\n"
+"    background: #252526;\n"
+"    width: 20px;\n"
+"    border-top-left-radius: 4px;\n"
+"    border-bottom-left-radius: 4px;\n"
+"    subcontrol-position: left;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:horizontal, QScroll"
+                        "Bar::down-arrow:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {\n"
+"    background: none;\n"
+"}")
         self.style_sheet = QWidget(MainWindow)
         self.style_sheet.setObjectName(u"style_sheet")
         self.style_sheet.setStyleSheet(u"QWidget#header_bar {\n"
@@ -673,13 +715,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_9 = QVBoxLayout(self.text_container_2)
         self.verticalLayout_9.setSpacing(6)
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
-        self.verticalLayout_9.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_9.setContentsMargins(9, 0, 9, 0)
         self.table_title_label = QLabel(self.text_container_2)
         self.table_title_label.setObjectName(u"table_title_label")
         self.table_title_label.setMaximumSize(QSize(16777215, 20))
         self.table_title_label.setFont(font1)
         self.table_title_label.setStyleSheet(u"color: #ffffff; \n"
-"margin-left : 7px; ")
+"margin-left : 0; ")
 
         self.verticalLayout_9.addWidget(self.table_title_label)
 
@@ -687,7 +729,7 @@ class Ui_MainWindow(object):
         self.table_update_label.setObjectName(u"table_update_label")
         self.table_update_label.setMaximumSize(QSize(16777215, 12))
         self.table_update_label.setFont(font)
-        self.table_update_label.setStyleSheet(u"margin-left : 9px; \n"
+        self.table_update_label.setStyleSheet(u"margin-left : 0; \n"
 "color : #90b6e7;")
 
         self.verticalLayout_9.addWidget(self.table_update_label)
@@ -719,17 +761,13 @@ class Ui_MainWindow(object):
         self.table_container = QWidget(self.page_table_container)
         self.table_container.setObjectName(u"table_container")
         self.table_container.setMaximumSize(QSize(16777215, 16777215))
-        self.table_container.setStyleSheet(u"background-color : #262a2f;\n"
-"border-radius:30px;\n"
-"margin-left : 10px;\n"
-"margin-right : 10px;")
+        self.table_container.setStyleSheet(u"background: transparent;")
         self.verticalLayout_10 = QVBoxLayout(self.table_container)
         self.verticalLayout_10.setSpacing(0)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_10.setContentsMargins(9, 0, 9, 0)
         self.tableView = QTableView(self.table_container)
         self.tableView.setObjectName(u"tableView")
-        self.tableView.setStyleSheet(u"")
 
         self.verticalLayout_10.addWidget(self.tableView)
 
@@ -1121,7 +1159,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 224, 554))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 116, 54))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -1717,7 +1755,7 @@ class Ui_MainWindow(object):
         font6.setPointSize(12)
         self.textEdit.setFont(font6)
         self.textEdit.setStyleSheet(u"color:white; \n"
-"font-famlily:\"Comfortaa\";\n"
+" font-family:\"Comfortaa\";\n"
 "border :0;\n"
 "background:#262a2f;\n"
 "padding :5px;\n"
@@ -1830,35 +1868,35 @@ class Ui_MainWindow(object):
         self.verticalLayout_29.setContentsMargins(0, 0, 0, 0)
         self.bea = QCheckBox(self.ts_data)
         self.bea.setObjectName(u"bea")
-        self.bea.setEnabled(True)
+        self.bea.setEnabled(False)
         self.bea.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bea)
 
         self.yf = QCheckBox(self.ts_data)
         self.yf.setObjectName(u"yf")
-        self.yf.setEnabled(True)
+        self.yf.setEnabled(False)
         self.yf.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.yf)
 
         self.fred = QCheckBox(self.ts_data)
         self.fred.setObjectName(u"fred")
-        self.fred.setEnabled(True)
+        self.fred.setEnabled(False)
         self.fred.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.fred)
 
         self.bls = QCheckBox(self.ts_data)
         self.bls.setObjectName(u"bls")
-        self.bls.setEnabled(True)
+        self.bls.setEnabled(False)
         self.bls.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.bls)
 
         self.te = QCheckBox(self.ts_data)
         self.te.setObjectName(u"te")
-        self.te.setEnabled(True)
+        self.te.setEnabled(False)
         self.te.setCheckable(True)
 
         self.verticalLayout_29.addWidget(self.te)
@@ -2117,7 +2155,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.console_area.sizePolicy().hasHeightForWidth())
         self.console_area.setSizePolicy(sizePolicy1)
         self.console_area.setStyleSheet(u"color:white; \n"
-"font-famlily:\"Comfortaa\";\n"
+" font-family:\"Comfortaa\";\n"
 "border :0;\n"
 "background:transparent;\n"
 "padding :5px;\n"

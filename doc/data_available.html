@@ -5,138 +5,156 @@
     <title>Macro Dashboard 宏观经济面板：数据索引</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 20px; }
-        h1 { color: #2c3e50; }
-        h2 { color: #2c3e50; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h2 { color: #2c3e50; margin-top: 40px; }
         h3 { color: #546F8CFF; }
         h4 {color: #de2d4b;}
-        b {color: #666666;}
-        ul { list-style-type: square; padding-left: 20px; }
-        .section { margin-bottom: 30px; }
     </style>
 </head>
 <body>
-    <h1>宏观经济数据索引</h1>
+<h1>宏观经济数据索引（表格版）</h1>
 
-    <div class="section">
-        <h4>注意：弹出的浏览器窗口需保持打开状态！不要对其进行任何操作。程序仅限于交流学习使用，严禁商用！！！</h4>
-        <h2>Time Series Data // 时序数据</h2>
-        <h3>Yahoo Finance API</h3>
-        <ul>
-            <li>标普500日数据（^GSPC）</li>
-            <li>纳斯达克日数据 （^IXIC）</li>
-            <li>VIX美股波动率 （^VIX）</li>
-        </ul>
-    </div>
+<h4>注意：弹出的浏览器窗口需保持打开状态！不要对其进行任何操作。程序仅限于交流学习使用，严禁商用！！！</h4>
 
-    <div class="section">
-        <h3>BEA API</h3>
-        <ul>
-            <li>季度环比GDP变化率 T10101</li>
-            <li>价格指数 T10104</li>
-            <li>名义细分GDP数值 T10105</li>
-            <li>实际细分GDP数值 T10106</li>
-            <li>居民收入与开支 T20100</li>
-            <li>核心支出结构拆分 U20305</li>
-            <li>载具生产销售库存 U70205S【等待debug】</li>
-            <li>企业盈利 T61600B【等待debug】</li>
-            <li>存量耐用消费品 FAAt801</li>
-            <li>部门收入和投资 T50100</li>
-            <li>部门固定资产投资 FAAt307ESI</li>
-            <li>政府财政赤字【等待debug】</li>
-            <li>政府开支与GDP占比</li>
-            <li>国际贸易赤字</li>
-            <li>PCE月度通胀指数 U20304</li>
-            <li>实际PCE消费趋势</li>
-            <li>库存 U001BC</li>
-            <li>库存销售比 U003BU</li>
-        </ul>
-    </div>
+<h2>Time Series Data // 时序数据</h2>
 
-    <div class="section">
-        <h3>FRED St. Louis API</h3>
-        <ul>
-            <li>失业率</li>
-            <li>JOLTS空缺岗位</li>
-            <li>大非农总就业人数，新增就业人数，细分领域就业人数</li>
-            <li>初请失业金人数</li>
-            <li>续请失业金人数</li>
-            <li>密歇根消费者信心指数</li>
-            <li>密歇根消费者通胀预期</li>
-            <li>居民储蓄率</li>
-            <li>芝加哥金融松紧度指数</li>
-            <li>圣路易斯金融松紧度指数</li>
-            <li>美联储资产负债表</li>
-            <li>美联储隔夜逆回购规模</li>
-            <li>美联储流动性数据</li>
-            <li>US10Y-US2Y衰退预期</li>
-            <li>10年期美债收益率</li>
-            <li>BofA垃圾债收益率指数</li>
-            <li>垃圾债10年期债券收益率利差</li>
-            <li>亚特兰大联储GDP NOW预测</li>
-            <li>LMS每周经济活跃指数</li>
-            <li>芝加哥联储全国活动指数</li>
-            <li>5年期前瞻通胀</li>
-            <li>90天AA级高信用金融企业商业票据利率</li>
-            <li>90天AA级高信用非金融企业商业票据利率</li>
-            <li>全商品进口价格指数</li>
-            <li>全商品出口价格指数</li>
-            <li>自雇与非正式就业人口统计</li>
-            <li>美债规模</li>
-            <li>外国投资者持有美债规模</li>
-            <li>美债比GDP</li>
-            <li>外国投资者持有的美债比GDP</li>
-            <li>新建房住房许可数量</li>
-            <li>新建房开工数量</li>
-            <li>完工住房数量</li>
-            <li>销售住房数量</li>
-            <li>标普-芝加哥住房价格指数</li>
-        </ul>
-    </div>
+<h3>Yahoo Finance API</h3>
+<table>
+    <tr><th>中文名称 / 数据代码</th><th>英文名称</th></tr>
+    <tr><td>标普500日数据（^GSPC） </td><td>SPX_500</td></tr>
+    <tr><td>纳斯达克日数据（^IXIC） </td><td>Nasdaq_Index</td></tr>
+    <tr><td>VIX美股波动率（^VIX） </td><td>Volatility_Index</td></tr>
+</table>
 
-    <div class="section">
-        <h3>BLS API</h3>
-        <ul>
-            <li>ECI劳工成本指数</li>
-            <li>生产劳工成本指数</li>
-            <li>长期失业率</li>
-            <li>青年失业率</li>
-            <li>兼职人口数量</li>
-            <li>生产加班时长</li>
-            <li>平均薪资</li>
-            <li>季调/非季调CPI数值与环比增长</li>
-            <li>季调/非季调核心CPI数值与环比增长</li>
-            <li>季调/非季调PPI数值与环比增长</li>
-            <li>季调/非季调核心PPI数值与环比增长</li>
-            <li>CPI能源价格</li>
-            <li>CPI食物价格</li>
-            <li>CPI住房价格</li>
-            <li>部分细分CPI数据</li>
-        </ul>
-    </div>
+<h3>BEA API</h3>
+<table>
+    <tr><th>中文名称 / 数据代码</th><th>英文名称</th></tr>
+    <tr><td>季度环比GDP变化率 T10101</td><td>GDP_Growth_QoQ</td></tr>
+    <tr><td>价格指数 T10104</td><td>Price_Index_GDP</td></tr>
+    <tr><td>名义细分GDP数值 T10105</td><td>Nominal_GDP</td></tr>
+    <tr><td>实际细分GDP数值 T10106</td><td>Real_GDP</td></tr>
+    <tr><td>居民收入与开支 T20100</td><td>Income_and_Spending</td></tr>
+    <tr><td>核心支出结构拆分 U20305</td><td>Expenditure_Structure</td></tr>
+    <tr><td>载具生产销售库存 U70205S【等待debug】</td><td>Vehicle_Data</td></tr>
+    <tr><td>企业盈利 T61600B【等待debug】</td><td>Corporation_Profit</td></tr>
+    <tr><td>部门收入和投资 T50100</td><td>Savings_and_Investment</td></tr>
+    <tr><td>政府财政赤字【等待debug】</td><td>Government_Surplus_and_Deficit</td></tr>
+    <tr><td>政府开支与GDP占比</td><td>Government_Spending_as_GDP</td></tr>
+    <tr><td>国际贸易赤字</td><td>Foreign_Trade</td></tr>
+    <tr><td>存量耐用消费品 FAAt801</td><td>Stock_consumer_durable_goods</td></tr>
+    <tr><td>部门固定资产投资 FAAt307ESI</td><td>Sector_Private_Fix_Investment</td></tr>
+    <tr><td>PCE月度通胀指数 U20304</td><td>PCE_Inflation_Index</td></tr>
+    <tr><td>实际PCE消费趋势</td><td>Real_PCE_consumption_trend</td></tr>
+    <tr><td>库存 U001BC</td><td>Inventories</td></tr>
+    <tr><td>库存销售比 U003BU</td><td>Inventories_Sales_Ratio</td></tr>
+</table>
 
-    <div class="section">
-        <h3>其他自动化采集类数据</h3>
-        <ul>
-            <li>LEI谘商会经济领先指数 （未公开）</li>
-            <li>NFIB小企业乐观指数 （未公开）</li>
-        </ul>
-    </div>
+<h3>FRED St. Louis API</h3>
+<table>
+    <tr><th>中文名称 / 数据代码</th><th>英文名称</th></tr>
 
-    <div class="section">
-        <h2>Cross Sectional Data // 横截面数据</h2>
-        <ul>
-            <li>ISM制造业指数与细分数据</li>
-            <li>ISM服务业指数与细分数据</li>
-            <li>CME FedWatch：利率期货市场--利率预期 （未公开）</li>
-            <li>达拉斯联储季调/非季调制造业指数</li>
-            <li>纽约联储信贷总额与占比 表3</li>
-            <li>纽约联储信贷额度 表10</li>
-            <li>纽约联储居民30天期/90天期债务拖欠 表13&14</li>
-            <li>纽约联储居民债务破产违约数量 表17</li>
-            <li>克利夫兰联储实时通胀预期指数</li>
-            <li>CME： Emini期货价格曲线 （未公开）</li>
-            <li>CME： Emini期货交易量与持仓量 （未公开）</li>
-            <li>外汇交易中心：USD外汇掉期掉期数据 （未公开）</li>
-            <li>各国债券收益率（swap转换后的美元计价） （未公开）</li>
-        </ul>
-    </div>
+    <tr><td></td><td></td></tr>
+    <tr><td>---就业，通胀与经济预期---</td><td>↓↓↓</td></tr>
+    <tr><td>失业率</td><td>Unemployment_Rate</td></tr>
+    <tr><td>JOLTS空缺岗位</td><td>JOLTS_job_openings</td></tr>
+    <tr><td>大非农总就业人数，新增就业人数，细分领域就业人数</td><td></td></tr>
+    <tr><td>初请失业金人数</td><td>Initial_Job_Claims</td></tr>
+    <tr><td>BofA企业债信用利差</td><td>Corporate_Bond_Spread</td></tr>
+    <tr><td>续请失业金人数</td><td>Continue_Job_Claims</td></tr>
+    <tr><td>密歇根消费者信心指数</td><td>Michigan_Consumer_Sentiment</td></tr>
+    <tr><td>密歇根消费者通胀预期</td><td>Michigan_Inflation_Expectation</td></tr>
+    <tr><td>居民储蓄率</td><td>Personal_Saving_Rate</td></tr>
+    <tr><td>芝加哥金融松紧度指数</td><td>Chicago_Financial_Condition</td></tr>
+    <tr><td>圣路易斯金融松紧度指数</td><td>St_Louis_Financial_Stress</td></tr>
+    <tr><td>美联储资产负债表</td><td>Federal_Balance_Sheet</td></tr>
+    <tr><td>US10Y-US2Y衰退预期</td><td>10Y_2Y_Bond_Yield_Spread</td></tr>
+    <tr><td>亚特兰大联储GDP NOW预测</td><td>Atlanta_GDPNOW</td></tr>
+    <tr><td>LMS每周经济活跃指数</td><td>LMS_Weekly_Economic_Index</td></tr>
+    <tr><td>5年期前瞻通胀</td><td>Five_Year_Inflation_Expectation</td></tr>
+    <tr><td>自雇与非正式就业人口统计</td><td>Self_Employment_Population</td></tr>
+    <tr><td>M1总量</td><td>M1_Total</td></tr>
+    <tr><td>M2总量</td><td>M2_Total</td></tr>
+    <tr><td>金融收购总额</td><td>Acquisition_of_Financial_Assets</td></tr>
+
+    <tr><td></td><td></td></tr>
+    <tr><td>---美债规模类---</td><td>↓↓↓</td></tr>
+    <tr><td>美债规模</td><td>Total_US_Debt</td></tr>
+    <tr><td>外国投资者持有美债规模</td><td>Foreign_Hold_US_Debt</td></tr>
+    <tr><td>美债比GDP</td><td>Total_US_Debt_Over_GDP_QoQ</td></tr>
+    <tr><td>外国投资者持有的美债比GDP</td><td>Foreign_US_Debt_Over_GDP_QoQ</td></tr>
+
+    <tr><td></td><td></td></tr>
+    <tr><td>---住房类---</td><td>↓↓↓</td></tr>
+    <tr><td>新建房住房许可数量</td><td>Housing_Permits</td></tr>
+    <tr><td>新建房开工数量</td><td>Housing_Started_Number</td></tr>
+    <tr><td>完工住房数量</td><td>Housing_Complete_Number</td></tr>
+    <tr><td>销售住房数量</td><td>Housing_Sold_Number</td></tr>
+    <tr><td>标普-芝加哥住房价格指数</td><td>SP_Chicago_Home_Price_Index</td></tr>
+    <tr><td>住房负担能力指数</td><td>US_Housing_Affordability_Index</td></tr>
+    <tr><td>租房空置率</td><td>Rental_Vacancy_Rate</td></tr>
+
+    <tr><td></td><td></td></tr>
+    <tr><td>---票据与利率类---</td><td>↓↓↓</td></tr>
+    <tr><td>10年期美债收益率</td><td>US10Y_Treasury_Rate</td></tr>
+    <tr><td>BofA垃圾债收益率指数</td><td>BOFA_High_Yield_Bond_Rate_Index</td></tr>
+    <tr><td>美联储隔夜逆回购规模</td><td>Federal_Overnight_Repurchase</td></tr>
+    <tr><td>90天AA级高信用金融企业商业票据利率</td><td>AA_90days_Financial_Paper_Rate</td></tr>
+    <tr><td>90天AA级高信用非金融企业商业票据利率</td><td>AA_90days_Non_Financial_Paper_Rate</td></tr>
+    <tr><td>SOFR担保隔夜融资利率</td><td>SOFR</td></tr>
+    <tr><td>30天SOFR担保隔夜融资利率均值</td><td>SOFR_30_days_average</td></tr>
+
+    <tr><td></td><td></td></tr>
+    <tr><td>---商品价格类---</td><td>↓↓↓</td></tr>
+    <tr><td>全商品进口价格指数</td><td>Import_Price_Index</td></tr>
+    <tr><td>全商品出口价格指数</td><td>Export_Price_Index</td></tr>
+    <tr><td>WTI原油价格</td><td>WTI_Crude_Oil_Price</td></tr>
+    <tr><td>美国平均每单位KWh电价</td><td>US_Average_Electricity_Price_KWh</td></tr>
+    <tr><td>国际铜价</td><td>Copper_Price</td></tr>
+
+</table>
+
+<h3>BLS API</h3>
+<table>
+    <tr><th>中文名称 / 数据代码</th><th>英文名称</th></tr>
+    <tr><td>ECI劳工成本指数</td><td>ECI_Employment_Cost_index</td></tr>
+    <tr><td>生产劳工成本指数</td><td>ECI_Manufacture</td></tr>
+    <tr><td>兼职人口数量</td><td>Part_Time_Job_Population</td></tr>
+    <tr><td>生产加班时长</td><td>Manufacture_Overtime</td></tr>
+    <tr><td>平均薪资</td><td>Average_Wage</td></tr>
+    <tr><td>季调/非季调CPI数值与环比增长</td><td>CPI_ [Not_] Seasonally_Adjusted</td></tr>
+    <tr><td>季调/非季调核心CPI数值与环比增长</td><td>Core_CPI_ [Not_] Seasonally_Adjusted</td></tr>
+    <tr><td>季调/非季调PPI数值与环比增长</td><td>PPI_ [Not_] Seasonally_Adjusted</td></tr>
+    <tr><td>季调核心PPI数值与环比增长</td><td>Core_PPI_Seasonally_Adjusted</td></tr>
+    <tr><td>CPI能源价格</td><td>CPI_Energy</td></tr>
+    <tr><td>CPI食物价格</td><td>CPI_Food</td></tr>
+    <tr><td>CPI住房价格</td><td>CPI_Shelter</td></tr>
+    <tr><td>长期失业率</td><td>Long_Term_Unemployment</td></tr>
+    <tr><td>青年失业率</td><td>Youth_Unemployment</td></tr>
+</table>
+
+<h3>其他自动化采集类数据</h3>
+<table>
+    <tr><th>中文名称 / 数据代码</th><th>英文名称</th></tr>
+    <tr><td>LEI谘商会经济领先指数</td><td>leading_economic_index</td></tr>
+    <tr><td>NFIB小企业乐观指数</td><td>nfib_business_optimism_index</td></tr>
+</table>
+
+<h2>Table Data // 列表数据</h2>
+<table>
+    <tr><th>中文名称 / 数据代码</th><th>英文名称</th></tr>
+    <tr><td>ISM制造业指数与细分数据</td><td>ISM_manufacture</td></tr>
+    <tr><td>ISM服务业指数与细分数据</td><td>ISM_service</td></tr>
+    <tr><td>CME FedWatch：利率期货市场--利率预期</td><td>FedWatch</td></tr>
+    <tr><td>达拉斯联储季调/非季调制造业指数</td><td>Dallas_Federal_Manufacture_unadjusted_Index</td></tr>
+    <tr><td>纽约联储信贷总额与占比 表3</td><td>Debt_balance</td></tr>
+    <tr><td>纽约联储信贷额度 表10</td><td>Credit_quota</td></tr>
+    <tr><td>纽约联储居民30天期/90天期债务拖欠 表13&14</td><td>30/90_Days_debt_default</td></tr>
+    <tr><td>纽约联储居民债务破产违约数量 表17</td><td>Num_of_debts_bankruptcy_and_default</td></tr>
+    <tr><td>克利夫兰联储实时通胀预期指数</td><td>Cleveland_Inflation_Nowcasting</td></tr>
+    <tr><td>CME： Emini期货交易量与持仓量</td><td>CME_E_mini_Volume_and_Open_Interest</td></tr>
+    <tr><td>外汇交易中心：USD外汇掉期数据</td><td>USD_CNY_Forex_Swap</td></tr>
+</table>
+</body>
+</html>

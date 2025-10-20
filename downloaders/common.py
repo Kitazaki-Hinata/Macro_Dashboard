@@ -491,7 +491,7 @@ class DatabaseConverter:
 		self,
 		df: pd.DataFrame,
 		data_name: str,
-		start_date: str,
+		start_date: str = None,
 		is_time_series: bool = False,
 		is_pct_data: bool = False,
 		overwrite_existing: bool = True,
@@ -581,50 +581,6 @@ class DatabaseConverter:
 						logger.debug("%s returns 2 cols shape=%s", data_name, tuple(rtn_df.shape))
 						logger.info("write_into_db finished: data=%s (%.3fs)", data_name, time.perf_counter() - t_all)
 						return rtn_df
-					else:
-						cols = list(df.columns)
-						has_date = "date" in cols
-						cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (data_name,))
-						exists = cursor.fetchone() is not None
-						if not exists:
-							df.to_sql(data_name, self.conn, if_exists='fail', index=False)
-							self.conn.commit()
-							logger.info("write_into_db(sheet=%s): created table rows=%d", data_name, len(df))
-						else:
-							if has_date:
-								cursor.execute(f"PRAGMA table_info('{data_name}')")
-								info = cursor.fetchall()
-								has_pk = any(r[1] == 'date' and r[5] == 1 for r in info)
-								if not has_pk:
-									tmp_cols = [r[1] for r in info]
-									cursor.execute(f"ALTER TABLE {data_name} RENAME TO {data_name}_backup")
-									col_defs = ["date TEXT PRIMARY KEY"] + [f"{c} REAL" for c in tmp_cols if c != 'date']
-									cursor.execute(f"CREATE TABLE {data_name} ({', '.join(col_defs)})")
-									cols_sel = ','.join(tmp_cols)
-									cursor.execute(f"INSERT OR REPLACE INTO {data_name} ({cols_sel}) SELECT {cols_sel} FROM {data_name}_backup")
-									cursor.execute(f"DROP TABLE {data_name}_backup")
-									self.conn.commit()
-								if df['date'].dtype != object:
-									try:
-										df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.strftime('%Y-%m-%d')
-									except Exception:
-										pass
-								insert_cols = ','.join(cols)
-								placeholders = ','.join(['?'] * len(cols))
-								rows = [tuple(x if (not (isinstance(x, float) and np.isnan(x))) else None for x in r) for r in df.itertuples(index=False, name=None)]
-								cursor.executemany(
-									f"INSERT OR REPLACE INTO {data_name} ({insert_cols}) VALUES ({placeholders})",
-									rows
-								)
-								self.conn.commit()
-								logger.info("write_into_db(sheet=%s): upserted %d rows", data_name, len(rows))
-							else:
-								df.to_sql(data_name, self.conn, if_exists='append', index=False)
-								self.conn.commit()
-								logger.warning("write_into_db(sheet=%s): appended %d rows (no date pk)", data_name, len(df))
-						logger.info("write_into_db finished: data=%s (%.3fs)", data_name, time.perf_counter() - t_all)
-						self.conn.close()
-						return df
 
 			except Exception as e:
 				logger.error(f"FAILED to write into database, in method write_into_db, since {e}")
