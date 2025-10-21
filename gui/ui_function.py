@@ -247,8 +247,8 @@ class UiFunctions():  # 删除:mainWindow
         link = (state == 2)
         # 优先尝试调用 chart_functions 已存在的封装方法（如果后来添加了）
         try:
-            if hasattr(self.main_window, 'chart_functions') and hasattr(self.main_window.chart_functions, 'toggle_four_charts_link'):
-                self.main_window.chart_functions.toggle_four_charts_link(link)  # type: ignore[attr-defined]
+            if hasattr(self.main_window, 'chart_functions') and hasattr(self.main_window.chart_functions, 'link_four_charts'):
+                self.main_window.chart_functions.link_four_charts(link)  # type: ignore[attr-defined]
                 return
         except Exception:
             pass
@@ -1489,6 +1489,8 @@ class UiFunctions():  # 删除:mainWindow
 
     def _on_worker_failed(self, msg: str):
         self._append_console(f"Error: {msg}")
+
+
 
 
 

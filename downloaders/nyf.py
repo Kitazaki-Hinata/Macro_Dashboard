@@ -211,6 +211,22 @@ class NYFDownloader(DataDownloader):
             df_single_data.columns.values[0] = f"Quarter, unit {unit}"
             df_single_data = df_single_data.iloc[-30:].reset_index(drop=True)
 
+            # 对credit quota数据进行单独处理
+            try:
+                if data_name == "Credit_quota":
+                    df_single_data = df_single_data.drop(columns=df_single_data.columns[-1])
+                    df_right = df_single_data[["HE Revolving Balance", "HE Revolving Available Credit", "HE Revolving Limit"]]
+                    df_left = df_single_data.iloc[:,0:4]
+
+                    # 清除错行的空格
+                    df_right = df_right.dropna().reset_index(drop=True)
+                    df_left = df_left.dropna().reset_index(drop=True)
+                    df_single_data = pd.concat([df_left, df_right], axis = 1)
+            except Exception as e:
+                print(f"error : {e}")
+                logging.error(f"Failed to process credit quota data: {e}")
+                continue
+
             # 清除表17的最后两列多余内容
             if data_name == "Num_of_debts_bankruptcy_and_default":
                 df_single_data = df_single_data.iloc[:, :-2]
