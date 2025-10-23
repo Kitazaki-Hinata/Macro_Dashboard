@@ -277,7 +277,7 @@ QComboBox:focus {
       <item row="2" column="2">
        <widget class="QSpinBox" name="second_time_lag">
         <property name="maximum">
-         <number>10000</number>
+         <number>700</number>
         </property>
        </widget>
       </item>

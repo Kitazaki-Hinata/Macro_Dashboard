@@ -280,6 +280,24 @@
       "needs_pct": false,
       "needs_cleaning": false
     },
+    "VISA_consumption_momentum_index": {
+      "name": "VISA_Consumption_Momentum_Index",
+      "code": "VISASMIDSA",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "median_household_income": {
+      "name": "Median_Household_Income",
+      "code": "MEHOINUSA672N",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "median_personal_income": {
+      "name": "Median_Personal_Income",
+      "code": "MEPAINUSA672N",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
 
     "total_us_debt_q": {
       "name": "Total_US_Debt",
@@ -304,6 +322,12 @@
       "code": "HBFIGDQ188S",
       "needs_pct": false,
       "needs_cleaning": false
+    },
+    "us_dollar_index": {
+      "name": "US_Dollar_Index",
+      "code": "DTWEXBGS",
+      "needs_pct": false,
+      "needs_cleaning": true
     },
 
     "housing_permits_m": {
@@ -391,6 +415,43 @@
       "needs_pct": false,
       "needs_cleaning": true
     },
+    "AMERIBOR": {
+      "name": "AMERIBOR",
+      "code": "AMERIBOR",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "auto_loans_rate": {
+      "name": "Auto_Loans_Rate_48_Months",
+      "code": "TERMCBAUTO48NS",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "ccc_credit_spread": {
+      "name": "CCC_Ratings_High_Yield_Index_Option_Adjusted_Spread",
+      "code": "BAMLH0A3HYC",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "bb_credit_spread": {
+      "name": "BB_Ratings_High_Yield_Index_Option_Adjusted_Spread",
+      "code": "BAMLH0A1HYBB",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "bbb_credit_spread": {
+      "name": "BBB_Ratings_Index_Option_Adjusted_Spread",
+      "code": "BAMLC0A4CBBB",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+    "aaa_credit_spread_d": {
+      "name": "AAA_Ratings_Index_Option_Adjusted_Spread",
+      "code": "BAMLC0A1CAAA",
+      "needs_pct": false,
+      "needs_cleaning": true
+    },
+
 
     "import_price_index_m": {
       "name": "Import_Price_Index",

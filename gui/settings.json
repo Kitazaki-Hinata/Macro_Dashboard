@@ -1,40 +1,41 @@
 {
-  "recent_update_time": "2025-10-20 16:18:30",
+  "recent_update_time": "2025-10-23 14:54:51",
   "one_chart_settings": {
     "first_data": {
-      "data_name": "SOFR_30_days_average",
+      "data_name": "",
       "time_lags": 0,
       "color": "#90b6e7"
     },
     "second_data": {
-      "data_name": "Youth_Unemployment",
+      "data_name": "",
       "time_lags": 0,
       "color": "#EE5C88"
     }
   },
   "four_chart_settings": {
     "first_data": {
-      "data_name": "Leading_economic_index",
+      "data_name": "",
       "time_lags": 0,
       "color": "#90b6e7"
     },
     "second_data": {
-      "data_name": "Expenditure_Structure",
+      "data_name": "",
       "time_lags": 0,
       "color": "#90b6e7"
     },
     "third_data": {
-      "data_name": "Income_and_Spending",
+      "data_name": "",
       "time_lags": 0,
       "color": "#90b6e7"
     },
     "fourth_data": {
-      "data_name": "Government_Spending_as_GDP",
+      "data_name": "",
       "time_lags": 0,
       "color": "#90b6e7"
     }
   },
   "table_settings": {
-    "table_name": "EUR_USD_Forex_Swap"
-  }
+    "table_name": ""
+  },
+  "agree_to_terms": false
 }

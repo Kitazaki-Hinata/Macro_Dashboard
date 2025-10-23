@@ -220,7 +220,7 @@ class Ui_OneChartSettingsPanel(object):
 
         self.second_time_lag = QSpinBox(self.settings_panel)
         self.second_time_lag.setObjectName(u"second_time_lag")
-        self.second_time_lag.setMaximum(10000)
+        self.second_time_lag.setMaximum(700)
 
         self.gridLayout.addWidget(self.second_time_lag, 2, 2, 1, 1)
 

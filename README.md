@@ -119,15 +119,7 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
     <summary>点击展开事项</summary>
 
 **debug waitlist :**
-- [ ] **新bug：four chart 光标十字针无法同步**
-- [ ] four chart里面ctrl加滚轮无法同时缩放四个图表的纵轴
-- [ ] One_chart导入db里面的列名以及限制输入框只能输入列名
-- [ ] 再多次重新设置图表的时候，后面的数据会错位
-- [ ] 软件启动的时候自动读取json里面的内容然后更新
-- [ ] four chart里面数据有错开，数量都一致
-- [ ] one chart里面的右坐标轴字体没法缩小
-- [ ] One chart里面的time lags功能（数据错位）还没有添加
-- [ ] nyf credit quota最后一列是多余的
+- [ ] One_chart导入db里面的列名以及限制4输入框只能输入列名
 
 **extra function waitlist :**
 - [ ] 新板块：彭博文章

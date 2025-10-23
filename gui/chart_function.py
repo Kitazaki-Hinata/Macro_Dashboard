@@ -11,10 +11,9 @@ import os
 import sqlite3
 import logging
 import numpy as np
-from typing import Any, Sequence, Tuple, List, Protocol, cast
-from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QLayout  # 改为 PySide6
-from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QPainter, QPainterPath, QColor, QTextDocument
+from typing import Any, Tuple, List, Protocol, cast
+from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QLayout
+from PySide6.QtCore import Qt
 from pyqtgraph.Point import Point
 import pyqtgraph.functions as fn
 
@@ -424,7 +423,7 @@ class ChartFunction:
 
         # 设置坐标轴标签字体
         font = pg.QtGui.QFont()
-        font.setPixelSize(12)
+        font.setPixelSize(10)
         font.setFamilies(["Comfortaa"])
         self.single_plot_widget.getAxis('left').setTickFont(font)
         self.single_plot_widget.getAxis('bottom').setTickFont(font)
@@ -779,7 +778,7 @@ class ChartFunction:
         """Plot data to single chart，绘制数据并展示
         widget是plot widget, self.single_plot_widget
         axis_label 是是否需要写x轴label，默认false，第一个图需要true"""
-    # 保存当前十字线和标签的引用
+         # 保存当前十字线和标签的引用
         plot_item = widget.getPlotItem()
         view_box = plot_item.getViewBox()
         object_name = widget.objectName()
@@ -838,7 +837,7 @@ class ChartFunction:
         
         # 设置轴标签字体
         font = pg.QtGui.QFont()
-        font.setPixelSize(12)
+        font.setPixelSize(10)
         font.setFamilies(["Comfortaa"])
         widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
         widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
@@ -940,51 +939,93 @@ class ChartFunction:
                 w.enableAutoRange(axis='x', enable=True)  # 只对x轴自适应
 
             def sync_crosshair(pos):
+                # 首先确定鼠标在哪个图表上
+                active_widget = None
                 for w in widgets:
-                    plot_item = w.getPlotItem()
-                    if plot_item.sceneBoundingRect().contains(pos):
-                        mouse_point = plot_item.vb.mapSceneToView(pos)
-                        x_val = mouse_point.x()
-                        y_val = mouse_point.y()
-                        object_name = w.objectName()
-                        v_line, h_line = self.crosshairs[object_name]
-                        label = self.labels[object_name]
-                        items = plot_item.listDataItems()
-                        nearest_y_for_hline = None
-                        data_texts = []
-                        for item in items:
-                            if hasattr(item, 'getData') and item.getData() is not None:
-                                x_data, y_data = item.getData()
-                                if x_data is not None and y_data is not None and len(x_data) > 0:
-                                    distances = np.abs(np.array(x_data) - x_val)
-                                    if len(distances) > 0:
-                                        min_index = np.argmin(distances)
-                                        if min_index < len(x_data) and min_index < len(y_data):
-                                            nearest_x = x_data[min_index]
-                                            nearest_y = y_data[min_index]
-                                            if nearest_y_for_hline is None:
-                                                nearest_y_for_hline = nearest_y
-                                            name = getattr(item, 'opts', {}).get('name', 'Data')
-                                            data_texts.append(f"Date : {nearest_x}\n{name} : {nearest_y:.2f}")
-                        v_line.setPos(x_val)
-                        if nearest_y_for_hline is not None:
-                            h_line.setPos(nearest_y_for_hline)
-                        else:
-                            h_line.setPos(y_val)
-                        if data_texts:
-                            label_text = "\n".join(data_texts)
-                            label.setText(label_text)
-                            label.setPos(x_val, nearest_y_for_hline if nearest_y_for_hline is not None else y_val)
-                        v_line.show()
-                        h_line.show()
-                        label.show()
-                    else:
+                    if w.getPlotItem().sceneBoundingRect().contains(pos):
+                        active_widget = w
+                        break
+                
+                # 如果鼠标不在任何图表上，则隐藏所有十字线
+                if active_widget is None:
+                    for w in widgets:
                         object_name = w.objectName()
                         v_line, h_line = self.crosshairs[object_name]
                         label = self.labels[object_name]
                         v_line.hide()
                         h_line.hide()
                         label.hide()
+                    return
+
+                # 获取鼠标位置的坐标值
+                mouse_point = active_widget.getPlotItem().vb.mapSceneToView(pos)
+                x_val = mouse_point.x()
+                y_val = mouse_point.y()
+
+                # 在所有图表上同步显示十字线
+                for w in widgets:
+                    plot_item = w.getPlotItem()
+                    object_name = w.objectName()
+                    v_line, h_line = self.crosshairs[object_name]
+                    label = self.labels[object_name]
+                    
+                    # 设置十字线位置
+                    v_line.setPos(x_val)
+                    h_line.setPos(y_val)
+                    
+                    # 获取当前图表的数据项
+                    items = plot_item.listDataItems()
+                    if not items:
+                        continue
+                        
+                    # 查找最接近鼠标的点
+                    nearest_y_for_hline = None
+                    html_lines = []
+                    formatted_date = f"Index: {int(round(x_val))}" if isinstance(x_val, (int, float)) else ""
+                    
+                    # 获取日期缓存
+                    date_cache = getattr(w, '_date_cache', None)
+                    if date_cache and isinstance(x_val, (int, float)):
+                        int_idx = int(round(x_val))
+                        if 0 <= int_idx < len(date_cache):
+                            raw_date = date_cache[int_idx]
+                            formatted_date = self._format_date_string(raw_date)
+                    
+                    for item in items:
+                        if hasattr(item, 'getData') and item.getData() is not None:
+                            x_data, y_data = item.getData()
+                            if x_data is not None and y_data is not None and len(x_data) > 0:
+                                distances = np.abs(np.array(x_data) - x_val)
+                                if len(distances) > 0:
+                                    min_index = np.argmin(distances)
+                                    if min_index < len(x_data) and min_index < len(y_data):
+                                        nearest_x = x_data[min_index]
+                                        nearest_y = y_data[min_index]
+                                        if nearest_y_for_hline is None:
+                                            nearest_y_for_hline = nearest_y
+                                        name = getattr(item, 'opts', {}).get('name', 'Data')
+                                        # 获取颜色
+                                        color_hex = '#ffffff'
+                                        try:
+                                            pen_obj = getattr(item, 'opts', {}).get('pen', None)
+                                            if pen_obj is not None:
+                                                qcolor = pen_obj.color()
+                                                color_hex = qcolor.name()
+                                        except Exception:
+                                            pass
+                                        html_lines.append(f"<span style='color:{color_hex}'>{name} : {nearest_y:.2f}</span>")
+                    
+                    # 更新标签内容
+                    if html_lines:
+                        final_html = [f"<div style='color:#bbbbbb'>Date : {formatted_date}</div>"]
+                        final_html.extend(f"<div>{line}</div>" for line in html_lines)
+                        label.setHtml("".join(final_html))
+                        label.setPos(x_val, nearest_y_for_hline if nearest_y_for_hline is not None else y_val)
+                    
+                    # 显示十字线和标签
+                    v_line.show()
+                    h_line.show()
+                    label.show()
 
             self._four_charts_mouse_conn = []
             for w in widgets:

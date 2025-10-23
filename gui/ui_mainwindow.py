@@ -166,6 +166,11 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             lambda: self.ui_functions.table_close_setting_window(self.table_settings_window)
         )
 
+        existing_data: dict = self.ui_functions.get_settings_from_json()
+        if existing_data["agree_to_terms"] is False:
+            self.read_and_agree_check.setChecked(False)
+        else:
+            self.read_and_agree_check.setChecked(True)
 
 
     def left_bar_button_slot(self):
