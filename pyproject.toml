@@ -19,6 +19,6 @@ dependencies = [
     "datetime>=5.5",
     "logging>=0.4.9.6",
     "typing>=3.10.0.0",
-    "numpy>=2.3.1",
     "pathlib>=1.0.1",
+    "numpy>=2.3.1",
 ]
