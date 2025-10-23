@@ -1116,7 +1116,15 @@ class UiFunctions():  # 删除:mainWindow
         except Exception:
             pass
 
-        self.main_window.title_label_2.setText(first_data)
+        # 如果 first_data 为空或仅空白，则展示占位提示
+        try:
+            if isinstance(first_data, str) and first_data.strip():
+                self.main_window.title_label_2.setText(first_data)
+            else:
+                self.main_window.title_label_2.setText("Data name will be here")
+        except Exception:
+            # 若控件不存在或出错，忽略以保证健壮性
+            pass
 
     def one_close_setting_window(self, window: Any, widget: QWidget):
         try:
@@ -1312,9 +1320,28 @@ class UiFunctions():  # 删除:mainWindow
             return None
 
     def start_download(self):
+
+        # 先检查是否点击了term and condition btn
         if not self.main_window.read_and_agree_check.isChecked():
             self._append_console("PLEASE READ AND AGREE TO THE TERMS AND CONDITIONS !!!")
+            # 读取json path并修改内容
+            existing_data: Dict[str, Any] = self.get_settings_from_json()
+            existing_data["agree_to_terms"] = False
+            try:
+                with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
+                    json.dump(existing_data, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                logging.error(f"Error writing settings file: {e}")
             return
+        else:
+            existing_data: Dict[str, Any] = self.get_settings_from_json()
+            existing_data["agree_to_terms"] = True
+            try:
+                with open(self._get_json_settings_path(), 'w', encoding='utf-8') as f:
+                    json.dump(existing_data, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                logging.error(f"Error writing settings file: {e}")
+
         if self._dl_thread is not None or self._parallel_exec is not None:
             self._append_console("Download already running.")
             return
