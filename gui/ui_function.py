@@ -287,7 +287,7 @@ class UiFunctions():  # 删除:mainWindow
                             pi = w.getPlotItem()
                             # 查找十字线
                             # 由于十字线存放在 chart_functions.crosshairs 中，若存在则直接使用
-                            cross = getattr(self.main_window.chart_functions, 'crosshairs', {}) if hasattr(self.main_window, 'chart_functions') else {}
+                            cross = getattr(self.main_window, 'chart_functions', 'crosshairs', {}) if hasattr(self.main_window, 'chart_functions') else {}
                             key = w.objectName()
                             if key in cross:
                                 v_line, h_line = cross[key]
@@ -814,9 +814,9 @@ class UiFunctions():  # 删除:mainWindow
         existing_data : Dict[str, Any] = self.get_settings_from_json()
 
         existing_data["one_chart_settings"]["first_data"]["data_name"] = first_data
-        # 只有当第二条数据非空时才记录
-        if isinstance(second_data, str) and second_data.strip():
-            existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
+        # # 只有当第二条数据非空时才记录
+        # if isinstance(second_data, str) and second_data.strip():
+        existing_data["one_chart_settings"]["second_data"]["data_name"] = second_data
 
         existing_data["one_chart_settings"]["first_data"]["time_lags"] = first_lag
         existing_data["one_chart_settings"]["second_data"]["time_lags"] = second_lag
@@ -901,7 +901,7 @@ class UiFunctions():  # 删除:mainWindow
 
                 # 创建右侧ViewBox
                 font = pg.QtGui.QFont()
-                font.setPixelSize(12)
+                font.setPixelSize(10)
                 font.setFamilies(["Comfortaa"])
                 # 使用自定义 ViewBox，使绘图区内部垂直拖动被自动还原，但允许轴区域控制 Y
                 try:
@@ -1006,11 +1006,24 @@ class UiFunctions():  # 删除:mainWindow
                 # 添加第二个曲线到右侧ViewBox
                 second_curve = pg.PlotCurveItem(name=second_data)
                 flash_date_buff = list(range(len(values)))
+                # 根据 second_time_lag 将数据向左移动若干单位（保持长度不变，末尾以 nan 填充）
+                try:
+                    lag = int(second_lag) if isinstance(second_lag, int) or isinstance(second_lag, float) else int(second_lag)
+                except Exception:
+                    lag = 0
+                if lag and lag > 0:
+                    try:
+                        shifted_values = [values[i + lag] if (i + lag) < len(values) else math.nan for i in range(len(values))]
+                    except Exception:
+                        shifted_values = values
+                else:
+                    shifted_values = values
+
                 # 提供 name 供悬浮标签识别，并缓存日期列表
                 try:
-                    second_curve.setData(x=flash_date_buff, y=values, pen=pen, name=second_data)
+                    second_curve.setData(x=flash_date_buff, y=shifted_values, pen=pen, name=second_data)
                 except Exception:
-                    second_curve.setData(x=flash_date_buff, y=values, pen=pen)
+                    second_curve.setData(x=flash_date_buff, y=shifted_values, pen=pen)
                 try:
                     setattr(second_curve, '_date_labels', dates)
                 except Exception:

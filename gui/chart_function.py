@@ -11,10 +11,9 @@ import os
 import sqlite3
 import logging
 import numpy as np
-from typing import Any, Sequence, Tuple, List, Protocol, cast
-from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QLayout  # 改为 PySide6
-from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QPainter, QPainterPath, QColor, QTextDocument
+from typing import Any, Tuple, List, Protocol, cast
+from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QLayout
+from PySide6.QtCore import Qt
 from pyqtgraph.Point import Point
 import pyqtgraph.functions as fn
 
@@ -424,7 +423,7 @@ class ChartFunction:
 
         # 设置坐标轴标签字体
         font = pg.QtGui.QFont()
-        font.setPixelSize(12)
+        font.setPixelSize(10)
         font.setFamilies(["Comfortaa"])
         self.single_plot_widget.getAxis('left').setTickFont(font)
         self.single_plot_widget.getAxis('bottom').setTickFont(font)
@@ -779,7 +778,7 @@ class ChartFunction:
         """Plot data to single chart，绘制数据并展示
         widget是plot widget, self.single_plot_widget
         axis_label 是是否需要写x轴label，默认false，第一个图需要true"""
-    # 保存当前十字线和标签的引用
+         # 保存当前十字线和标签的引用
         plot_item = widget.getPlotItem()
         view_box = plot_item.getViewBox()
         object_name = widget.objectName()
@@ -838,7 +837,7 @@ class ChartFunction:
         
         # 设置轴标签字体
         font = pg.QtGui.QFont()
-        font.setPixelSize(12)
+        font.setPixelSize(10)
         font.setFamilies(["Comfortaa"])
         widget.setLabel('left', 'Value', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})
         widget.setLabel('bottom', 'Date', color="#ffffff", **{'font-family': "Comfortaa", 'font-size': '12px'})

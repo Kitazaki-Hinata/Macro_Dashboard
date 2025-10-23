@@ -244,7 +244,6 @@ class NYFDownloader(DataDownloader):
                 continue
 
 
-
     def to_db(
             self,
               return_csv = False,   # None time series data should directly download csv

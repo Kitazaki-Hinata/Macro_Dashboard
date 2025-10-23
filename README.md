@@ -120,11 +120,8 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 
 **debug waitlist :**
 - [ ] One_chart导入db里面的列名以及限制4输入框只能输入列名
-- [ ] 再多次重新设置图表的时候，后面的数据会错位
 - [ ] 软件启动的时候自动读取json里面的内容然后更新
-- [ ] four chart里面数据有错开，数量都一致
-- [ ] one chart里面的右坐标轴字体没法缩小
-- [ ] One chart里面的time lags功能（数据错位）还没有添加
+- [ ] one chart里面的time lags功能（数据错位）还没有添加
 
 **extra function waitlist :**
 - [ ] 新板块：彭博文章
