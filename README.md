@@ -41,13 +41,14 @@
 
 ```powershell
 # Windows PowerShell
-    
-    
 pip install uv
-    
-#### 4. 使用方法
-
+uv sync
 ```
+#### 3. 运行程序
+```powershell
+python main.py
+```
+或者双击运行main.bat文件（win系统）
 
 - 如果没有下载数据，选择开始年份（目前支持的最早年份是 2020年），勾选同意须知后点击下载按钮下载数据。
 - 等待下载完成后，点击左边栏的按钮跳转到想要的界面，在左上角设置想要展示的数据，点击确定。

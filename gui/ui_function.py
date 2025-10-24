@@ -483,7 +483,7 @@ class UiFunctions():  # 删除:mainWindow
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
 
-        if note_name == "note_instructions_btn" or note_name == "User_instructions":
+        if note_name == "note_instructions_btn" or note_name == "Users_instructions" or note_name == "Users instructions":
             self.main_window.note_status_bar.setText("This file cannot be deleted")
             self.main_window.note_status_bar.setStyleSheet("color: #EE5C88")
             return
