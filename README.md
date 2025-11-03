@@ -44,12 +44,20 @@
 pip install uv
 uv sync
 ```
-#### 3. 运行程序
+
+#### 3. 获取 API key
+请访问以下地址获取免费API key：
+- BEA: https://apps.bea.gov/api/signup/
+- FRED St. Louis: https://fredaccount.stlouisfed.org/apikeys
+- BLS: https://data.bls.gov/registrationEngine/
+
+
+#### 4. 运行程序
 ```powershell
 python main.py
 ```
 或者双击运行main.bat文件（win系统）
-
+- 首次运行，点击左下角的设置按钮，在左上方填写上面获取的API KEY
 - 如果没有下载数据，选择开始年份（目前支持的最早年份是 2020年），勾选同意须知后点击下载按钮下载数据。
 - 等待下载完成后，点击左边栏的按钮跳转到想要的界面，在左上角设置想要展示的数据，点击确定。
 
