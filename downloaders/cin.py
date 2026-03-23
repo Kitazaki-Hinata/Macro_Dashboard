@@ -90,7 +90,11 @@ class CINDownloader(DataDownloader):
 
         if xlsx_file.exists():
             # 确保目标目录存在
-            xlsx_file.rename(target_location_path)
+            #xlsx_file.rename(target_location_path)
+            if os.name == 'nt':
+                os.system("move " + str(xlsx_file) + " " + str(target_location_path))
+            else:
+                os.system("mv " + str(xlsx_file) + " " + str(target_location_path))
             driver.quit()
 
             # 修改csv，需要用pd转换成df，因为table模块会默认删除一列

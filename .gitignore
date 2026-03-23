@@ -86,3 +86,5 @@ gui/subwindows/ui_oneChartSettings_ui.py
 gui/subwindows/ui_fourChartSettings_ui.py
 gui/resources_rc_rc.py
 gui/settings.json
+Scripts
+/pyvenv.cfg
