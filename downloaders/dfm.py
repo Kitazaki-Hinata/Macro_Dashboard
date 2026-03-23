@@ -225,7 +225,11 @@ class DFMDownloader(DataDownloader):
 
                 # 将下载的xlsx移动位置并重命名
                 if xlsx_file.exists():
-                    downloaded_file = xlsx_file.rename(target_location_path)
+                    if os.name == 'nt':
+                        os.system("move " + str(xlsx_file) + " " + str(target_location_path))
+                    else:
+                        os.system("mv " + str(xlsx_file) + " " + str(target_location_path))
+                    downloaded_file = target_location_path#xlsx_file.rename(target_location_path)
                     break
                 else:
                     logging.error("Failed to download data of Dallas manufacture index")
