@@ -9,7 +9,7 @@
     简体中文 | <a href="https://github.com/Kitazaki-Hinata/Macro_Dashboard/blob/dev/doc/README_en.md">English</a>
 </p>
 
-> Version: v0.9.00_beta
+> Version: v0.9.10_beta
 
 > Author: Kitazaki Hinata, SeaStar, yuyoux7
 
@@ -129,6 +129,10 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 
 **debug waitlist :**
 - [ ] One_chart导入db里面的列名以及限制4输入框只能输入列名
+- [ ] CME fedwatch (fw) 单独可以下载，统一下载不行
+- [ ] Cleveland Inflation Nowcasting (cin) 数据无法下载的问题
+- [ ] Dallas Federal manufacture (dfs) 单独可以下载，统一下载不行
+- [ ] Forex Swap (fs) 单独可以下载，统一下载不行
 
 **extra function waitlist :**
 - [ ] 新板块：彭博文章

@@ -89,7 +89,9 @@ class DFMDownloader(DataDownloader):
             for url in [self.url_1, self.url_2]:
                 check_cancel()
                 self.driver.get(url)
-                time.sleep(1)
+                WebDriverWait(self.driver, 10).until(
+                    lambda d: d.execute_script("return document.readyState") == "complete"
+                )
                 if self.driver.find_elements(By.XPATH, '//h1[@class="dal-headline" and contains(text(), "HTTP Error 404")]'):
                     continue
 

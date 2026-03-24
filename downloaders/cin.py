@@ -76,7 +76,12 @@ class CINDownloader(DataDownloader):
 
         # download data
         driver.get(self.url)
-        time.sleep(1)
+        WebDriverWait(driver, 10).until(
+            lambda d: d.execute_script("return document.readyState") == "complete"
+        )
+        for _ in range(5):
+            driver.execute_script("window.scrollBy(0, 500);")
+            time.sleep(1.2)  # 等待内容加载
         button = WebDriverWait(driver, 8).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="btn-NowcastDownload-quarter"]'))
         )

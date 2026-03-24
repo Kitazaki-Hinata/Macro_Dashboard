@@ -49,7 +49,7 @@ class EMDownloader(DataDownloader):
             check_cancel()
             for _ in range(3):
                 self.driver.execute_script("window.scrollBy(0, 500);")
-                time.sleep(1.5)  # 等待内容加载
+                time.sleep(1.2)  # 等待内容加载，滚动间隔
 
             html = self.driver.page_source
             soup = BeautifulSoup(html, "lxml")
