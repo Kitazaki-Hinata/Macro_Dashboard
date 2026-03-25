@@ -131,8 +131,8 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 - [ ] One_chart导入db里面的列名以及限制4输入框只能输入列名
 - [ ] CME fedwatch (fw) 单独可以下载，统一下载不行
 - [ ] Cleveland Inflation Nowcasting (cin) 数据无法下载的问题
-- [ ] Dallas Federal manufacture (dfs) 单独可以下载，统一下载不行
-- [ ] Forex Swap (fs) 单独可以下载，统一下载不行
+- [ ] Dallas Federal manufacture (dfm) 单独可以下载，统一下载不行
+- [x] Forex Swap (fs) 单独可以下载，统一下载不行
 
 **extra function waitlist :**
 - [ ] 新板块：彭博文章
