@@ -583,7 +583,14 @@ QPushButton#settings_btn:pressed {
     icon-size: 20px 20px;
 }
 
-
+QPushButton#bbg_page_btn {
+    icon: url(:/png/png/bbg.png);
+    icon-size: 20px 20px;
+}
+QPushButton#bbg_page_btn:pressed {
+    icon: url(:/png_press/png/bbg_press.png);
+    icon-size: 20px 20px;
+}
 
 </string>
            </property>
@@ -726,6 +733,25 @@ QPushButton#settings_btn:pressed {
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="bbg_page_btn">
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="vertical_spacer">
               <property name="orientation">
                <enum>Qt::Orientation::Vertical</enum>
@@ -785,6 +811,7 @@ QPushButton#settings_btn:pressed {
            <zorder>note_btn</zorder>
            <zorder>settings_btn</zorder>
            <zorder>one_page_btn</zorder>
+           <zorder>bbg_page_btn</zorder>
           </widget>
          </item>
         </layout>
@@ -819,7 +846,7 @@ QPushButton#settings_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -1152,6 +1179,176 @@ border-radius:30px;
 margin-left : 10px;
 margin-right : 10px;</string>
                    </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_bbg_container">
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QWidget" name="bbg_search_widget" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <item>
+                  <widget class="QLabel" name="label_2">
+                   <property name="font">
+                    <font>
+                     <family>Comfortaa</family>
+                     <pointsize>9</pointsize>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: #ffffff</string>
+                   </property>
+                   <property name="text">
+                    <string>Enter the Bloomberg article URL :</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit">
+                   <property name="minimumSize">
+                    <size>
+                     <width>845</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Comfortaa</family>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: #ffffff</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="btn_bbg_confirm_widget" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>45</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>45</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+	background-color : #252526;
+	border-radius : 9px;
+}
+
+QPushButton:hover {
+	background-color : #33363a;
+	border-radius : 9px;
+}
+
+QPushButton:pressed {
+	background-color : #90b6e7;
+	border-radius : 9px;
+}
+
+QPushButton#one_set_preference {
+    icon: url(:/png/png/set_preference.png);
+    icon-size: 17px 17px;
+}
+QPushButton#one_set_preference:pressed {
+    icon: url(:/png_press/png/set_preference_press.png);
+    icon-size: 17px 17px;
+}</string>
+                   </property>
+                   <widget class="QPushButton" name="pushButton">
+                    <property name="geometry">
+                     <rect>
+                      <x>0</x>
+                      <y>0</y>
+                      <width>45</width>
+                      <height>25</height>
+                     </rect>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>45</width>
+                      <height>25</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>25</width>
+                      <height>25</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Comfortaa</family>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">color: #ffffff</string>
+                    </property>
+                    <property name="text">
+                     <string>Load</string>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QWidget" name="bbg_content" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QWidget" name="text_show_container" native="true">
+                   <property name="styleSheet">
+                    <string notr="true">background-color : #262a2f;
+border-radius:30px;
+margin-left : 10px;
+margin-right : 10px;</string>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_6">
+                    <item>
+                     <widget class="QPlainTextEdit" name="plainTextEdit_2">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Comfortaa</family>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">color:#ffffff</string>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                 </layout>
@@ -2012,8 +2209,8 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>116</width>
-                      <height>54</height>
+                      <width>224</width>
+                      <height>554</height>
                      </rect>
                     </property>
                     <property name="styleSheet">
@@ -3542,7 +3739,7 @@ color : #777785;
                                    <bool>false</bool>
                                   </property>
                                   <property name="text">
-                                   <string>ISM</string>
+                                   <string>ISM (Unavailable)</string>
                                   </property>
                                   <property name="checkable">
                                    <bool>true</bool>

@@ -1,7 +1,7 @@
 <RCC>
   <qresource prefix="png">
+    <file>png/bbg.png</file>
     <file>png/ico_small.png</file>
-    <file>png/csv.png</file>
     <file>png/big_window.png</file>
     <file>png/rename.png</file>
     <file>png/save_2.png</file>
@@ -13,7 +13,6 @@
     <file>png/save.png</file>
     <file>png/ico.png</file>
     <file>png/close_2.png</file>
-    <file>png/csv.png</file>
     <file>png/delete.png</file>
     <file>png/download.png</file>
     <file>png/false.png</file>
@@ -33,8 +32,10 @@
     <file>png/one_check.png</file>
     <file>png/settings_check.png</file>
     <file>png/table_check.png</file>
+    <file>png/bbg_check.png</file>
   </qresource>
   <qresource prefix="png_press">
+    <file>png/bbg_press.png</file>
     <file>png/save_2_press.png</file>
     <file>png/rename_press.png</file>
     <file>png/delete_press.png</file>
