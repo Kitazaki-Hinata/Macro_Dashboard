@@ -846,7 +846,7 @@ QPushButton#bbg_page_btn:pressed {
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_one_container">
              <property name="sizePolicy">
@@ -1200,8 +1200,14 @@ margin-right : 10px;</string>
                  <string notr="true"/>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <property name="leftMargin">
+                  <number>20</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>20</number>
+                 </property>
                  <item>
-                  <widget class="QLabel" name="label_2">
+                  <widget class="QLabel" name="enter_bbg_pre_label">
                    <property name="font">
                     <font>
                      <family>Comfortaa</family>
@@ -1218,7 +1224,7 @@ margin-right : 10px;</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit">
+                  <widget class="QLineEdit" name="url_entry">
                    <property name="minimumSize">
                     <size>
                      <width>845</width>
@@ -1233,6 +1239,9 @@ margin-right : 10px;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true">color: #ffffff</string>
+                   </property>
+                   <property name="placeholderText">
+                    <string>example : https://www.bloomberg.com/news/articles/2022-12-19/neuro-sama-an-ai-twitch-influencer</string>
                    </property>
                   </widget>
                  </item>
@@ -1275,7 +1284,7 @@ QPushButton#one_set_preference:pressed {
     icon-size: 17px 17px;
 }</string>
                    </property>
-                   <widget class="QPushButton" name="pushButton">
+                   <widget class="QPushButton" name="bbg_url_load_btn">
                     <property name="geometry">
                      <rect>
                       <x>0</x>
@@ -1330,7 +1339,7 @@ margin-right : 10px;</string>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_6">
                     <item>
-                     <widget class="QPlainTextEdit" name="plainTextEdit_2">
+                     <widget class="QPlainTextEdit" name="bbg_article_showbox">
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
@@ -1345,6 +1354,9 @@ margin-right : 10px;</string>
                       </property>
                       <property name="readOnly">
                        <bool>true</bool>
+                      </property>
+                      <property name="plainText">
+                       <string>Article wil be loaded here.</string>
                       </property>
                      </widget>
                     </item>
@@ -2209,8 +2221,8 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>224</width>
-                      <height>554</height>
+                      <width>116</width>
+                      <height>54</height>
                      </rect>
                     </property>
                     <property name="styleSheet">
@@ -3350,7 +3362,7 @@ margin-right:20px;
 }</string>
                             </property>
                             <property name="text">
-                             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Macro Dashboard &lt;/p&gt;&lt;p&gt;Version: 0.9.00_beta&lt;/p&gt;&lt;p&gt;Copyright (c) 2025 Kitazaki-Hinata&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Macro Dashboard &lt;/p&gt;&lt;p&gt;Version: 1.0.0&lt;/p&gt;&lt;p&gt;Copyright (c) 2025 Kitazaki-Hinata&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                             </property>
                             <property name="wordWrap">
                              <bool>false</bool>

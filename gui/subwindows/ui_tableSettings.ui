@@ -291,7 +291,7 @@ QComboBox:focus {
       <item row="3" column="0">
        <widget class="QLabel" name="stretch_table_title">
         <property name="text">
-         <string>Stretch Table</string>
+         <string>Dynamic Col. Sizing</string>
         </property>
        </widget>
       </item>

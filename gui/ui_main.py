@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTableView, QTextEdit,
     QVBoxLayout, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -707,27 +708,28 @@ class Ui_MainWindow(object):
         self.bbg_search_widget.setStyleSheet(u"")
         self.horizontalLayout_3 = QHBoxLayout(self.bbg_search_widget)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.label_2 = QLabel(self.bbg_search_widget)
-        self.label_2.setObjectName(u"label_2")
+        self.horizontalLayout_3.setContentsMargins(20, -1, 20, -1)
+        self.enter_bbg_pre_label = QLabel(self.bbg_search_widget)
+        self.enter_bbg_pre_label.setObjectName(u"enter_bbg_pre_label")
         font2 = QFont()
         font2.setFamilies([u"Comfortaa"])
         font2.setPointSize(9)
         font2.setBold(True)
-        self.label_2.setFont(font2)
-        self.label_2.setStyleSheet(u"color: #ffffff")
+        self.enter_bbg_pre_label.setFont(font2)
+        self.enter_bbg_pre_label.setStyleSheet(u"color: #ffffff")
 
-        self.horizontalLayout_3.addWidget(self.label_2)
+        self.horizontalLayout_3.addWidget(self.enter_bbg_pre_label)
 
-        self.lineEdit = QLineEdit(self.bbg_search_widget)
-        self.lineEdit.setObjectName(u"lineEdit")
-        self.lineEdit.setMinimumSize(QSize(845, 25))
+        self.url_entry = QLineEdit(self.bbg_search_widget)
+        self.url_entry.setObjectName(u"url_entry")
+        self.url_entry.setMinimumSize(QSize(845, 25))
         font3 = QFont()
         font3.setFamilies([u"Comfortaa"])
         font3.setBold(True)
-        self.lineEdit.setFont(font3)
-        self.lineEdit.setStyleSheet(u"color: #ffffff")
+        self.url_entry.setFont(font3)
+        self.url_entry.setStyleSheet(u"color: #ffffff")
 
-        self.horizontalLayout_3.addWidget(self.lineEdit)
+        self.horizontalLayout_3.addWidget(self.url_entry)
 
         self.btn_bbg_confirm_widget = QWidget(self.bbg_search_widget)
         self.btn_bbg_confirm_widget.setObjectName(u"btn_bbg_confirm_widget")
@@ -756,14 +758,14 @@ class Ui_MainWindow(object):
 "    icon: url(:/png_press/png/set_preference_press.png);\n"
 "    icon-size: 17px 17px;\n"
 "}")
-        self.pushButton = QPushButton(self.btn_bbg_confirm_widget)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setGeometry(QRect(0, 0, 45, 25))
-        self.pushButton.setMinimumSize(QSize(45, 25))
-        self.pushButton.setMaximumSize(QSize(25, 25))
-        self.pushButton.setFont(font3)
-        self.pushButton.setStyleSheet(u"color: #ffffff")
-        self.pushButton.setAutoDefault(False)
+        self.bbg_url_load_btn = QPushButton(self.btn_bbg_confirm_widget)
+        self.bbg_url_load_btn.setObjectName(u"bbg_url_load_btn")
+        self.bbg_url_load_btn.setGeometry(QRect(0, 0, 45, 25))
+        self.bbg_url_load_btn.setMinimumSize(QSize(45, 25))
+        self.bbg_url_load_btn.setMaximumSize(QSize(25, 25))
+        self.bbg_url_load_btn.setFont(font3)
+        self.bbg_url_load_btn.setStyleSheet(u"color: #ffffff")
+        self.bbg_url_load_btn.setAutoDefault(False)
 
         self.horizontalLayout_3.addWidget(self.btn_bbg_confirm_widget)
 
@@ -782,14 +784,14 @@ class Ui_MainWindow(object):
 "margin-right : 10px;")
         self.verticalLayout_6 = QVBoxLayout(self.text_show_container)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.plainTextEdit_2 = QPlainTextEdit(self.text_show_container)
-        self.plainTextEdit_2.setObjectName(u"plainTextEdit_2")
-        self.plainTextEdit_2.setEnabled(True)
-        self.plainTextEdit_2.setFont(font3)
-        self.plainTextEdit_2.setStyleSheet(u"color:#ffffff")
-        self.plainTextEdit_2.setReadOnly(True)
+        self.bbg_article_showbox = QPlainTextEdit(self.text_show_container)
+        self.bbg_article_showbox.setObjectName(u"bbg_article_showbox")
+        self.bbg_article_showbox.setEnabled(True)
+        self.bbg_article_showbox.setFont(font3)
+        self.bbg_article_showbox.setStyleSheet(u"color:#ffffff")
+        self.bbg_article_showbox.setReadOnly(True)
 
-        self.verticalLayout_6.addWidget(self.plainTextEdit_2)
+        self.verticalLayout_6.addWidget(self.bbg_article_showbox)
 
 
         self.horizontalLayout_4.addWidget(self.text_show_container)
@@ -1272,7 +1274,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 224, 554))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 116, 54))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -2312,7 +2314,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -2348,8 +2350,10 @@ class Ui_MainWindow(object):
         self.title_label_2.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
         self.update_label_2.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.one_set_preference.setText("")
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Enter the Bloomberg article URL :", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Load", None))
+        self.enter_bbg_pre_label.setText(QCoreApplication.translate("MainWindow", u"Enter the Bloomberg article URL :", None))
+        self.url_entry.setPlaceholderText(QCoreApplication.translate("MainWindow", u"example : https://www.bloomberg.com/news/articles/2022-12-19/neuro-sama-an-ai-twitch-influencer", None))
+        self.bbg_url_load_btn.setText(QCoreApplication.translate("MainWindow", u"Load", None))
+        self.bbg_article_showbox.setPlainText(QCoreApplication.translate("MainWindow", u"Article wil be loaded here.", None))
         self.table_title_label.setText(QCoreApplication.translate("MainWindow", u"Table : Selected Table Name", None))
         self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.page_table_set_preference.setText("")
@@ -2440,7 +2444,7 @@ class Ui_MainWindow(object):
         self.status_label.setText(QCoreApplication.translate("MainWindow", u"Status will be displayed here", None))
         self.other_group_box.setTitle("")
         self.other_option_text.setText(QCoreApplication.translate("MainWindow", u"About & Terms", None))
-        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 0.9.00_beta</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
+        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 1.0.0</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
         self.image_label.setText("")
         self.textEdit.setDocumentTitle("")
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"

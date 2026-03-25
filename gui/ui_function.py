@@ -20,7 +20,6 @@ from downloaders.common import CancellationToken, CancelledError
 
 from gui import *
 
-
 from dotenv import dotenv_values
 
 
@@ -54,6 +53,7 @@ class _MainWindowProto(Protocol):
     # UI labels and controls for various pages
     title_label_2: Any
     table_update_label: Any
+    bbg_article_showbox : Any
     update_label_2: Any
     four_update_label: Any
     # Note page controls
@@ -61,6 +61,7 @@ class _MainWindowProto(Protocol):
     note_status_bar: Any
     scrollAreaWidgetContents: Any
     plainTextEdit: Any
+    url_entry: Any
     save_text: Any
     note_update_label: Any
     note_label_notes: Any
@@ -242,7 +243,6 @@ class UiFunctions():  # 删除:mainWindow
           * X 轴联动（共用缩放/平移）
           * 十字线同步（可选，若 chart_functions 具备内部封装则调用其方法）
         """
-
 
         link = (state == 2)
         # 优先尝试调用 chart_functions 已存在的封装方法（如果后来添加了）
@@ -773,6 +773,30 @@ class UiFunctions():  # 删除:mainWindow
 
         # 打开窗口
         window.show()
+
+    '''BLOOMBERG PAGE SLOTS METHODS'''
+    def bbg_load_article(self):
+        self.main_window.bbg_article_showbox.setStyleSheet("color: #ffffff")
+        self.main_window.bbg_article_showbox.setPlainText("Waiting... 正在薅资本主义羊毛...")
+        bbg_url: str = self.main_window.url_entry.text()
+
+        # 验证 URL 是否以 https 开头
+        if not bbg_url.startswith('https'):
+            self.main_window.bbg_article_showbox.setPlainText("Error: URL must start with https")
+            self.main_window.bbg_article_showbox.setStyleSheet("color: #ff6b6b")
+            return
+
+        # 进一步验证是否是有效的 Bloomberg URL
+        if not bbg_url.startswith('https://www.bloomberg.com/'):
+            self.main_window.bbg_article_showbox.setPlainText("Error: Invalid Bloomberg URL format")
+            self.main_window.bbg_article_showbox.setStyleSheet("color: #ff6b6b")
+            return
+
+        # 传回是否成功的bool与result文章内容
+        extractor = BloombergExtractor()
+        success, result = extractor.fetch_bbg_article(bbg_url)
+
+        return
 
 
     '''ONE CHART PAGE SETTINGS SLOTS METHODS'''
