@@ -6,6 +6,7 @@
 # pyright: reportUnknownParameterType=false, reportUnknownArgumentType=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportMissingTypeStubs=false
 
 import os
+import time
 import logging
 import sqlite3
 import json
@@ -19,6 +20,7 @@ from PySide6.QtCore import QTimer
 from downloaders.common import CancellationToken, CancelledError
 
 from gui import *
+from gui.bbg_extract import BloombergExtractor
 
 from dotenv import dotenv_values
 
@@ -776,6 +778,7 @@ class UiFunctions():  # 删除:mainWindow
 
     '''BLOOMBERG PAGE SLOTS METHODS'''
     def bbg_load_article(self):
+        self.main_window.bbg_url_load_btn.setDisabled(True)
         self.main_window.bbg_article_showbox.setStyleSheet("color: #ffffff")
         self.main_window.bbg_article_showbox.setPlainText("Waiting... 正在薅资本主义羊毛...")
         bbg_url: str = self.main_window.url_entry.text()
@@ -784,18 +787,23 @@ class UiFunctions():  # 删除:mainWindow
         if not bbg_url.startswith('https'):
             self.main_window.bbg_article_showbox.setPlainText("Error: URL must start with https")
             self.main_window.bbg_article_showbox.setStyleSheet("color: #ff6b6b")
+            time.sleep(2)
+            self.main_window.bbg_url_load_btn.setEnabled(True)
             return
 
         # 进一步验证是否是有效的 Bloomberg URL
         if not bbg_url.startswith('https://www.bloomberg.com/'):
             self.main_window.bbg_article_showbox.setPlainText("Error: Invalid Bloomberg URL format")
             self.main_window.bbg_article_showbox.setStyleSheet("color: #ff6b6b")
+            time.sleep(2)
+            self.main_window.bbg_url_load_btn.setEnabled(True)
             return
 
         # 传回是否成功的bool与result文章内容
         extractor = BloombergExtractor()
-        success, result = extractor.fetch_bbg_article(bbg_url)
-
+        success_bool, result = extractor.edit_bbg_article(bbg_url)
+        time.sleep(2)
+        self.main_window.bbg_url_load_btn.setEnabled(True)
         return
 
 

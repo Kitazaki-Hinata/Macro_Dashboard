@@ -1197,7 +1197,17 @@ margin-right : 10px;</string>
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">QLineEdit {
+        background-color: #33363a;
+        border-radius : 2px;
+	    max-height : 9px;
+        border-bottom: 1px solid #90b6e7;
+        padding: 5px;
+    }
+QLineEdit:focus {
+		background-color: #454555;
+        border-bottom: 1px solid #ffffff;
+    }</string>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <property name="leftMargin">
@@ -1205,6 +1215,9 @@ margin-right : 10px;</string>
                  </property>
                  <property name="rightMargin">
                   <number>20</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>9</number>
                  </property>
                  <item>
                   <widget class="QLabel" name="enter_bbg_pre_label">
@@ -1224,25 +1237,36 @@ margin-right : 10px;</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="url_entry">
-                   <property name="minimumSize">
-                    <size>
-                     <width>845</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <family>Comfortaa</family>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">color: #ffffff</string>
-                   </property>
-                   <property name="placeholderText">
-                    <string>example : https://www.bloomberg.com/news/articles/2022-12-19/neuro-sama-an-ai-twitch-influencer</string>
-                   </property>
+                  <widget class="QWidget" name="url_entry_widget" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_23">
+                    <property name="topMargin">
+                     <number>1</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>9</number>
+                    </property>
+                    <item>
+                     <widget class="QLineEdit" name="url_entry">
+                      <property name="minimumSize">
+                       <size>
+                        <width>845</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Comfortaa</family>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">color : #ffffff</string>
+                      </property>
+                      <property name="placeholderText">
+                       <string>example : https://www.bloomberg.com/news/articles/2022-12-19/neuro-sama-an-ai-twitch-influencer</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                  <item>
@@ -2221,7 +2245,7 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>116</width>
+                      <width>216</width>
                       <height>54</height>
                      </rect>
                     </property>

@@ -164,7 +164,7 @@ class BLSDownloader(DataDownloader):
                         logger.info("BLS task %s cancelled", tn)
                         raise
                     except Exception as e:
-                        logging.error("BLS future for %s raised: %s", tn, e)
+                        logger.error("BLS future for %s raised: %s", tn, e)
             finally:
                 if token is not None and token.cancelled():
                     for fut in future_map:
@@ -178,8 +178,8 @@ class BLSDownloader(DataDownloader):
                     os.makedirs(data_folder_path, exist_ok=True)
                     csv_path = os.path.join(data_folder_path, f"{name}.csv")
                     df.to_csv(csv_path, index=True)
-                    logging.info("%s saved to %s Successfully!", name, csv_path)
+                    logger.info("%s saved to %s Successfully!", name, csv_path)
                 except Exception as err:
-                    logging.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
+                    logger.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
                     continue
         return df_dict if return_csv else None

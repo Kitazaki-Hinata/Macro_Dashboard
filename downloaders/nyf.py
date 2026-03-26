@@ -62,7 +62,7 @@ class NYFDownloader(DataDownloader):
                 f"未找到匹配的HHD_C_Report文件，当前路径: {self.download_path}\n"
                 f"当前目录下的文件列表: {all_files}"
             )
-            logging.error(error_msg)
+            logger.error(error_msg)
             print(error_msg)
             raise FileNotFoundError(error_msg)
 
@@ -91,7 +91,7 @@ class NYFDownloader(DataDownloader):
             return
         else:
             error_msg = "Failed to download, because did not found target excel file"
-            logging.error(error_msg)
+            logger.error(error_msg)
             print(error_msg)
             return
 
@@ -117,7 +117,7 @@ class NYFDownloader(DataDownloader):
             html = urllib.request.urlopen(url).read()
         except Exception as e:
             error_msg = f"Failed to access URL {url}: {e}"
-            logging.error(error_msg)
+            logger.error(error_msg)
             print(error_msg)
             return
 
@@ -132,7 +132,7 @@ class NYFDownloader(DataDownloader):
                 iframe_html = urllib.request.urlopen(full_iframe_url).read()
             except Exception as e:
                 error_msg = f"Failed to access iframe URL {full_iframe_url}: {e}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 print(error_msg)
                 return
 
@@ -145,7 +145,7 @@ class NYFDownloader(DataDownloader):
                     href = link[1].get("href")
                 except IndexError:
                     error_msg = f"Expected at least 2 download links, but found {len(link)}"
-                    logging.error(error_msg)
+                    logger.error(error_msg)
                     print(error_msg)
                     return
 
@@ -156,7 +156,7 @@ class NYFDownloader(DataDownloader):
 
             else:
                 error_msg = "Failed to find download button"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 print(error_msg)
                 return
 
@@ -165,7 +165,7 @@ class NYFDownloader(DataDownloader):
 
         else:
             error_msg = "Failed to find iframe"
-            logging.error(error_msg)
+            logger.error(error_msg)
             print(error_msg)
             return
 
@@ -202,7 +202,7 @@ class NYFDownloader(DataDownloader):
                 df_single_data = pd.read_excel(file_name_path, sheet_name=sheet_name)
             except:
                 error_msg = f"Failed to read sheet {sheet_name} from file {file_name_path}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 print(error_msg)
                 continue
 
@@ -228,7 +228,7 @@ class NYFDownloader(DataDownloader):
                     df_single_data = pd.concat([df_left, df_right], axis = 1)
             except Exception as e:
                 print(f"error : {e}")
-                logging.error(f"Failed to process credit quota data: {e}")
+                logger.error(f"Failed to process credit quota data: {e}")
                 continue
 
             # 清除表17的最后两列多余内容
@@ -243,7 +243,7 @@ class NYFDownloader(DataDownloader):
                 df_single_data.to_csv(csv_path, index=True)
             except Exception as e:
                 error_msg = f"Failed to save data to csv file {data_name}: {e}"
-                logging.error(error_msg)
+                logger.error(error_msg)
                 print(error_msg)
                 continue
 

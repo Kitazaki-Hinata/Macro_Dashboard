@@ -23,6 +23,8 @@ from downloaders.common import (
     DataDownloader,
 )
 
+logger = logging.getLogger(__name__)
+
 class CINDownloader(DataDownloader):
     def __init__(
             self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int
@@ -108,7 +110,7 @@ class CINDownloader(DataDownloader):
             df.to_csv(target_location_path, index=False)
 
         else:
-            logging.error("Failed to download Cleveland inflation data")
+            logger.error("Failed to download Cleveland inflation data")
             driver.quit()
             return
 

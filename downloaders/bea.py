@@ -108,7 +108,7 @@ class BEADownloader(DataDownloader):
                 logger.info("BEA_%s Successfully extracted! rows=%d", table_name, len(df_modified))
 
                 if df_modified.empty:
-                    logging.error("%s is empty, FAILED INSERT, locate in to_db", table_name)
+                    logger.error("%s is empty, FAILED INSERT, locate in to_db", table_name)
                     return table_name, None
                 converter = DatabaseConverter()
                 _check_cancel()
@@ -146,7 +146,7 @@ class BEADownloader(DataDownloader):
                         logger.info("BEA task %s cancelled", tn)
                         raise
                     except Exception as e:
-                        logging.error("BEA future for %s raised: %s", tn, e)
+                        logger.error("BEA future for %s raised: %s", tn, e)
             finally:
                 if token is not None and token.cancelled():
                     for fut in future_map:
@@ -160,9 +160,9 @@ class BEADownloader(DataDownloader):
                     os.makedirs(data_folder_path, exist_ok=True)
                     csv_path = os.path.join(data_folder_path, f"{name}.csv")
                     df.to_csv(csv_path, index=True)
-                    logging.info("%s saved to %s Successfully!", name, csv_path)
+                    logger.info("%s saved to %s Successfully!", name, csv_path)
                 except Exception as err:
-                    logging.error("%s FAILED DOWNLOAD CSV in method 'to_csv', since %s", name, err)
+                    logger.error("%s FAILED DOWNLOAD CSV in method 'to_csv', since %s", name, err)
                     continue
 
         return df_dict if return_csv else None

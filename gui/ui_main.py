@@ -22,7 +22,6 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTableView, QTextEdit,
     QVBoxLayout, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -705,10 +704,20 @@ class Ui_MainWindow(object):
         self.bbg_search_widget = QWidget(self.page_bbg_container)
         self.bbg_search_widget.setObjectName(u"bbg_search_widget")
         self.bbg_search_widget.setMinimumSize(QSize(0, 60))
-        self.bbg_search_widget.setStyleSheet(u"")
+        self.bbg_search_widget.setStyleSheet(u"QLineEdit {\n"
+"        background-color: #33363a;\n"
+"        border-radius : 2px;\n"
+"	    max-height : 9px;\n"
+"        border-bottom: 1px solid #90b6e7;\n"
+"        padding: 5px;\n"
+"    }\n"
+"QLineEdit:focus {\n"
+"		background-color: #454555;\n"
+"        border-bottom: 1px solid #ffffff;\n"
+"    }")
         self.horizontalLayout_3 = QHBoxLayout(self.bbg_search_widget)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(20, -1, 20, -1)
+        self.horizontalLayout_3.setContentsMargins(20, -1, 20, 9)
         self.enter_bbg_pre_label = QLabel(self.bbg_search_widget)
         self.enter_bbg_pre_label.setObjectName(u"enter_bbg_pre_label")
         font2 = QFont()
@@ -720,16 +729,23 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.enter_bbg_pre_label)
 
-        self.url_entry = QLineEdit(self.bbg_search_widget)
+        self.url_entry_widget = QWidget(self.bbg_search_widget)
+        self.url_entry_widget.setObjectName(u"url_entry_widget")
+        self.horizontalLayout_23 = QHBoxLayout(self.url_entry_widget)
+        self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
+        self.horizontalLayout_23.setContentsMargins(-1, 1, -1, 9)
+        self.url_entry = QLineEdit(self.url_entry_widget)
         self.url_entry.setObjectName(u"url_entry")
         self.url_entry.setMinimumSize(QSize(845, 25))
         font3 = QFont()
         font3.setFamilies([u"Comfortaa"])
-        font3.setBold(True)
         self.url_entry.setFont(font3)
-        self.url_entry.setStyleSheet(u"color: #ffffff")
+        self.url_entry.setStyleSheet(u"color : #ffffff")
 
-        self.horizontalLayout_3.addWidget(self.url_entry)
+        self.horizontalLayout_23.addWidget(self.url_entry)
+
+
+        self.horizontalLayout_3.addWidget(self.url_entry_widget)
 
         self.btn_bbg_confirm_widget = QWidget(self.bbg_search_widget)
         self.btn_bbg_confirm_widget.setObjectName(u"btn_bbg_confirm_widget")
@@ -763,7 +779,10 @@ class Ui_MainWindow(object):
         self.bbg_url_load_btn.setGeometry(QRect(0, 0, 45, 25))
         self.bbg_url_load_btn.setMinimumSize(QSize(45, 25))
         self.bbg_url_load_btn.setMaximumSize(QSize(25, 25))
-        self.bbg_url_load_btn.setFont(font3)
+        font4 = QFont()
+        font4.setFamilies([u"Comfortaa"])
+        font4.setBold(True)
+        self.bbg_url_load_btn.setFont(font4)
         self.bbg_url_load_btn.setStyleSheet(u"color: #ffffff")
         self.bbg_url_load_btn.setAutoDefault(False)
 
@@ -787,7 +806,7 @@ class Ui_MainWindow(object):
         self.bbg_article_showbox = QPlainTextEdit(self.text_show_container)
         self.bbg_article_showbox.setObjectName(u"bbg_article_showbox")
         self.bbg_article_showbox.setEnabled(True)
-        self.bbg_article_showbox.setFont(font3)
+        self.bbg_article_showbox.setFont(font4)
         self.bbg_article_showbox.setStyleSheet(u"color:#ffffff")
         self.bbg_article_showbox.setReadOnly(True)
 
@@ -961,7 +980,7 @@ class Ui_MainWindow(object):
         self.connect_charts = QCheckBox(self.four_text_widget)
         self.connect_charts.setObjectName(u"connect_charts")
         self.connect_charts.setMaximumSize(QSize(150, 16777215))
-        self.connect_charts.setFont(font3)
+        self.connect_charts.setFont(font4)
         self.connect_charts.setStyleSheet(u"color:white;")
 
         self.horizontalLayout_5.addWidget(self.connect_charts)
@@ -1226,11 +1245,11 @@ class Ui_MainWindow(object):
         self.four_title_label_3 = QLabel(self.note_text_container_3)
         self.four_title_label_3.setObjectName(u"four_title_label_3")
         self.four_title_label_3.setMaximumSize(QSize(16777215, 18))
-        font4 = QFont()
-        font4.setFamilies([u"Comfortaa"])
-        font4.setPointSize(10)
-        font4.setBold(True)
-        self.four_title_label_3.setFont(font4)
+        font5 = QFont()
+        font5.setFamilies([u"Comfortaa"])
+        font5.setPointSize(10)
+        font5.setBold(True)
+        self.four_title_label_3.setFont(font5)
         self.four_title_label_3.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.four_title_label_3.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
@@ -1241,11 +1260,11 @@ class Ui_MainWindow(object):
         self.four_update_label_3 = QLabel(self.note_text_container_3)
         self.four_update_label_3.setObjectName(u"four_update_label_3")
         self.four_update_label_3.setMaximumSize(QSize(16777215, 12))
-        font5 = QFont()
-        font5.setFamilies([u"Comfortaa"])
-        font5.setPointSize(6)
-        font5.setBold(True)
-        self.four_update_label_3.setFont(font5)
+        font6 = QFont()
+        font6.setFamilies([u"Comfortaa"])
+        font6.setPointSize(6)
+        font6.setBold(True)
+        self.four_update_label_3.setFont(font6)
         self.four_update_label_3.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
         self.four_update_label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1274,7 +1293,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 116, 54))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 216, 54))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -1486,7 +1505,7 @@ class Ui_MainWindow(object):
 
         self.note_label_notes = QLabel(self.content_area)
         self.note_label_notes.setObjectName(u"note_label_notes")
-        self.note_label_notes.setFont(font3)
+        self.note_label_notes.setFont(font4)
         self.note_label_notes.setStyleSheet(u"color : #EE5C88; margin-left : 20px")
 
         self.verticalLayout_11.addWidget(self.note_label_notes)
@@ -1661,7 +1680,7 @@ class Ui_MainWindow(object):
         self.setting_page_notify_text = QLabel(self.api_group_box)
         self.setting_page_notify_text.setObjectName(u"setting_page_notify_text")
         self.setting_page_notify_text.setMaximumSize(QSize(16777215, 30))
-        self.setting_page_notify_text.setFont(font4)
+        self.setting_page_notify_text.setFont(font5)
         self.setting_page_notify_text.setStyleSheet(u"color : #90b6e7;")
         self.setting_page_notify_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -1803,7 +1822,7 @@ class Ui_MainWindow(object):
         self.other_option_text.setObjectName(u"other_option_text")
         self.other_option_text.setMinimumSize(QSize(0, 30))
         self.other_option_text.setMaximumSize(QSize(16777215, 30))
-        self.other_option_text.setFont(font4)
+        self.other_option_text.setFont(font5)
         self.other_option_text.setStyleSheet(u"color:#90b6e7;\n"
 "font-weight : Bold;")
         self.other_option_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1861,10 +1880,10 @@ class Ui_MainWindow(object):
         self.textEdit.setObjectName(u"textEdit")
         self.textEdit.setEnabled(True)
         self.textEdit.setMaximumSize(QSize(16777215, 16777215))
-        font6 = QFont()
-        font6.setFamilies([u"Comfortaa"])
-        font6.setPointSize(12)
-        self.textEdit.setFont(font6)
+        font7 = QFont()
+        font7.setFamilies([u"Comfortaa"])
+        font7.setPointSize(12)
+        self.textEdit.setFont(font7)
         self.textEdit.setStyleSheet(u"color:white; \n"
 " font-family:\"Comfortaa\";\n"
 "border :0;\n"
@@ -1942,7 +1961,7 @@ class Ui_MainWindow(object):
         self.download_text = QLabel(self.download_data_box)
         self.download_text.setObjectName(u"download_text")
         self.download_text.setMaximumSize(QSize(16777215, 30))
-        self.download_text.setFont(font4)
+        self.download_text.setFont(font5)
         self.download_text.setStyleSheet(u"color : #90b6e7;")
         self.download_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -2294,7 +2313,7 @@ class Ui_MainWindow(object):
         self.author_name_and_time = QLabel(self.frame)
         self.author_name_and_time.setObjectName(u"author_name_and_time")
         self.author_name_and_time.setMaximumSize(QSize(16777215, 16777215))
-        self.author_name_and_time.setFont(font3)
+        self.author_name_and_time.setFont(font4)
         self.author_name_and_time.setStyleSheet(u"color:#90b6e7;\n"
 "font-family:\"Comfortaa\";\n"
 "padding:3px;\n"

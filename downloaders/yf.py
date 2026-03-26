@@ -102,7 +102,7 @@ class YFDownloader(DataDownloader):
             except CancelledError:
                 raise
             except Exception as e:
-                logging.error("YF task for %s raised: %s", tn, e)
+                logger.error("YF task for %s raised: %s", tn, e)
 
         if return_csv and df_dict:
             _check_cancel()
@@ -112,8 +112,8 @@ class YFDownloader(DataDownloader):
                     os.makedirs(data_folder_path, exist_ok=True)
                     csv_path = os.path.join(data_folder_path, f"{name}.csv")
                     df.to_csv(csv_path, index=True)
-                    logging.info("%s saved to %s Successfully!", name, csv_path)
+                    logger.info("%s saved to %s Successfully!", name, csv_path)
                 except Exception as err:
-                    logging.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
+                    logger.error("%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err)
                     continue
         return df_dict if return_csv else None

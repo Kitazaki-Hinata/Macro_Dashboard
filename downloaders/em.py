@@ -19,6 +19,8 @@ from downloaders.common import (
     DataDownloader,
 )
 
+logger = logging.getLogger(__name__)
+
 class EMDownloader(DataDownloader):
     def __init__(
             self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int
@@ -61,7 +63,7 @@ class EMDownloader(DataDownloader):
             line_heights = []
             date_list = []
         except Exception as e:
-            logging.error("Error in downloading CME-emini-future")
+            logger.error("Error in downloading CME-emini-future")
             return
 
         # get bar height data
@@ -82,7 +84,7 @@ class EMDownloader(DataDownloader):
                     heights.append(height)
                 index += 1
         except Exception as e:
-            logging.error(error_text + "// BAR HEIGHT")
+            logger.error(error_text + "// BAR HEIGHT")
             print(error_text + "// BAR HEIGHT")
             return
 
@@ -98,7 +100,7 @@ class EMDownloader(DataDownloader):
                 line_h = bottom - float(i.split(".")[0])
                 line_heights.append(line_h)
         except Exception as e:
-            logging.error(error_text + "// LINE NUMBER")
+            logger.error(error_text + "// LINE NUMBER")
             print(error_text + "// LINE NUMBER")
             return
 
@@ -113,7 +115,7 @@ class EMDownloader(DataDownloader):
                         dates = date.get_text()
                         date_list.append(dates)
         except Exception as e:
-            logging.error(error_text + "// DATE")
+            logger.error(error_text + "// DATE")
             print(error_text + "// DATE")
             return
 
@@ -128,7 +130,7 @@ class EMDownloader(DataDownloader):
             else:
                 raise Exception("REFERENCE DATA报错")
         except Exception as e:
-            logging.error(error_text + "// REFERENCE DATA")
+            logger.error(error_text + "// REFERENCE DATA")
             print(error_text + "// REFERENCE DATA")
             return
 
@@ -173,7 +175,7 @@ class EMDownloader(DataDownloader):
             file_path = os.path.join(file_folder_path, f"{file_name}.csv")
             df.to_csv(file_path, index = False)
         except Exception as e:
-            logging.error(f"Failed to save file: {e}")
+            logger.error(f"Failed to save file: {e}")
             return
 
     def to_db(

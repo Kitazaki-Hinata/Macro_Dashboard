@@ -86,7 +86,7 @@ class CMEfedWatchDownloader(DataDownloader):
             )
             cookies_button.click()
         except:
-            logging.info("提示：未识别到CME fedwatch cookies按钮，程序继续 // Notify: Cookies button haven't been identified but continued...")
+            logger.info("提示：未识别到CME fedwatch cookies按钮，程序继续 // Notify: Cookies button haven't been identified but continued...")
             pass
 
         # 有 iframe 的话，先切换
@@ -97,7 +97,7 @@ class CMEfedWatchDownloader(DataDownloader):
             )
             self.driver.switch_to.frame(iframe)
         except Exception:
-            logging.info("提示：未识别到CME fedwatch iframe，程序继续 // Notify: Iframe haven't been identified but continued...")
+            logger.info("提示：未识别到CME fedwatch iframe，程序继续 // Notify: Iframe haven't been identified but continued...")
             pass
 
         # 滚动页面以确保按钮加载
@@ -160,10 +160,10 @@ class CMEfedWatchDownloader(DataDownloader):
                     csv_path = os.path.join(self.cme_folder_path, f"{self.date_list[index]}.csv")
                     self.total_df.to_csv(csv_path, index = True)
                 except Exception as e:
-                    logging.info(f"fw.py line 163, Data download successfully but failed to download csv, save_to_csv报错，原因是{e}")
+                    logger.info(f"fw.py line 163, Data download successfully but failed to download csv, save_to_csv报错，原因是{e}")
 
             except Exception as e:
-                logging.error(f"Failed to press button, reason is {e}")
+                logger.error(f"Failed to press button, reason is {e}")
                 return
 
         self.driver.quit()
@@ -242,7 +242,7 @@ class CMEfedWatchDownloader(DataDownloader):
 
                 # 如果df是空的，传入log，然后直接开始下一轮循环，下载下一个数据
                 if df is None:
-                    logging.error(
+                    logger.error(
                         "FAILED TO EXTRACT %s, check PREVIOUS loggings", table_name
                     )
                     return
@@ -264,7 +264,7 @@ class CMEfedWatchDownloader(DataDownloader):
                 df_dict : dict = {}
                 df_dict[table_name] = df
                 if df_dict is None:
-                    logging.error("No data downloaded from ISM")
+                    logger.error("No data downloaded from ISM")
                     return None
 
                 _check_cancel()
@@ -279,9 +279,9 @@ class CMEfedWatchDownloader(DataDownloader):
                         # 再写入新的文件
                         csv_path = os.path.join(self.cme_folder_path, f"{name}.csv")
                         df.to_csv(csv_path, index=True)
-                        logging.info("%s saved to %s Successfully!", name, csv_path)
+                        logger.info("%s saved to %s Successfully!", name, csv_path)
                     except Exception as err:
-                        logging.error(
+                        logger.error(
                             "%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err
                         )
                         continue

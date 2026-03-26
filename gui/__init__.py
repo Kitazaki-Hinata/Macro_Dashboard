@@ -53,5 +53,5 @@ __all__ = [
     "Ui_Prestart_ui",
     "ChartFunction",
     "TableFunction",
-    "BloombergExtractor"
+    "BloombergExtractor",
 ]

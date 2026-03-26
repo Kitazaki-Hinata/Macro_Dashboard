@@ -222,7 +222,7 @@ class DatabaseConverter:
 			df.insert(0, "date", date_col)  # type: ignore
 			return df
 		except Exception as e:
-			logging.error(f"{e}, FAILED to write into database")
+			logger.error(f"{e}, FAILED to write into database")
 			df = pd.DataFrame()
 			return df
 
@@ -285,7 +285,7 @@ class DatabaseConverter:
 				df = DatabaseConverter._rename_bea_date_col(df)
 				return finalize_with_date_first(df)
 		except Exception as e:
-			logging.warning(f"BEA match failed in _format_converter: {e}")
+			logger.warning(f"BEA match failed in _format_converter: {e}")
 
 		try:
 			ohlcv = {"Open", "High", "Low", "Close", "Volume"}
@@ -299,7 +299,7 @@ class DatabaseConverter:
 				})
 				return finalize_with_date_first(out)
 		except Exception as e:
-			logging.warning(f"yfinance match failed in _format_converter: {e}")
+			logger.warning(f"yfinance match failed in _format_converter: {e}")
 
 		try:
 			if "date" in df.columns and str(df["date"].iloc[1])[4] == "-":
@@ -311,7 +311,7 @@ class DatabaseConverter:
 					out = out.rename(columns={col: data_name})
 					return finalize_with_date_first(out)
 		except Exception as e:
-			logging.warning(f"FRED match failed in _format_converter: {e}")
+			logger.warning(f"FRED match failed in _format_converter: {e}")
 
 		try:
 			cols = list(df.columns)
@@ -345,7 +345,7 @@ class DatabaseConverter:
 				out = df[["date", val_col]].copy().rename(columns={val_col: data_name})
 				return finalize_with_date_first(out)
 		except Exception as e:
-			logging.warning(f"BLS match failed in _format_converter: {e}")
+			logger.warning(f"BLS match failed in _format_converter: {e}")
 
 		try:
 			if "date" in df.columns and df["date"].astype(str).str.contains(r"^[A-Za-z]{3}_[0-9]{4}$").any():
@@ -366,7 +366,7 @@ class DatabaseConverter:
 				df.insert(0, "date", date_col)
 				return finalize_with_date_first(df)
 		except Exception as e:
-			logging.warning(f"TE match failed in _format_converter: {e}")
+			logger.warning(f"TE match failed in _format_converter: {e}")
 
 		try:
 			if "date" in df.columns:
@@ -380,7 +380,7 @@ class DatabaseConverter:
 					out[data_name] = list(df.iloc[:, 0])
 				return finalize_with_date_first(out)
 		except Exception as e:
-			logging.warning(f"fallback in _format_converter failed: {e}")
+			logger.warning(f"fallback in _format_converter failed: {e}")
 			return df
 
 	def _create_ts_sheet(self, start_date: str) -> sqlite3.Cursor:
@@ -444,7 +444,7 @@ class DatabaseConverter:
 				return cursor
 
 		except sqlite3.Error as e:
-			logging.error(f"FAILED to create Time_Series table, since {e}")
+			logger.error(f"FAILED to create Time_Series table, since {e}")
 			return cursor
 
 	def _ensure_ts_primary_key(self) -> None:
