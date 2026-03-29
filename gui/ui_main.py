@@ -1293,7 +1293,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 216, 54))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 116, 54))
         self.scrollAreaWidgetContents.setStyleSheet(u"* {\n"
 "background:#3a3d43;\n"
 "}\n"
@@ -2488,7 +2488,7 @@ class Ui_MainWindow(object):
         self.fred.setText(QCoreApplication.translate("MainWindow", u"FRED data API", None))
         self.bls.setText(QCoreApplication.translate("MainWindow", u"BLS data API", None))
         self.te.setText(QCoreApplication.translate("MainWindow", u"TE data", None))
-        self.ism.setText(QCoreApplication.translate("MainWindow", u"ISM (Unavailable)", None))
+        self.ism.setText(QCoreApplication.translate("MainWindow", u"ISM", None))
         self.fw.setText(QCoreApplication.translate("MainWindow", u"CME FedWatch", None))
         self.dfm.setText(QCoreApplication.translate("MainWindow", u"Dallas Fed Manu.", None))
         self.nyf.setText(QCoreApplication.translate("MainWindow", u"NewYork Fed", None))

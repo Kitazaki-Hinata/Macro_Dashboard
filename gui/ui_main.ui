@@ -2245,7 +2245,7 @@ color : #90b6e7;</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>216</width>
+                      <width>116</width>
                       <height>54</height>
                      </rect>
                     </property>
@@ -3775,7 +3775,7 @@ color : #777785;
                                    <bool>false</bool>
                                   </property>
                                   <property name="text">
-                                   <string>ISM (Unavailable)</string>
+                                   <string>ISM</string>
                                   </property>
                                   <property name="checkable">
                                    <bool>true</bool>

@@ -800,10 +800,12 @@ class UiFunctions():  # 删除:mainWindow
             return
 
         # 传回是否成功的bool与result文章内容
-        extractor = BloombergExtractor()
-        success_bool, result = extractor.edit_bbg_article(bbg_url)
+        extractor = BloombergExtractor(url = bbg_url)
+        success_bool, result = extractor.edit_bbg_article()
         time.sleep(2)
         self.main_window.bbg_url_load_btn.setEnabled(True)
+        self.main_window.bbg_article_showbox.setPlainText(result)
+        extractor.close_driver()
         return
 
 
@@ -1386,7 +1388,7 @@ class UiFunctions():  # 删除:mainWindow
         download_all_bool = False
 
         # all sources name 是所有已经存在的数据源
-        all_sources_name = ["bea", "yf", "fred", "bls", "te", #"ism",
+        all_sources_name = ["bea", "yf", "fred", "bls", "te", "ism",
                            "fw", "dfm", "nyf", "cin", "em", "fs"]
 
         # 如果都下载，就直接sources = all sources name
