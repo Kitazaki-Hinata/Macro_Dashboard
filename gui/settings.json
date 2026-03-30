@@ -1,41 +1,41 @@
 {
-  "recent_update_time": "2025-10-23 22:24:31",
-  "one_chart_settings": {
-    "first_data": {
-      "data_name": "",
-      "time_lags": 0,
-      "color": "#90b6e7"
+    "recent_update_time": "2026-03-25 19:16:55",
+    "one_chart_settings": {
+        "first_data": {
+            "data_name": "Income_and_Spending",
+            "time_lags": 0,
+            "color": "#90b6e7"
+        },
+        "second_data": {
+            "data_name": "Sector_Private_Fix_Investment",
+            "time_lags": 0,
+            "color": "#EE5C88"
+        }
     },
-    "second_data": {
-      "data_name": "",
-      "time_lags": 0,
-      "color": "#EE5C88"
-    }
-  },
-  "four_chart_settings": {
-    "first_data": {
-      "data_name": "",
-      "time_lags": 0,
-      "color": "#90b6e7"
+    "four_chart_settings": {
+        "first_data": {
+            "data_name": "",
+            "time_lags": 0,
+            "color": "#90b6e7"
+        },
+        "second_data": {
+            "data_name": "",
+            "time_lags": 0,
+            "color": "#90b6e7"
+        },
+        "third_data": {
+            "data_name": "",
+            "time_lags": 0,
+            "color": "#90b6e7"
+        },
+        "fourth_data": {
+            "data_name": "",
+            "time_lags": 0,
+            "color": "#90b6e7"
+        }
     },
-    "second_data": {
-      "data_name": "",
-      "time_lags": 0,
-      "color": "#90b6e7"
+    "table_settings": {
+        "table_name": "CME_E_mini_Volume_and_Open_Interest"
     },
-    "third_data": {
-      "data_name": "",
-      "time_lags": 0,
-      "color": "#90b6e7"
-    },
-    "fourth_data": {
-      "data_name": "",
-      "time_lags": 0,
-      "color": "#90b6e7"
-    }
-  },
-  "table_settings": {
-    "table_name": ""
-  },
-  "agree_to_terms": false
+    "agree_to_terms": true
 }

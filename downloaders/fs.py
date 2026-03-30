@@ -21,7 +21,7 @@ from downloaders.common import (
     DataDownloader,
 )
 
-
+logger = logging.getLogger(__name__)
 
 class FSDownloader(DataDownloader):
     """外汇掉期汇率数据，selenium实现"""
@@ -47,7 +47,7 @@ class FSDownloader(DataDownloader):
                 break
             except:
                 self.driver.refresh()
-                logging.debug("尝试刷新... // Refreshing the page...")
+                logger.debug("尝试刷新... // Refreshing the page...")
                 print("尝试刷新... // Refreshing the page...")
                 repeat_time -= 1
 
@@ -93,7 +93,7 @@ class FSDownloader(DataDownloader):
             return df
 
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             return
 
     def _click_button(self, xpath):
@@ -112,7 +112,7 @@ class FSDownloader(DataDownloader):
             option.click()
             time.sleep(1)
         except Exception as e:
-            logging.error(f"Failed to click btn in forex swap page, {e}")
+            logger.error(f"Failed to click btn in forex swap page, {e}")
             return
 
     def usdcny_swap(self, file_name : str, check_cancel):
@@ -161,7 +161,7 @@ class FSDownloader(DataDownloader):
             self.file_path = os.path.join(self.file_folder_path, f"{file_name}.csv")
             df.to_csv(self.file_path, index = False)
         except Exception as e:
-            logging.error(f"Failed to save file: {e}")
+            logger.error(f"Failed to save file: {e}")
             return
 
     def to_db(

@@ -23,6 +23,8 @@ from downloaders.common import (
     DataDownloader,
 )
 
+logger = logging.getLogger(__name__)
+
 class CINDownloader(DataDownloader):
     def __init__(
             self, json_dict: Dict[str, Dict[str, Any]], api_key: str, request_year: int
@@ -76,7 +78,12 @@ class CINDownloader(DataDownloader):
 
         # download data
         driver.get(self.url)
-        time.sleep(1)
+        WebDriverWait(driver, 10).until(
+            lambda d: d.execute_script("return document.readyState") == "complete"
+        )
+        for _ in range(5):
+            driver.execute_script("window.scrollBy(0, 500);")
+            time.sleep(1.2)  # 等待内容加载
         button = WebDriverWait(driver, 8).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="btn-NowcastDownload-quarter"]'))
         )
@@ -90,7 +97,11 @@ class CINDownloader(DataDownloader):
 
         if xlsx_file.exists():
             # 确保目标目录存在
-            xlsx_file.rename(target_location_path)
+            #xlsx_file.rename(target_location_path)
+            if os.name == 'nt':
+                os.system("move " + str(xlsx_file) + " " + str(target_location_path))
+            else:
+                os.system("mv " + str(xlsx_file) + " " + str(target_location_path))
             driver.quit()
 
             # 修改csv，需要用pd转换成df，因为table模块会默认删除一列
@@ -99,7 +110,7 @@ class CINDownloader(DataDownloader):
             df.to_csv(target_location_path, index=False)
 
         else:
-            logging.error("Failed to download Cleveland inflation data")
+            logger.error("Failed to download Cleveland inflation data")
             driver.quit()
             return
 

@@ -103,6 +103,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.four_page_btn.clicked.connect(self.left_bar_button_slot)
         self.table_btn.clicked.connect(self.left_bar_button_slot)
         self.note_btn.clicked.connect(self.left_bar_button_slot)
+        self.bbg_page_btn.clicked.connect(self.left_bar_button_slot)
         self.settings_btn.clicked.connect(self.left_bar_button_slot)
 
         # 为 header_right_btn_container 添加鼠标事件
@@ -145,6 +146,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         # 四图表中的联动checkbox
         self.connect_charts.stateChanged.connect(self.ui_functions.on_connect_charts_changed)
 
+        '''Bloomberg page btn'''
+        self.bbg_url_load_btn.clicked.connect(self.ui_functions.bbg_load_article)
 
         '''SETTINGS page btn '''
         self.one_chart_ui.finish_btn.clicked.connect(lambda : self.ui_functions.one_finish_settings(self.one_chart_ui, self.one_chart_settings_window))
@@ -184,11 +187,12 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             "four_page_btn" : self.four_page_btn,
             "table_btn" : self.table_btn,
             "note_btn" : self.note_btn,
+            "bbg_page_btn" : self.bbg_page_btn,
             "settings_btn" : self.settings_btn,
         }
 
         # clear effect 清除自带的效果保留qss效果
-        for _, button in btn_dict.items():
+        for _ , button in btn_dict.items():
             if button != btn:
                 button.setChecked(False)
                 button.setStyleSheet("")  # 恢复QSS
@@ -236,6 +240,17 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 '''
                 background : #90b6e7;
                 icon: url(:/png_check/png/note_btn_check.png);
+                icon-size: 20px 20px;
+                border-left : 2px solid white;
+                padding-right : 2px;
+                '''
+            )
+        elif btn_name == "bbg_page_btn":
+            self.stackedWidget.setCurrentWidget(self.page_bbg_container)
+            self.bbg_page_btn.setStyleSheet(
+                '''
+                background : #90b6e7;
+                icon: url(:/png_check/png/bbg_check.png);
                 icon-size: 20px 20px;
                 border-left : 2px solid white;
                 padding-right : 2px;

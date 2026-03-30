@@ -22,7 +22,6 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QCheckBox, QFr
     QSpinBox, QStackedWidget, QTableView, QTextEdit,
     QVBoxLayout, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -432,7 +431,15 @@ class Ui_MainWindow(object):
 "    icon-size: 20px 20px;\n"
 "}\n"
 "\n"
-"\n"
+"QPushButton#bbg_page_btn {\n"
+"    icon: url(:/png/png/bbg.png);\n"
+"    icon-size: 20px 20px;\n"
+"}\n"
+"QPushButton#bbg_page_btn:pressed {\n"
+"    icon: url(:/png_press/png/bbg_press.png);\n"
+"    icon-size: 20px 20px;\n"
+""
+                        "}\n"
 "\n"
 "")
         self.left_box_frame.setLineWidth(0)
@@ -477,6 +484,13 @@ class Ui_MainWindow(object):
 
         self.left_up_four_frame.addWidget(self.note_btn)
 
+        self.bbg_page_btn = QPushButton(self.left_box_frame)
+        self.bbg_page_btn.setObjectName(u"bbg_page_btn")
+        self.bbg_page_btn.setMinimumSize(QSize(60, 40))
+        self.bbg_page_btn.setMaximumSize(QSize(60, 40))
+
+        self.left_up_four_frame.addWidget(self.bbg_page_btn)
+
         self.vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.left_up_four_frame.addItem(self.vertical_spacer)
@@ -498,6 +512,7 @@ class Ui_MainWindow(object):
         self.note_btn.raise_()
         self.settings_btn.raise_()
         self.one_page_btn.raise_()
+        self.bbg_page_btn.raise_()
 
         self.verticalLayout.addWidget(self.left_box_frame)
 
@@ -682,6 +697,128 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.widget_2)
 
         self.stackedWidget.addWidget(self.page_one_container)
+        self.page_bbg_container = QWidget()
+        self.page_bbg_container.setObjectName(u"page_bbg_container")
+        self.verticalLayout_5 = QVBoxLayout(self.page_bbg_container)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.bbg_search_widget = QWidget(self.page_bbg_container)
+        self.bbg_search_widget.setObjectName(u"bbg_search_widget")
+        self.bbg_search_widget.setMinimumSize(QSize(0, 60))
+        self.bbg_search_widget.setStyleSheet(u"QLineEdit {\n"
+"        background-color: #33363a;\n"
+"        border-radius : 2px;\n"
+"	    max-height : 9px;\n"
+"        border-bottom: 1px solid #90b6e7;\n"
+"        padding: 5px;\n"
+"    }\n"
+"QLineEdit:focus {\n"
+"		background-color: #454555;\n"
+"        border-bottom: 1px solid #ffffff;\n"
+"    }")
+        self.horizontalLayout_3 = QHBoxLayout(self.bbg_search_widget)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setContentsMargins(20, -1, 20, 9)
+        self.enter_bbg_pre_label = QLabel(self.bbg_search_widget)
+        self.enter_bbg_pre_label.setObjectName(u"enter_bbg_pre_label")
+        font2 = QFont()
+        font2.setFamilies([u"Comfortaa"])
+        font2.setPointSize(9)
+        font2.setBold(True)
+        self.enter_bbg_pre_label.setFont(font2)
+        self.enter_bbg_pre_label.setStyleSheet(u"color: #ffffff")
+
+        self.horizontalLayout_3.addWidget(self.enter_bbg_pre_label)
+
+        self.url_entry_widget = QWidget(self.bbg_search_widget)
+        self.url_entry_widget.setObjectName(u"url_entry_widget")
+        self.horizontalLayout_23 = QHBoxLayout(self.url_entry_widget)
+        self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
+        self.horizontalLayout_23.setContentsMargins(-1, 1, -1, 9)
+        self.url_entry = QLineEdit(self.url_entry_widget)
+        self.url_entry.setObjectName(u"url_entry")
+        self.url_entry.setMinimumSize(QSize(845, 25))
+        font3 = QFont()
+        font3.setFamilies([u"Comfortaa"])
+        self.url_entry.setFont(font3)
+        self.url_entry.setStyleSheet(u"color : #ffffff")
+
+        self.horizontalLayout_23.addWidget(self.url_entry)
+
+
+        self.horizontalLayout_3.addWidget(self.url_entry_widget)
+
+        self.btn_bbg_confirm_widget = QWidget(self.bbg_search_widget)
+        self.btn_bbg_confirm_widget.setObjectName(u"btn_bbg_confirm_widget")
+        self.btn_bbg_confirm_widget.setMinimumSize(QSize(45, 25))
+        self.btn_bbg_confirm_widget.setMaximumSize(QSize(45, 25))
+        self.btn_bbg_confirm_widget.setStyleSheet(u"QPushButton {\n"
+"	background-color : #252526;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	background-color : #33363a;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color : #90b6e7;\n"
+"	border-radius : 9px;\n"
+"}\n"
+"\n"
+"QPushButton#one_set_preference {\n"
+"    icon: url(:/png/png/set_preference.png);\n"
+"    icon-size: 17px 17px;\n"
+"}\n"
+"QPushButton#one_set_preference:pressed {\n"
+"    icon: url(:/png_press/png/set_preference_press.png);\n"
+"    icon-size: 17px 17px;\n"
+"}")
+        self.bbg_url_load_btn = QPushButton(self.btn_bbg_confirm_widget)
+        self.bbg_url_load_btn.setObjectName(u"bbg_url_load_btn")
+        self.bbg_url_load_btn.setGeometry(QRect(0, 0, 45, 25))
+        self.bbg_url_load_btn.setMinimumSize(QSize(45, 25))
+        self.bbg_url_load_btn.setMaximumSize(QSize(25, 25))
+        font4 = QFont()
+        font4.setFamilies([u"Comfortaa"])
+        font4.setBold(True)
+        self.bbg_url_load_btn.setFont(font4)
+        self.bbg_url_load_btn.setStyleSheet(u"color: #ffffff")
+        self.bbg_url_load_btn.setAutoDefault(False)
+
+        self.horizontalLayout_3.addWidget(self.btn_bbg_confirm_widget)
+
+
+        self.verticalLayout_5.addWidget(self.bbg_search_widget)
+
+        self.bbg_content = QWidget(self.page_bbg_container)
+        self.bbg_content.setObjectName(u"bbg_content")
+        self.horizontalLayout_4 = QHBoxLayout(self.bbg_content)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.text_show_container = QWidget(self.bbg_content)
+        self.text_show_container.setObjectName(u"text_show_container")
+        self.text_show_container.setStyleSheet(u"background-color : #262a2f;\n"
+"border-radius:30px;\n"
+"margin-left : 10px;\n"
+"margin-right : 10px;")
+        self.verticalLayout_6 = QVBoxLayout(self.text_show_container)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.bbg_article_showbox = QPlainTextEdit(self.text_show_container)
+        self.bbg_article_showbox.setObjectName(u"bbg_article_showbox")
+        self.bbg_article_showbox.setEnabled(True)
+        self.bbg_article_showbox.setFont(font4)
+        self.bbg_article_showbox.setStyleSheet(u"color:#ffffff")
+        self.bbg_article_showbox.setReadOnly(True)
+
+        self.verticalLayout_6.addWidget(self.bbg_article_showbox)
+
+
+        self.horizontalLayout_4.addWidget(self.text_show_container)
+
+
+        self.verticalLayout_5.addWidget(self.bbg_content)
+
+        self.stackedWidget.addWidget(self.page_bbg_container)
         self.page_table_container = QWidget()
         self.page_table_container.setObjectName(u"page_table_container")
         self.verticalLayout_8 = QVBoxLayout(self.page_table_container)
@@ -843,10 +980,7 @@ class Ui_MainWindow(object):
         self.connect_charts = QCheckBox(self.four_text_widget)
         self.connect_charts.setObjectName(u"connect_charts")
         self.connect_charts.setMaximumSize(QSize(150, 16777215))
-        font2 = QFont()
-        font2.setFamilies([u"Comfortaa"])
-        font2.setBold(True)
-        self.connect_charts.setFont(font2)
+        self.connect_charts.setFont(font4)
         self.connect_charts.setStyleSheet(u"color:white;")
 
         self.horizontalLayout_5.addWidget(self.connect_charts)
@@ -1111,11 +1245,11 @@ class Ui_MainWindow(object):
         self.four_title_label_3 = QLabel(self.note_text_container_3)
         self.four_title_label_3.setObjectName(u"four_title_label_3")
         self.four_title_label_3.setMaximumSize(QSize(16777215, 18))
-        font3 = QFont()
-        font3.setFamilies([u"Comfortaa"])
-        font3.setPointSize(10)
-        font3.setBold(True)
-        self.four_title_label_3.setFont(font3)
+        font5 = QFont()
+        font5.setFamilies([u"Comfortaa"])
+        font5.setPointSize(10)
+        font5.setBold(True)
+        self.four_title_label_3.setFont(font5)
         self.four_title_label_3.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.four_title_label_3.setStyleSheet(u"color: #ffffff; \n"
 "margin-left : 7px; ")
@@ -1126,11 +1260,11 @@ class Ui_MainWindow(object):
         self.four_update_label_3 = QLabel(self.note_text_container_3)
         self.four_update_label_3.setObjectName(u"four_update_label_3")
         self.four_update_label_3.setMaximumSize(QSize(16777215, 12))
-        font4 = QFont()
-        font4.setFamilies([u"Comfortaa"])
-        font4.setPointSize(6)
-        font4.setBold(True)
-        self.four_update_label_3.setFont(font4)
+        font6 = QFont()
+        font6.setFamilies([u"Comfortaa"])
+        font6.setPointSize(6)
+        font6.setBold(True)
+        self.four_update_label_3.setFont(font6)
         self.four_update_label_3.setStyleSheet(u"margin-left : 10px; \n"
 "color : #90b6e7;")
         self.four_update_label_3.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1371,7 +1505,7 @@ class Ui_MainWindow(object):
 
         self.note_label_notes = QLabel(self.content_area)
         self.note_label_notes.setObjectName(u"note_label_notes")
-        self.note_label_notes.setFont(font2)
+        self.note_label_notes.setFont(font4)
         self.note_label_notes.setStyleSheet(u"color : #EE5C88; margin-left : 20px")
 
         self.verticalLayout_11.addWidget(self.note_label_notes)
@@ -1546,7 +1680,7 @@ class Ui_MainWindow(object):
         self.setting_page_notify_text = QLabel(self.api_group_box)
         self.setting_page_notify_text.setObjectName(u"setting_page_notify_text")
         self.setting_page_notify_text.setMaximumSize(QSize(16777215, 30))
-        self.setting_page_notify_text.setFont(font3)
+        self.setting_page_notify_text.setFont(font5)
         self.setting_page_notify_text.setStyleSheet(u"color : #90b6e7;")
         self.setting_page_notify_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -1688,7 +1822,7 @@ class Ui_MainWindow(object):
         self.other_option_text.setObjectName(u"other_option_text")
         self.other_option_text.setMinimumSize(QSize(0, 30))
         self.other_option_text.setMaximumSize(QSize(16777215, 30))
-        self.other_option_text.setFont(font3)
+        self.other_option_text.setFont(font5)
         self.other_option_text.setStyleSheet(u"color:#90b6e7;\n"
 "font-weight : Bold;")
         self.other_option_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1715,11 +1849,7 @@ class Ui_MainWindow(object):
         self.basic_version_info_text.setObjectName(u"basic_version_info_text")
         self.basic_version_info_text.setMinimumSize(QSize(0, 75))
         self.basic_version_info_text.setMaximumSize(QSize(16777215, 75))
-        font5 = QFont()
-        font5.setFamilies([u"Comfortaa"])
-        font5.setPointSize(9)
-        font5.setBold(True)
-        self.basic_version_info_text.setFont(font5)
+        self.basic_version_info_text.setFont(font2)
         self.basic_version_info_text.setStyleSheet(u"* {\n"
 "font-family : \"Comfortaa\";\n"
 "color:white;\n"
@@ -1750,10 +1880,10 @@ class Ui_MainWindow(object):
         self.textEdit.setObjectName(u"textEdit")
         self.textEdit.setEnabled(True)
         self.textEdit.setMaximumSize(QSize(16777215, 16777215))
-        font6 = QFont()
-        font6.setFamilies([u"Comfortaa"])
-        font6.setPointSize(12)
-        self.textEdit.setFont(font6)
+        font7 = QFont()
+        font7.setFamilies([u"Comfortaa"])
+        font7.setPointSize(12)
+        self.textEdit.setFont(font7)
         self.textEdit.setStyleSheet(u"color:white; \n"
 " font-family:\"Comfortaa\";\n"
 "border :0;\n"
@@ -1831,7 +1961,7 @@ class Ui_MainWindow(object):
         self.download_text = QLabel(self.download_data_box)
         self.download_text.setObjectName(u"download_text")
         self.download_text.setMaximumSize(QSize(16777215, 30))
-        self.download_text.setFont(font3)
+        self.download_text.setFont(font5)
         self.download_text.setStyleSheet(u"color : #90b6e7;")
         self.download_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -2069,21 +2199,21 @@ class Ui_MainWindow(object):
         self.verticalLayout_27.setObjectName(u"verticalLayout_27")
         self.download_btn = QPushButton(self.download_btn_container)
         self.download_btn.setObjectName(u"download_btn")
-        self.download_btn.setFont(font5)
+        self.download_btn.setFont(font2)
 
         self.verticalLayout_27.addWidget(self.download_btn)
 
         self.cancel_btn = QPushButton(self.download_btn_container)
         self.cancel_btn.setObjectName(u"cancel_btn")
         self.cancel_btn.setEnabled(False)
-        self.cancel_btn.setFont(font5)
+        self.cancel_btn.setFont(font2)
         self.cancel_btn.setStyleSheet(u"")
 
         self.verticalLayout_27.addWidget(self.cancel_btn)
 
         self.clear_log_btn = QPushButton(self.download_btn_container)
         self.clear_log_btn.setObjectName(u"clear_log_btn")
-        self.clear_log_btn.setFont(font5)
+        self.clear_log_btn.setFont(font2)
         self.clear_log_btn.setStyleSheet(u"")
 
         self.verticalLayout_27.addWidget(self.clear_log_btn)
@@ -2183,7 +2313,7 @@ class Ui_MainWindow(object):
         self.author_name_and_time = QLabel(self.frame)
         self.author_name_and_time.setObjectName(u"author_name_and_time")
         self.author_name_and_time.setMaximumSize(QSize(16777215, 16777215))
-        self.author_name_and_time.setFont(font2)
+        self.author_name_and_time.setFont(font4)
         self.author_name_and_time.setStyleSheet(u"color:#90b6e7;\n"
 "font-family:\"Comfortaa\";\n"
 "padding:3px;\n"
@@ -2231,6 +2361,7 @@ class Ui_MainWindow(object):
         self.note_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.note_btn.setText("")
+        self.bbg_page_btn.setText("")
 #if QT_CONFIG(tooltip)
         self.settings_btn.setToolTip("")
 #endif // QT_CONFIG(tooltip)
@@ -2238,6 +2369,10 @@ class Ui_MainWindow(object):
         self.title_label_2.setText(QCoreApplication.translate("MainWindow", u"Data name will be here", None))
         self.update_label_2.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.one_set_preference.setText("")
+        self.enter_bbg_pre_label.setText(QCoreApplication.translate("MainWindow", u"Enter the Bloomberg article URL :", None))
+        self.url_entry.setPlaceholderText(QCoreApplication.translate("MainWindow", u"example : https://www.bloomberg.com/news/articles/2022-12-19/neuro-sama-an-ai-twitch-influencer", None))
+        self.bbg_url_load_btn.setText(QCoreApplication.translate("MainWindow", u"Load", None))
+        self.bbg_article_showbox.setPlainText(QCoreApplication.translate("MainWindow", u"Article wil be loaded here.", None))
         self.table_title_label.setText(QCoreApplication.translate("MainWindow", u"Table : Selected Table Name", None))
         self.table_update_label.setText(QCoreApplication.translate("MainWindow", u"Recent Update Time : ", None))
         self.page_table_set_preference.setText("")
@@ -2328,7 +2463,7 @@ class Ui_MainWindow(object):
         self.status_label.setText(QCoreApplication.translate("MainWindow", u"Status will be displayed here", None))
         self.other_group_box.setTitle("")
         self.other_option_text.setText(QCoreApplication.translate("MainWindow", u"About & Terms", None))
-        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 0.9.00_beta</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
+        self.basic_version_info_text.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Macro Dashboard </p><p>Version: 1.0.0</p><p>Copyright (c) 2025 Kitazaki-Hinata</p><p><br/></p></body></html>", None))
         self.image_label.setText("")
         self.textEdit.setDocumentTitle("")
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"

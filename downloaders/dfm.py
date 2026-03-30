@@ -89,7 +89,9 @@ class DFMDownloader(DataDownloader):
             for url in [self.url_1, self.url_2]:
                 check_cancel()
                 self.driver.get(url)
-                time.sleep(1)
+                WebDriverWait(self.driver, 10).until(
+                    lambda d: d.execute_script("return document.readyState") == "complete"
+                )
                 if self.driver.find_elements(By.XPATH, '//h1[@class="dal-headline" and contains(text(), "HTTP Error 404")]'):
                     continue
 
@@ -107,14 +109,18 @@ class DFMDownloader(DataDownloader):
 
                 if xlsx_file.exists():
                     # 确保目标目录存在
-                    downloaded_file = xlsx_file.rename(target_location_path)
+                    if os.name == 'nt':
+                        os.system("move " + str(xlsx_file) + " " + str(target_location_path))
+                    else:
+                        os.system("mv " + str(xlsx_file) + " " + str(target_location_path))
+                    downloaded_file = target_location_path#xlsx_file.rename(target_location_path)
                     break
                 else:
-                    logging.error("Failed to download data of Dallas manufacture index")
+                    logger.error("Failed to download data of Dallas manufacture index")
                     return
 
         except Exception as e:
-            logging.error(f"Failed to download data of Dallas manufacture index, error is {e}")
+            logger.error(f"Failed to download data of Dallas manufacture index, error is {e}")
             return
 
         # change column name
@@ -122,7 +128,7 @@ class DFMDownloader(DataDownloader):
         try:
             df = pd.read_excel(downloaded_file, sheet_name="Index")
         except:
-            logging.error("Failed to read downloaded file, probably error 404 from web")
+            logger.error("Failed to read downloaded file, probably error 404 from web")
             return
 
         # remove useless columns and rename columns
@@ -221,14 +227,18 @@ class DFMDownloader(DataDownloader):
 
                 # 将下载的xlsx移动位置并重命名
                 if xlsx_file.exists():
-                    downloaded_file = xlsx_file.rename(target_location_path)
+                    if os.name == 'nt':
+                        os.system("move " + str(xlsx_file) + " " + str(target_location_path))
+                    else:
+                        os.system("mv " + str(xlsx_file) + " " + str(target_location_path))
+                    downloaded_file = target_location_path#xlsx_file.rename(target_location_path)
                     break
                 else:
-                    logging.error("Failed to download data of Dallas manufacture index")
+                    logger.error("Failed to download data of Dallas manufacture index")
                     return
 
         except Exception as e:
-            logging.error(f"Failed to download data of Dallas manufacture index, error is {e}")
+            logger.error(f"Failed to download data of Dallas manufacture index, error is {e}")
             return
 
         # change column name
@@ -237,7 +247,7 @@ class DFMDownloader(DataDownloader):
         try:
             df = pd.read_excel(downloaded_file, sheet_name="Indexes Seasonally Adjusted")
         except:
-            logging.error("Failed to read downloaded file, probably error 404 from web")
+            logger.error("Failed to read downloaded file, probably error 404 from web")
             return
 
         # remove useless columns and rename columns
@@ -318,7 +328,7 @@ class DFMDownloader(DataDownloader):
                         check_cancel = _check_cancel
                     )
                 else:
-                    logging.error(f"dfm data failed to identified, line 308, {data_name} is not supported")
+                    logger.error(f"dfm data failed to identified, line 308, {data_name} is not supported")
 
         except CancelledError:
             raise

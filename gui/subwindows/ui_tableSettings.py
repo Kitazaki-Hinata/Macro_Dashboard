@@ -18,7 +18,6 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGridLayout,
     QHBoxLayout, QLabel, QPushButton, QSizePolicy,
     QSpacerItem, QVBoxLayout, QWidget)
-import gui.subwindows.sub_resources_rc
 
 class Ui_TableSettingsPanel(object):
     def setupUi(self, TableSettingsPanel):
@@ -332,7 +331,7 @@ class Ui_TableSettingsPanel(object):
     def retranslateUi(self, TableSettingsPanel):
         TableSettingsPanel.setWindowTitle(QCoreApplication.translate("TableSettingsPanel", u"Settings", None))
         self.label.setText(QCoreApplication.translate("TableSettingsPanel", u"Data Selection and Settings", None))
-        self.stretch_table_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Stretch Table", None))
+        self.stretch_table_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Dynamic Col. Sizing", None))
         self.data_name_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Data Name", None))
         self.stretch_table_check.setText("")
         self.first_data_title.setText(QCoreApplication.translate("TableSettingsPanel", u"Table Data", None))

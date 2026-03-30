@@ -9,7 +9,7 @@
     简体中文 | <a href="https://github.com/Kitazaki-Hinata/Macro_Dashboard/blob/dev/doc/README_en.md">English</a>
 </p>
 
-> Version: v0.9.00_beta
+> Version: v1.0.0
 
 > Author: Kitazaki Hinata, SeaStar, yuyoux7
 
@@ -23,13 +23,25 @@
 
 
 ### 一、项目说明
+**薅资本主义的羊毛是正确的！**
 
-创建这个项目的目的是方便汇集不同宏观数据方便进行比较（频繁的打开各种不同网页抓取数据太过于麻烦）。
-此项目使用脚本获取宏观经济数据，并将数据下载至本地数据库（data.db）文件当中，然后生成集成式的图表。
+创建这个项目的目的是方便汇集不同宏观数据方便进行比较（频繁的打开各种不同网页抓取数据太过于麻烦），
+以及免费获取彭博社的文章。
+**（就是你小子让我看广告还不让我看全文是吧）**<br>
+
+程序会使用脚本获取宏观经济数据，并将数据下载至本地数据库（data.db）文件当中，然后生成集成式的图表。
 可下载的数据会陆续更新。
 
-**注意：强烈建议使用代理 IP 下载数据！境内使用需要开启VPN。弹出的浏览器窗口需保持打开状态，不要对其进行任何操作！不要快速重复下载数据，会触发 API 上限，或触发 IP 封禁。**
+**强烈建议使用代理 IP 下载数据！东大境内使用需要开启VPN。弹出的浏览器窗口需保持打开状态，不要对其进行任何操作！不要快速重复下载数据，会触发 API 上限，或触发 IP 封禁。**
 
+<details>
+  <summary>查看程序截图 Screenshot</summary>
+    <p align="center">
+      <img src="doc/readme/line_chart.png" alt="Chart Example">
+      <img src="doc/readme/table_data.png" alt="Chart Example">
+      <img src="doc/readme/bloomberg_news.png" alt="Chart Example">
+    </p>
+</details>
 
 ### 二、准备工作与使用方法（包括配置环境，API key 获取）
 
@@ -130,13 +142,13 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 **debug waitlist :**
 - [ ] One_chart导入db里面的列名以及限制4输入框只能输入列名
 
+
 **extra function waitlist :**
-- [ ] 新板块：彭博文章
+- [ ] 彭博文章添加英译中功能
 - [ ] 新板块：美债期限结构
 - [ ] 设置图表网格的透明度&颜色
 - [ ] 设立一个使用说明页面
 - [ ] 储存上次设置好的线条样式
-- [ ] i18n 多语言支持（简中，繁中，日文）
 - [ ] 添加Table组件中复制粘贴功能
 
 

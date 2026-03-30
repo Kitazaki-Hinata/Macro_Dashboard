@@ -1,4 +1,5 @@
-"""ISM downloader implementation."""
+"""ISM downloader implementation.
+截至2026-03-25，官网将访问权限设定为会员查看，因此本模块已经失效"""
 
 from __future__ import annotations
 import random
@@ -24,8 +25,6 @@ from downloaders.common import (
     CancellationToken,
     DataDownloader,
 )
-
-
 
 logger = logging.getLogger(__name__)
 month_dict = {
@@ -69,7 +68,7 @@ class ISMDownloader(DataDownloader):
         try:
             html = self.driver.page_source  # crawl whole html
         except Exception as e:
-            logging.error(f"Failed to crawl html, haven't identify url, error:{e}")
+            logger.error(f"Failed to crawl html, haven't identify url, error:{e}")
             self.driver.quit()
             return
 
@@ -117,7 +116,7 @@ class ISMDownloader(DataDownloader):
             accept_button.click()
             time.sleep(random.uniform(0.3, 1))
         except NoSuchElementException:
-            logging.warning(f"Haven't detected cookies button in ISM manu, continue")
+            logger.warning(f"Haven't detected cookies button in ISM manu, continue")
             pass
 
         # main to report
@@ -130,7 +129,7 @@ class ISMDownloader(DataDownloader):
             view_button.click()
             time.sleep(random.uniform(0.3, 1)) # load data, random num to prevent IP ban
         except NoSuchElementException:
-            logging.error(f"Failed to navigate to report url, no button element, stop crawling")
+            logger.error(f"Failed to navigate to report url, no button element, stop crawling")
             self.driver.quit()
             return pd.DataFrame()
 
@@ -144,7 +143,7 @@ class ISMDownloader(DataDownloader):
             disclaimer_button.click()
             time.sleep(random.uniform(0.6,1.3))
         except NoSuchElementException:
-            logging.warning(f"Haven't detected disclaimer button in ISM manu, continue")
+            logger.warning(f"Haven't detected disclaimer button in ISM manu, continue")
             pass
 
         # crawl current data
@@ -227,7 +226,7 @@ class ISMDownloader(DataDownloader):
             )
             view_button.click()
         except Exception as e:
-            logging.error("Failed to navigate to report url, stop crawling ...// 并没有找到元素，停止爬取此数据")
+            logger.error("Failed to navigate to report url, stop crawling ...// 并没有找到元素，停止爬取此数据")
             self.driver.quit()
             return pd.DataFrame()  # return empty df
 
@@ -240,7 +239,7 @@ class ISMDownloader(DataDownloader):
         #     )
         #     disclaimer_button.click()
         # except NoSuchElementException:
-        #     logging.warning("Notify: Haven't detected cookies button, but continue...")
+        #     logger.warning("Notify: Haven't detected cookies button, but continue...")
         #     print("提示：没有识别到ISM service cookies按钮，程序继续进行 // Notify: Haven't detected cookies button, but continue...")
         #     pass
 
@@ -255,7 +254,7 @@ class ISMDownloader(DataDownloader):
 
         month_num = reversed_dict.get(extract_month)
         if not month_num:
-            logging.error(f"Cannot identify month: {extract_month}")
+            logger.error(f"Cannot identify month: {extract_month}")
             return pd.DataFrame()
 
         prev_months = []  # store str "month" name
@@ -368,7 +367,7 @@ class ISMDownloader(DataDownloader):
                 df_dict[table_name] = df
 
                 if df_dict is None:
-                    logging.error("No data downloaded from ISM")
+                    logger.error("No data downloaded from ISM")
                     return None
 
                 if return_csv and df_dict:
@@ -385,9 +384,9 @@ class ISMDownloader(DataDownloader):
                             os.makedirs(data_folder_path, exist_ok=True)
                             csv_path = os.path.join(data_folder_path, f"{name}.csv")
                             df.to_csv(csv_path, index=True)
-                            logging.info("%s saved to %s Successfully!", name, csv_path)
+                            logger.info("%s saved to %s Successfully!", name, csv_path)
                         except Exception as err:
-                            logging.error(
+                            logger.error(
                                 "%s FAILED DOWNLOAD CSV in method 'to_db', since %s", name, err
                             )
                             continue
