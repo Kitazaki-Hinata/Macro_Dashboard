@@ -52,7 +52,7 @@
 #### 2. 安装依赖
 
 ```powershell
-# Windows PowerShell
+# Windows PowerShell  逐步输入
 pip install uv
 uv sync
 ```
@@ -145,10 +145,10 @@ BLS 数据代码查询：<https://beta.bls.gov/dataQuery/find>
 
 **extra function waitlist :**
 - [ ] 彭博文章添加英译中功能
+- [ ] 反彭博多次访问识别robot
 - [ ] 新板块：美债期限结构
 - [ ] 设置图表网格的透明度&颜色
 - [ ] 设立一个使用说明页面
-- [ ] 储存上次设置好的线条样式
 - [ ] 添加Table组件中复制粘贴功能
 
 
