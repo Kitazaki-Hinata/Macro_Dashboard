@@ -185,6 +185,10 @@ class UiFunctions():  # 删除:mainWindow
         # parallel executor refs
         self._parallel_exec = None
         self._cleanup_pending = False
+
+        # bbg_driver 初始化
+        self.bbg_driver = None
+
         # wire buttons
         try:
             self.main_window.download_btn.clicked.connect(self.start_download)
@@ -801,11 +805,16 @@ class UiFunctions():  # 删除:mainWindow
 
         # 传回是否成功的bool与result文章内容
         extractor = BloombergExtractor(url = bbg_url)
-        success_bool, result = extractor.edit_bbg_article()
+
+        # 提取文章的时候永远只开启一个driver，防爬虫识别
+        if self.bbg_driver is None:
+            self.bbg_driver = extractor.create_driver()
+
+        success_bool, result = extractor.edit_bbg_article(driver = self.bbg_driver)
         time.sleep(2)
         self.main_window.bbg_url_load_btn.setEnabled(True)
         self.main_window.bbg_article_showbox.setPlainText(result)
-        extractor.close_driver()
+        # extractor.close_driver()
         return
 
 
