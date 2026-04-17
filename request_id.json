@@ -672,5 +672,14 @@
     "audusd_swap": {
       "name": "AUD_USD_Forex_Swap"
     }
+  },
+
+
+  "naaim": {
+    "naaim_exposure_index_w": {
+      "name": "NAAIM_Exposure_Index",
+      "needs_pct": false,
+      "needs_cleaning": false
+    }
   }
 }
