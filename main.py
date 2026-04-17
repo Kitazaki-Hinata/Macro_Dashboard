@@ -30,6 +30,9 @@ SMART_QUOTES_MAP = {
     '\u2013': '-',  '\u2014': '-',   # 短/长破折号
     '\u00a0': ' ',                    # 不换行空格
 }
+# 预构建字符翻译表，供 `str.translate` 一次性完成全部替换，
+# 避免每次调用时反复执行多轮 `str.replace`（单次线性扫描更高效）。
+_SMART_QUOTES_TRANSLATION = str.maketrans(SMART_QUOTES_MAP)
 
 
 def _format_exception(
@@ -103,10 +106,8 @@ class SafeApplication(QApplication):
 
 
 def _normalize_smart_chars(text: str) -> str:
-    for k, v in SMART_QUOTES_MAP.items():
-        if k in text:
-            text = text.replace(k, v)
-    return text
+    # 使用预构建的翻译表一次性替换全部智能字符，O(n) 单次扫描
+    return text.translate(_SMART_QUOTES_TRANSLATION)
 
 def _load_json_raw(path: Path) -> Optional[Dict[str, Any]]:
     """底层读取函数：多编码尝试 + 智能字符清洗。"""
