@@ -393,13 +393,18 @@ class DatabaseConverter:
 			if not table_exists:
 				t0 = time.perf_counter()
 				cursor.execute("CREATE TABLE IF NOT EXISTS Time_Series(date DATE PRIMARY KEY)")
-				current_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-				while current_date <= DatabaseConverter.end_date:
-					cursor.execute(
+				# 批量生成日期序列并通过 executemany 一次性写入，避免按天逐行 INSERT 带来的大量 SQL 调用与 Python/SQLite 往返开销
+				start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+				total_days = (DatabaseConverter.end_date - start_date_obj).days + 1
+				if total_days > 0:
+					rows = [
+						((start_date_obj + timedelta(days=i)).strftime("%Y-%m-%d"),)
+						for i in range(total_days)
+					]
+					cursor.executemany(
 						"INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
-						(current_date.strftime("%Y-%m-%d"),)
+						rows
 					)
-					current_date += timedelta(days=1)
 				self.conn.commit()
 				logger.info("Time_Series table created and initialized (%.3fs)", time.perf_counter() - t0)
 				return cursor
@@ -420,27 +425,36 @@ class DatabaseConverter:
 
 				if start_date_obj < min_date:
 					t0_back = time.perf_counter()
-					dates_to_prepend: List[date] = []
-					d = min_date - timedelta(days=1)
-					while d >= start_date_obj:
-						dates_to_prepend.append(d)
-						d -= timedelta(days=1)
-					for d in reversed(dates_to_prepend):
-						cursor.execute("INSERT OR IGNORE INTO Time_Series (date) VALUES (?)", (d.strftime("%Y-%m-%d"),))
-					self.conn.commit()
-					logger.info("Time_Series table prepended %d earlier date rows (%.3fs)", len(dates_to_prepend), time.perf_counter() - t0_back)
+					# 批量补齐 start_date 之前缺失的日期，使用 executemany 提升插入性能
+					prepend_days = (min_date - start_date_obj).days
+					if prepend_days > 0:
+						rows_prepend = [
+							((start_date_obj + timedelta(days=i)).strftime("%Y-%m-%d"),)
+							for i in range(prepend_days)
+						]
+						cursor.executemany(
+							"INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
+							rows_prepend
+						)
+						self.conn.commit()
+						logger.info("Time_Series table prepended %d earlier date rows (%.3fs)", len(rows_prepend), time.perf_counter() - t0_back)
 
 				current_date = datetime.now().date()
 				if current_date > max_date:
 					t0_fwd = time.perf_counter()
-					dates_to_add: List[date] = []
-					while current_date > max_date:
-						dates_to_add.append(current_date)
-						current_date -= timedelta(days=1)
-					for d in dates_to_add:
-						cursor.execute("INSERT OR IGNORE INTO Time_Series (date) VALUES (?)", (d.strftime("%Y-%m-%d"),))
-					self.conn.commit()
-					logger.info("Time_Series table appended %d future date rows (%.3fs)", len(dates_to_add), time.perf_counter() - t0_fwd)
+					# 批量补齐 max_date 之后到今天的日期；同样通过 executemany 减少往返
+					append_days = (current_date - max_date).days
+					rows_append = [
+						((max_date + timedelta(days=i + 1)).strftime("%Y-%m-%d"),)
+						for i in range(append_days)
+					]
+					if rows_append:
+						cursor.executemany(
+							"INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
+							rows_append
+						)
+						self.conn.commit()
+						logger.info("Time_Series table appended %d future date rows (%.3fs)", len(rows_append), time.perf_counter() - t0_fwd)
 				return cursor
 
 		except sqlite3.Error as e:

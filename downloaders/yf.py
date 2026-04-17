@@ -92,17 +92,36 @@ class YFDownloader(DataDownloader):
                 return table_name, None
 
         load_dotenv()
-        logger.info("YF submitting %d tasks (sequential execution)", len(items))
-        for tn, cfg in items:
-            _check_cancel()
+        # 通过线程池并行下载多个 yfinance 标的（IO 密集型，GIL 在网络等待期间释放），
+        # 与 FRED/BLS/BEA 下载器保持一致的并发模式。
+        # 工作线程数可由环境变量 YF_WORKERS 覆盖；默认偏小以避免触发 Yahoo 限流。
+        env_workers = os.environ.get("YF_WORKERS")
+        workers = max_workers or (
+            int(env_workers) if env_workers and env_workers.isdigit() else min(8, (os.cpu_count() or 4) * 2)
+        )
+        logger.info("YF submitting %d tasks (workers=%d)", len(items), workers)
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            future_map = {ex.submit(worker, tn, cfg): tn for tn, cfg in items}
             try:
-                name, df = worker(tn, cfg)
-                if df is not None:
-                    df_dict[name] = df
+                for fut in as_completed(future_map):
+                    _check_cancel()
+                    tn = future_map[fut]
+                    try:
+                        name, df = fut.result()
+                        if df is not None:
+                            df_dict[name] = df
+                    except CancelledError:
+                        logger.info("YF task %s cancelled", tn)
+                        raise
+                    except Exception as e:
+                        logger.error("YF task for %s raised: %s", tn, e)
             except CancelledError:
+                # 取消时立即停止派发剩余任务，避免无谓的网络请求
+                for f in future_map:
+                    f.cancel()
                 raise
-            except Exception as e:
-                logger.error("YF task for %s raised: %s", tn, e)
 
         if return_csv and df_dict:
             _check_cancel()
