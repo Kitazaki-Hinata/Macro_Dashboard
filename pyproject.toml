@@ -21,4 +21,5 @@ dependencies = [
     "numpy>=2.3.1",
     "auto-py-to-exe>=2.48.1",
     "matplotlib>=3.10.7",
+    "openpyxl>=3.1.5",
 ]
