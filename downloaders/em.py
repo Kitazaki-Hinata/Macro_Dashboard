@@ -167,11 +167,10 @@ class EMDownloader(DataDownloader):
         check_cancel()
         try:
             table_path = os.path.join(CSV_DATA_FOLDER, "A_TABLE_DATA")
-            if not os.path.exists(table_path):
-                os.makedirs(table_path)
+            # 合并 exists+makedirs 为一次 makedirs(exist_ok=True)，减少文件系统 stat 调用
+            os.makedirs(table_path, exist_ok=True)
             file_folder_path = os.path.join(table_path, file_name)
-            if not os.path.exists(file_folder_path):
-                os.makedirs(file_folder_path)
+            os.makedirs(file_folder_path, exist_ok=True)
             file_path = os.path.join(file_folder_path, f"{file_name}.csv")
             df.to_csv(file_path, index = False)
         except Exception as e:

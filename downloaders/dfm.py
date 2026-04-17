@@ -44,8 +44,8 @@ class DFMDownloader(DataDownloader):
         self.csv_folder = os.path.join(self.current_file_path, "..", "csv", "A_TABLE_DATA")
 
         # check folder exists
-        if not os.path.exists(self.csv_folder):
-            os.makedirs(self.csv_folder)
+        # 合并 exists+makedirs 为一次 makedirs(exist_ok=True)，减少文件系统 stat 调用
+        os.makedirs(self.csv_folder, exist_ok=True)
 
         # driver
         options = Options()

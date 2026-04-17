@@ -238,8 +238,8 @@ class NYFDownloader(DataDownloader):
             try:
                 single_file_folder_path = os.path.join(self.table_folder_path, data_name)
                 csv_path = os.path.join(single_file_folder_path, f"{data_name}.csv")
-                if not os.path.exists(single_file_folder_path):
-                    os.makedirs(single_file_folder_path)
+                # 合并 exists+makedirs 为一次 makedirs(exist_ok=True)
+                os.makedirs(single_file_folder_path, exist_ok=True)
                 df_single_data.to_csv(csv_path, index=True)
             except Exception as e:
                 error_msg = f"Failed to save data to csv file {data_name}: {e}"

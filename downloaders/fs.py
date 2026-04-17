@@ -153,11 +153,10 @@ class FSDownloader(DataDownloader):
         check_cancel()
         try:
             self.table_path = os.path.join(CSV_DATA_FOLDER, "A_TABLE_DATA")
-            if not os.path.exists(self.table_path):
-                os.makedirs(self.table_path)
+            # 合并 exists+makedirs 为一次 makedirs(exist_ok=True)，减少文件系统 stat 调用
+            os.makedirs(self.table_path, exist_ok=True)
             self.file_folder_path = os.path.join(self.table_path, file_name)
-            if not os.path.exists(self.file_folder_path):
-                os.makedirs(self.file_folder_path)
+            os.makedirs(self.file_folder_path, exist_ok=True)
             self.file_path = os.path.join(self.file_folder_path, f"{file_name}.csv")
             df.to_csv(self.file_path, index = False)
         except Exception as e:
