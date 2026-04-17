@@ -34,6 +34,9 @@ CSV_DATA_FOLDER = DOWNLOADERS_ROOT.parent / "csv"
 # 全局 DB 写锁，避免并发写入 SQLite 导致数据丢失或锁冲突
 DB_WRITE_LOCK = threading.Lock()
 
+# HTTP 非重试型客户端错误状态码（遇到这些状态立即失败，避免无意义的重试）
+_NON_RETRIABLE_CLIENT_STATUSES = frozenset({400, 401, 403, 404, 405, 406, 410, 422})
+
 # 模块级 logger（与异步日志模块配合使用）
 logger = logging.getLogger(__name__)
 
@@ -107,7 +110,8 @@ def http_get_with_retry(url: str, *, params: Optional[Dict[str, Any]] = None, he
 			logger.info("HTTP GET %s attempt=%d status=%s in %.3fs", url, i, status, dt)
 			if resp.ok:
 				return resp
-			if status is not None and 400 <= int(status) < 500 and int(status) in {400, 401, 403, 404, 405, 406, 410, 422}:
+			# 明确的非重试型客户端错误（集合成员判断已隐含 4xx 范围）
+			if status is not None and int(status) in _NON_RETRIABLE_CLIENT_STATUSES:
 				raise Exception(f"non-retriable client error: status={status}")
 			last_exc = Exception(f"status={status}")
 		except Exception as e:
@@ -139,7 +143,8 @@ def http_post_with_retry(url: str, *, data: Any = None, json_data: Any = None, h
 			logger.info("HTTP POST %s attempt=%d status=%s in %.3fs", url, i, status, dt)
 			if resp.ok:
 				return resp
-			if status is not None and 400 <= int(status) < 500 and int(status) in {400, 401, 403, 404, 405, 406, 410, 422}:
+			# 明确的非重试型客户端错误（集合成员判断已隐含 4xx 范围）
+			if status is not None and int(status) in _NON_RETRIABLE_CLIENT_STATUSES:
 				raise Exception(f"non-retriable client error: status={status}")
 			last_exc = Exception(f"status={status}")
 		except Exception as e:
@@ -394,12 +399,16 @@ class DatabaseConverter:
 				t0 = time.perf_counter()
 				cursor.execute("CREATE TABLE IF NOT EXISTS Time_Series(date DATE PRIMARY KEY)")
 				current_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+				# 使用 executemany 批量插入，显著减少单行 INSERT 的 Python/SQLite 往返开销
+				rows: List[Tuple[str]] = []
 				while current_date <= DatabaseConverter.end_date:
-					cursor.execute(
-						"INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
-						(current_date.strftime("%Y-%m-%d"),)
-					)
+					rows.append((current_date.strftime("%Y-%m-%d"),))
 					current_date += timedelta(days=1)
+				if rows:
+					cursor.executemany(
+						"INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
+						rows,
+					)
 				self.conn.commit()
 				logger.info("Time_Series table created and initialized (%.3fs)", time.perf_counter() - t0)
 				return cursor
@@ -425,8 +434,12 @@ class DatabaseConverter:
 					while d >= start_date_obj:
 						dates_to_prepend.append(d)
 						d -= timedelta(days=1)
-					for d in reversed(dates_to_prepend):
-						cursor.execute("INSERT OR IGNORE INTO Time_Series (date) VALUES (?)", (d.strftime("%Y-%m-%d"),))
+					if dates_to_prepend:
+						# 逆序后批量写入，保持原有按时间升序插入的行为
+						cursor.executemany(
+							"INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
+							[(d.strftime("%Y-%m-%d"),) for d in reversed(dates_to_prepend)],
+						)
 					self.conn.commit()
 					logger.info("Time_Series table prepended %d earlier date rows (%.3fs)", len(dates_to_prepend), time.perf_counter() - t0_back)
 
@@ -437,8 +450,12 @@ class DatabaseConverter:
 					while current_date > max_date:
 						dates_to_add.append(current_date)
 						current_date -= timedelta(days=1)
-					for d in dates_to_add:
-						cursor.execute("INSERT OR IGNORE INTO Time_Series (date) VALUES (?)", (d.strftime("%Y-%m-%d"),))
+					if dates_to_add:
+						# 批量插入新增的未来日期
+						cursor.executemany(
+							"INSERT OR IGNORE INTO Time_Series (date) VALUES (?)",
+							[(d.strftime("%Y-%m-%d"),) for d in dates_to_add],
+						)
 					self.conn.commit()
 					logger.info("Time_Series table appended %d future date rows (%.3fs)", len(dates_to_add), time.perf_counter() - t0_fwd)
 				return cursor
