@@ -36,15 +36,13 @@ class CMEfedWatchDownloader(DataDownloader):
         self.json_dict: Dict[str, Dict[str, Any]] = json_dict
 
 
-        # 创建文件夹
+        # 创建文件夹：统一使用 makedirs(exist_ok=True) 一次到位，避免多余的 exists 检查
         table_data_folder_path = os.path.join(os.fspath(CSV_DATA_FOLDER), "A_TABLE_DATA")
-        if not os.path.exists(table_data_folder_path):
-            os.makedirs(table_data_folder_path, exist_ok=True)  # exist_ok 创建文件夹的时候，如果文件夹已经存在，则不报错
+        os.makedirs(table_data_folder_path, exist_ok=True)  # exist_ok 创建文件夹的时候，如果文件夹已经存在，则不报错
 
         # cme_fedwatch 文件夹
         self.cme_folder_path = os.path.join(os.fspath(table_data_folder_path), "fed_watch")
-        if not os.path.exists(self.cme_folder_path):
-            os.makedirs(self.cme_folder_path, exist_ok=True)
+        os.makedirs(self.cme_folder_path, exist_ok=True)
 
 
         # create new webdriver

@@ -37,6 +37,13 @@ DB_WRITE_LOCK = threading.Lock()
 # 模块级 logger（与异步日志模块配合使用）
 logger = logging.getLogger(__name__)
 
+# 预编译的正则：在 _format_converter 等热路径中反复使用，
+# 提前编译可避免每次调用都依赖 re 模块的内部缓存命中。
+_RE_BEA_YEAR = re.compile(r"\d{4}")            # BEA 年度格式 如 "2024"
+_RE_BEA_QUARTER = re.compile(r"\d{4}Q[1-4]")   # BEA 季度格式 如 "2024Q1"
+_RE_BEA_MONTH = re.compile(r"\d{4}M\d{2}")     # BEA 月度格式 如 "2024M03"
+_RE_SAFE_IDENT = re.compile(r"[A-Za-z0-9_]+")  # SQL 标识符白名单（防注入）
+
 
 class CancelledError(RuntimeError):
 	"""Raised when a download operation is cancelled by the caller."""
@@ -246,12 +253,13 @@ class DatabaseConverter:
 		logger.debug("_format_converter start: data=%s empty=%s columns=%s index_name=%s shape=%s", data_name, df.empty, list(df.columns), getattr(df.index, "name", None), tuple(df.shape))
 		try:
 			sample = str(df.index[0]) if len(df.index) else ""
-			if re.fullmatch(r"\d{4}", sample):
+			# 使用模块级预编译正则，避免反复编译
+			if _RE_BEA_YEAR.fullmatch(sample):
 				logger.debug("_format_converter matched BEA annual for %s (sample=%s)", data_name, sample)
 				df["date"] = [f"{int(y)}-12-31" for y in df.index.astype(str)]
 				df = DatabaseConverter._rename_bea_date_col(df)
 				return finalize_with_date_first(df.rename_axis(None, axis=1))
-			if re.fullmatch(r"\d{4}Q[1-4]", sample):
+			if _RE_BEA_QUARTER.fullmatch(sample):
 				logger.debug("_format_converter matched BEA quarterly for %s (sample=%s)", data_name, sample)
 
 				def q_to_date(s: str) -> str:
@@ -267,7 +275,7 @@ class DatabaseConverter:
 				df["date"] = [q_to_date(str(s)) for s in df.index]
 				df = DatabaseConverter._rename_bea_date_col(df)
 				return finalize_with_date_first(df)
-			if re.fullmatch(r"\d{4}M\d{2}", sample):
+			if _RE_BEA_MONTH.fullmatch(sample):
 				logger.debug("_format_converter matched BEA monthly for %s (sample=%s)", data_name, sample)
 
 				def m_to_date(s: str) -> str:
@@ -481,7 +489,7 @@ class DatabaseConverter:
 			data_cols: List[str] = [c for c in existing_cols if c != "date"]
 			for c in data_cols:
 				t = col_type_map.get(c, "REAL")
-				if not re.fullmatch(r"[A-Za-z0-9_]+", t):
+				if not _RE_SAFE_IDENT.fullmatch(t):
 					t = "REAL"
 				create_cols_def.append(f"{c} {t}")
 			create_sql = f"CREATE TABLE Time_Series_new ({', '.join(create_cols_def)})"
@@ -544,7 +552,7 @@ class DatabaseConverter:
 								df_full.loc[df_full.index[:first_valid_pos + 1], data_name] = first_valid_value
 						df_full[data_name] = df_full[data_name].ffill()
 
-						if not re.fullmatch(r"[A-Za-z0-9_]+", data_name):
+						if not _RE_SAFE_IDENT.fullmatch(data_name):
 							logger.error("Invalid column name '%s', abort writing", data_name)
 							return
 						try:
@@ -562,18 +570,35 @@ class DatabaseConverter:
 							except sqlite3.Error:
 								pass
 
-						update_rows: List[Tuple[float, str]] = []
-						for date_str, v in df_full[["date", data_name]].itertuples(index=False, name=None):
-							if pd.isna(v):
-								continue
-							ds = str(date_str)
-							if only_fill_null:
-								if ds in existing_map and existing_map[ds] is not None:
-									continue
-							elif not overwrite_existing:
-								if ds in existing_map and existing_map[ds] is not None:
-									continue
-							update_rows.append((float(v), ds))
+						# 向量化构建待更新行：
+						# 1) 先用布尔掩码过滤掉 NaN 行（原循环中 `if pd.isna(v): continue`）；
+						# 2) 当需要跳过已有非空值时，再用一次基于 existing_map 的向量过滤，
+						#    取代原先的逐行 `if ds in existing_map ...` 判断。
+						# 仅在最终压缩后的小数组上构造元组列表，大幅减少 Python 循环开销。
+						sub = df_full[["date", data_name]]
+						mask = sub[data_name].notna().to_numpy(dtype=bool, copy=False)
+						if existing_map and (only_fill_null or not overwrite_existing):
+							# 构造「已有非空值的日期集合」用于向量过滤
+							skip_dates = {
+								d for d, v in existing_map.items() if v is not None
+							}
+							if skip_dates:
+								date_arr = sub["date"].to_numpy()
+								keep = np.fromiter(
+									(str(d) not in skip_dates for d in date_arr),
+									count=len(date_arr),
+									dtype=bool,
+								)
+								mask &= keep
+						if mask.any():
+							filtered = sub[mask]
+							dates_arr = filtered["date"].astype(str).to_numpy()
+							vals_arr = filtered[data_name].astype(float).to_numpy()
+							update_rows: List[Tuple[float, str]] = list(
+								zip(vals_arr.tolist(), dates_arr.tolist())
+							)
+						else:
+							update_rows = []
 						t_sql = time.perf_counter()
 						if update_rows:
 							cursor.executemany(
