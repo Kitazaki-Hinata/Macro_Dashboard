@@ -482,6 +482,18 @@
       "code": "PCOPPUSDM",
       "needs_pct": false,
       "needs_cleaning": false
+    },
+    "crude_oil_ending_stocks_w": {
+      "name": "US_Crude_Oil_Ending_Stocks",
+      "code": "WCESTUS1",
+      "needs_pct": false,
+      "needs_cleaning": false
+    },
+    "refinery_utilization_rate_w": {
+      "name": "US_Refinery_Utilization_Rate",
+      "code": "WPULEUS3",
+      "needs_pct": false,
+      "needs_cleaning": false
     }
   },
 
