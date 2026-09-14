@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Macro Dashboard Bloomberg Bridge",
+  "version": "1.0.0",
+  "description": "将工作台请求的彭博文章页面 JSON 传回本机 Macro Dashboard。",
+  "permissions": ["storage"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [
+    {
+      "matches": ["http://127.0.0.1/bbg/connect*"],
+      "js": ["connect.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.bloomberg.com/*", "https://bloomberg.com/*"],
+      "js": ["article.js"],
+      "run_at": "document_end"
+    }
+  ]
+}

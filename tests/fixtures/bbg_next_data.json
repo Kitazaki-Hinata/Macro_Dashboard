@@ -1,0 +1,23 @@
+{
+  "props": {
+    "pageProps": {
+      "story": {
+        "title": "Synthetic test article",
+        "body": {
+          "content": [
+            {"type": "heading", "content": [{"type": "text", "value": "Ignored heading"}]},
+            {"type": "paragraph", "content": [
+              {"type": "text", "value": "测试段落："},
+              {"type": "entity", "content": [{"type": "text", "value": "实体与"}]},
+              {"type": "link", "content": [{"type": "text", "value": "链接。"}]}
+            ]},
+            {"type": "paragraph", "content": [{"type": "text", "value": "   "}]},
+            {"type": "paragraph", "content": [{"type": "text", "value": "Second paragraph — preserved."}]}
+          ]
+        }
+      }
+    }
+  },
+  "page": "/news/articles/[...slug]",
+  "buildId": "synthetic-test"
+}
