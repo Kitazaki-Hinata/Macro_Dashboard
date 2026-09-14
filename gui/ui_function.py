@@ -11,6 +11,8 @@ import logging
 import sqlite3
 import json
 import math
+from queue import Empty, Queue
+from threading import Thread
 from datetime import datetime
 from typing import Optional, Dict, Any, Protocol
 import pyqtgraph as pg
@@ -188,6 +190,14 @@ class UiFunctions():  # 删除:mainWindow
 
         # bbg_driver 初始化
         self.bbg_driver = None
+        self._bbg_results = Queue()
+        self._bbg_thread = None
+        self._bbg_timer = QTimer(main_window)
+        self._bbg_timer.setInterval(100)
+        self._bbg_timer.timeout.connect(self._poll_bbg_article)
+        app = QApplication.instance()
+        if app is not None:
+            app.aboutToQuit.connect(self._cancel_bbg_read)
 
         # wire buttons
         try:
@@ -793,16 +803,18 @@ class UiFunctions():  # 删除:mainWindow
 
     '''BLOOMBERG PAGE SLOTS METHODS'''
     def bbg_load_article(self):
+        if self._bbg_thread is not None:
+            return
         self.main_window.bbg_url_load_btn.setDisabled(True)
         self.main_window.bbg_article_showbox.setStyleSheet("color: #ffffff")
-        self.main_window.bbg_article_showbox.setPlainText("Waiting... 正在薅资本主义羊毛...")
-        bbg_url: str = self.main_window.url_entry.text()
+        self.main_window.bbg_article_showbox.setPlainText(
+            "正在连接日常浏览器并等待文章数据… 首次使用请按浏览器页面提示加载扩展；如有验证码，可在浏览器中手动处理。")
+        bbg_url: str = self.main_window.url_entry.text().strip()
 
         # 验证 URL 是否以 https 开头
         if not bbg_url.startswith('https'):
             self.main_window.bbg_article_showbox.setPlainText("Error: URL must start with https")
             self.main_window.bbg_article_showbox.setStyleSheet("color: #ff6b6b")
-            time.sleep(2)
             self.main_window.bbg_url_load_btn.setEnabled(True)
             return
 
@@ -810,23 +822,46 @@ class UiFunctions():  # 删除:mainWindow
         if not bbg_url.startswith('https://www.bloomberg.com/'):
             self.main_window.bbg_article_showbox.setPlainText("Error: Invalid Bloomberg URL format")
             self.main_window.bbg_article_showbox.setStyleSheet("color: #ff6b6b")
-            time.sleep(2)
             self.main_window.bbg_url_load_btn.setEnabled(True)
             return
 
-        # 传回是否成功的bool与result文章内容
-        extractor = BloombergExtractor(url = bbg_url)
+        try:
+            extractor = BloombergExtractor(url=bbg_url)
+            if self.bbg_driver is None:
+                self.bbg_driver = extractor.create_driver()
+            self._bbg_thread = Thread(target=self._read_bbg_article, args=(extractor, self.bbg_driver), daemon=True)
+            self._bbg_thread.start()
+            self._bbg_timer.start()
+        except Exception as exc:
+            self._bbg_thread = None
+            self.main_window.bbg_article_showbox.setPlainText(f"读取失败：{exc}")
+            self.main_window.bbg_article_showbox.setStyleSheet("color: #ff6b6b")
+            self.main_window.bbg_url_load_btn.setEnabled(True)
 
-        # 提取文章的时候永远只开启一个driver，防爬虫识别
-        if self.bbg_driver is None:
-            self.bbg_driver = extractor.create_driver()
+    def _read_bbg_article(self, extractor, browser):
+        # Worker thread touches no Qt widgets. The existing parser returns the result.
+        try:
+            result = extractor.edit_bbg_article(driver=browser)
+        except Exception as exc:
+            logging.getLogger(__name__).exception("Bloomberg article extraction failed")
+            result = (False, f"读取失败：{exc}")
+        self._bbg_results.put(result)
 
-        success_bool, result = extractor.edit_bbg_article(driver = self.bbg_driver)
-        time.sleep(2)
+    def _poll_bbg_article(self):
+        try:
+            success_bool, result = self._bbg_results.get_nowait()
+        except Empty:
+            return
+        self._bbg_timer.stop()
+        self._bbg_thread = None
         self.main_window.bbg_url_load_btn.setEnabled(True)
+        self.main_window.bbg_article_showbox.setStyleSheet("color: #ffffff" if success_bool else "color: #ff6b6b")
         self.main_window.bbg_article_showbox.setPlainText(result)
-        # extractor.close_driver()
-        return
+
+    def _cancel_bbg_read(self):
+        self._bbg_timer.stop()
+        if self.bbg_driver is not None:
+            self.bbg_driver.close()
 
 
     '''ONE CHART PAGE SETTINGS SLOTS METHODS'''
