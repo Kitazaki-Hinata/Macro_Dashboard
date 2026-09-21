@@ -2,7 +2,7 @@
   <img src="readme/chart.png" alt="Chart Example">
 </p>
 <h2 align="center">Macro Dashboard</h2>
-  <p align="center">A free macro data visualization software.</p>
+  <p align="center">A lightweight desktop workspace for macroeconomic data analysis.</p>
 
 
 <p align="center">
@@ -11,9 +11,9 @@
 
 > Author: Kitazaki Hinata, SeaStar, yuyoux7
 
-**<p style="color:red"> - This program is for learning and academic research purposes ONLY. Please comply with the terms of use of the target websites.</p>**
+**<p style="color:red"> - This program is intended for learning and academic research. Please comply with the source websites' terms of use.</p>**
 
-**<p style="color:red"> - Chart data is for analytical reference only. Actual data should be verified with official data sources.</p>**
+**<p style="color:red"> - Chart data is provided for analytical reference. Please verify values against the official data sources.</p>**
 
 **<p style="color:red"> - Users are responsible for any risks associated with using the program. The author is not liable for any consequences resulting from the use of the program.</p>**
 
@@ -22,12 +22,12 @@
 
 ### 1. Project Description
 
-The purpose of this project is to conveniently aggregate different macroeconomic data for comparison (frequently opening various webpages to extract data is too cumbersome).
-This project uses scripts to obtain macroeconomic data, downloads the data to a local database (data.db) file, and generates integrated charts.
-The available data for download will be continuously updated.
+Macro Dashboard is a desktop application built with Python and PySide6 for organizing and exploring macroeconomic data in educational and research settings. It brings together data from BEA, FRED, BLS, Yahoo Finance, TradingEconomics, and other sources, with support for data downloads, CSV export, and chart and table views. By reducing repetitive data collection across platforms, it enables users to compare historical trends in a single interface and explore potential lead and lag relationships through time shifts. The application also provides browser-assisted reading and text organization for Bloomberg news, bringing article text supplied by the source page into the workspace to support analysis in the context of economic news. Content availability depends on the data returned by the page, and use is subject to the source website's access permissions and terms of use.
+Source-specific download modules share a common interface for data retrieval, format conversion, and storage. Time series are stored locally in a SQLite database (data.db) and displayed in interactive charts using PyQtGraph. Downloaded data can also be saved as CSV files for further analysis.
+The data catalog and project configuration define the current coverage, with additional indicators planned for future updates. Historical coverage, update frequency, and statistical definitions depend on the original data source and should be considered when comparing indicators. Before downloading, ensure that your network can reach the selected sources and configure a proxy or VPN if needed. Keep browser windows opened by automated data downloads running and avoid manual interactions that could interrupt the process. Avoid repeated download requests in quick succession to stay within API quotas and access rate limits.
 
 
-### 2. Preparation and Usage Instructions (Incl. env config, API key acquisition)
+### 2. Setup and Usage (Environment Configuration and API Keys)
 
 #### 1. Python Environment
 
@@ -43,7 +43,7 @@ uv sync
 
 
 #### 3. Obtain API Keys
-Please visit the following addresses to obtain free API keys:
+Request the relevant API keys from the following data providers:
 ```ini
 BEA: https://apps.bea.gov/api/signup/
 FRED St. Louis: https://fredaccount.stlouisfed.org/apikeys
@@ -51,31 +51,31 @@ BLS: https://data.bls.gov/registrationEngine/
 ```
 
 #### 4. Usage Instructions
-Open the software, click the "Settings" button at the bottom of the left sidebar, and fill in the API keys in the corresponding fields. Alternatively, create a new file named .env in the project root directory and write the API keys as follows:
+Start the application by running python main.py, or double-click main.bat on Windows. On first launch, click the "Settings" button at the bottom of the left sidebar and enter your API keys in the corresponding fields at the top left. Alternatively, create a file named .env in the project root directory and enter the API keys as follows:
 
 ```ini
 bea = "XXXXXX-YOUR-API-KEY"
 fred = "YOURAPIKEY-123456"
 bls = "YOUR-API-KEY-000000"
 ```
-If data has not been downloaded, select the start year (the earliest year currently supported is 2020), check the agreement box, and click the download button to download the data.
+If you have not yet downloaded any data, select a start year (the earliest year currently supported by the interface is 2020), read and accept the usage notice, and click the download button.
 
-After the download is complete, click the buttons on the left sidebar to navigate to the desired interface. Set the data you want to display in the top left corner and click confirm.
+Once the download is complete, use the left sidebar to open the desired view. Select the data to display at the top left and click confirm.
 
 
 ### 3. Data Overview
-View the current list of available data
+[View the current data catalog](data_available.html)
 
-#### Partial Data Sources
+#### Selected Data Sources
 - Yahoo Finance API
 - BEA API
 - FRED API
-- BLS API (Note: This API requires a non-China IP for access)
+- BLS API (Availability depends on your network environment and the provider's access restrictions)
 - TradingEconomics
-- Data from other sources
+- Additional data sources are planned
 
-### 4. Other Information
-**Open Source License :** MIT-Non-Commercial license (See LICENSE file in the root directory)
+### 4. Software License, Architecture, and Other Information
+**Software License :** MIT Non-Commercial License (MIT-NC), for non-commercial use only. See the LICENSE file in the project root for the full terms. The data processing architecture and interfaces are described in the [architecture documentation](structure.md) (in Chinese).
 
 **BLS Data Code Query :** https://beta.bls.gov/dataQuery/find
 
